@@ -1,74 +1,51 @@
 # Python
 __pycache__/
 *.py[cod]
-*$py.class
 *.so
 .Python
 env/
 venv/
 ENV/
 build/
-develop-eggs/
 dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
-*.egg
 
 # Database
 *.db
 *.sqlite
 *.sqlite3
 instance/
-*.db-journal
 
-# Environment variables
+# Environment
 .env
 .env.local
 .env.production
-.env.*.local
 
 # IDE
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
 .DS_Store
-Thumbs.db
 
-# Uploads (keep structure but not files)
-frontend/static/uploads/*/
-!frontend/static/uploads/*/.gitkeep
-frontend/static/uploads/*/*
+# Uploads - ONLY ignore temp files, but keep images
+frontend/static/uploads/temp/
+frontend/static/uploads/*/.gitkeep
+frontend/static/uploads/test/
 
 # Logs
 *.log
-logs/
-
-# Backup files
-*.bak
-*.backup
-*.ipynb_checkpoints/
 
 # Jupyter
 .ipynb_checkpoints/
 *.ipynb
 
-# Local config
-config.local.py
+# Backup files
+*.bak
+*.backup
 
-# Render specific
-.env.render
-
-# Test files
-test_*.py
-*_test.py
+# Check scripts (temporary)
+check_local_data.py
+cleanup_project.py
+backup_existing_data.py
+*.mov
+*.MP4
+*.mp4
