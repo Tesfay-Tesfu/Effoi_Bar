@@ -1,0 +1,100 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Hero Sliders - EFFOI Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Hero Sliders</h1>
+    <a href="{{ url_for('admin_add_slider') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Add New Slide
+    </a>
+</div>
+
+<div class="row">
+    {% for slider in sliders %}
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="position-relative">
+                {% if slider.image_url %}
+                <img src="{{ slider.image_url }}" class="card-img-top" alt="{{ slider.title }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="fas fa-image fa-3x text-white-50"></i>
+                </div>
+                {% endif %}
+                <span class="position-absolute top-0 end-0 badge bg-{{ 'success' if slider.is_active else 'secondary' }} m-3">
+                    {{ 'Active' if slider.is_active else 'Inactive' }}
+                </span>
+                <span class="position-absolute top-0 start-0 badge bg-primary m-3">
+                    Order: {{ slider.display_order }}
+                </span>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">{{ slider.title }}</h5>
+                {% if slider.subtitle %}
+                <p class="card-text text-muted">{{ slider.subtitle }}</p>
+                {% endif %}
+                <p class="small">
+                    <strong>Button:</strong> {{ slider.button_text }} → {{ slider.button_link }}
+                </p>
+                
+                <div class="btn-group w-100">
+                    <a href="{{ url_for('admin_edit_slider', slider_id=slider.id) }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <form method="POST" action="{{ url_for('admin_toggle_slider', slider_id=slider.id) }}" style="display: inline;">
+                        <button type="submit" class="btn btn-sm btn-{{ 'warning' if slider.is_active else 'success' }}">
+                            <i class="fas fa-{{ 'eye-slash' if slider.is_active else 'eye' }}"></i> 
+                            {{ 'Deactivate' if slider.is_active else 'Activate' }}
+                        </button>
+                    </form>
+                    <button class="btn btn-sm btn-danger" onclick="confirmDelete({{ slider.id }})">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-images fa-4x text-muted mb-3"></i>
+                <h4>No Hero Slides Found</h4>
+                <p class="text-muted">Click "Add New Slide" to create your first hero slider.</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this slide? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmDelete(id) {
+    document.getElementById('deleteForm').action = "{{ url_for('admin_delete_slider', slider_id=0) }}".replace('0', id);
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
+{% endblock %}

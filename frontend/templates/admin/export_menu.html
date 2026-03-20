@@ -1,0 +1,35 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Export Menu - EFFOI Admin{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Export Menu to JSON</h5>
+            </div>
+            <div class="card-body text-center py-5">
+                <i class="fas fa-file-code fa-5x text-primary mb-4"></i>
+                <h3>Export Menu Data</h3>
+                <p class="text-muted mb-4">Download all menu items and categories as a JSON file for backup or import into another system.</p>
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    The export includes:
+                    <ul class="mt-2 text-start">
+                        <li>All menu categories</li>
+                        <li>All menu items with descriptions, prices, and metadata</li>
+                        <li>Item flags (special, popular, active)</li>
+                        <li>Display orders</li>
+                    </ul>
+                </div>
+                
+                <a href="{{ url_for('admin_download_menu_json') }}" class="btn btn-primary btn-lg px-5">
+                    <i class="fas fa-download"></i> Download Menu JSON
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

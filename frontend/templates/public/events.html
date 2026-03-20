@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Club Events - EFFOI Restaurant{% endblock %}
+
+{% block content %}
+<div class="my-5">
+    <h1 class="display-3 text-center mb-5" data-aos="fade-up">Club Events at EFFOI</h1>
+    
+    <!-- Upcoming Events -->
+    <h2 class="mb-4" data-aos="fade-right">Upcoming Events</h2>
+    <div class="row g-4 mb-5">
+        {% if upcoming %}
+            {% for event in upcoming %}
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden h-100">
+                    <div class="position-relative">
+                        {% if event.image_url %}
+                        <img src="{{ event.image_url }}" class="card-img-top" alt="{{ event.title }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                        <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2070" class="card-img-top" alt="Event" style="height: 200px; object-fit: cover;">
+                        {% endif %}
+                        <span class="position-absolute top-0 end-0 bg-danger text-white px-3 py-2 m-3 rounded-pill">
+                            <i class="far fa-calendar-alt me-1"></i> {{ event.event_date.strftime('%b %d') }}
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ event.title }}</h5>
+                        <p class="card-text text-muted">{{ event.description|default('Join us for an unforgettable evening!') }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="far fa-clock text-danger me-1"></i> {{ event.event_time|default('8:00 PM') }}
+                                <i class="fas fa-map-marker-alt text-danger ms-3 me-1"></i> {{ event.location|default('Main Hall') }}
+                            </div>
+                            {% if event.price and event.price > 0 %}
+                            <span class="badge bg-warning text-dark">${{ "%.2f"|format(event.price) }}</span>
+                            {% else %}
+                            <span class="badge bg-success">Free Entry</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                <h4>No Upcoming Events</h4>
+                <p class="text-muted">Check back soon for exciting events!</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Event Gallery - FIXED: Show ALL images regardless of event date -->
+    <h2 class="mb-4" data-aos="fade-right">Event Gallery</h2>
+    
+    {# Get all images from all events #}
+    {% set all_images = [] %}
+    {% for event in events %}  {# Use 'events' which contains all events #}
+        {% if event.gallery_images and event.gallery_images|length > 0 %}
+            {% for image in event.gallery_images %}
+                {% if image.is_active %}
+                    {# Add to our collection #}
+                    {% set temp = all_images.append({
+                        'url': image.image_url,
+                        'title': image.title or event.title,
+                        'event_title': event.title,
+                        'event_date': event.event_date
+                    }) %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+    
+    {% if all_images|length > 0 %}
+        <div class="row g-4">
+            {% for image in all_images %}
+            <div class="col-md-4 col-lg-3" data-aos="zoom-in" data-aos-delay="{{ loop.index * 50 }}">
+                <div class="image-frame" style="height: 200px; cursor: pointer;" 
+                     onclick="openImageModal('{{ image.url }}', '{{ image.title }}')">
+                    <img src="{{ image.url }}" class="w-100 h-100" 
+                         alt="{{ image.title }}" 
+                         style="object-fit: cover;"
+                         onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2070';">
+                    <div class="image-overlay">
+                        <small>{{ image.title }}</small>
+                        <br>
+                        <small class="text-warning">{{ image.event_date.strftime('%b %d, %Y') }}</small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Default gallery images -->
+        <div class="row g-4">
+            <div class="col-md-4 col-lg-3">
+                <div class="image-frame" style="height: 200px; cursor: pointer;" onclick="openImageModal('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2070')">
+                    <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2070" class="w-100 h-100" alt="Event" style="object-fit: cover;">
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <div class="image-frame" style="height: 200px; cursor: pointer;" onclick="openImageModal('https://images.unsplash.com/photo-1501286353178-1ec871214cf9?q=80&w=2070')">
+                    <img src="https://images.unsplash.com/photo-1501286353178-1ec871214cf9?q=80&w=2070" class="w-100 h-100" alt="Event" style="object-fit: cover;">
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <div class="image-frame" style="height: 200px; cursor: pointer;" onclick="openImageModal('https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=2070')">
+                    <img src="https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=2070" class="w-100 h-100" alt="Event" style="object-fit: cover;">
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <div class="image-frame" style="height: 200px; cursor: pointer;" onclick="openImageModal('https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070')">
+                    <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070" class="w-100 h-100" alt="Event" style="object-fit: cover;">
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-3 text-muted">
+            <p>No gallery images yet. Check back after our events!</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-body text-center">
+                <img src="" id="modalImage" class="img-fluid rounded-4" style="max-height: 80vh;">
+                <p id="modalCaption" class="text-white mt-2"></p>
+                <button type="button" class="btn btn-light mt-3 rounded-pill" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .image-frame {
+        position: relative;
+        border-radius: 5%;
+        overflow: hidden;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        transition: all 0.3s ease;
+    }
+    .image-frame:hover {
+        transform: scale(1.05);
+        box-shadow: 0 25px 50px rgba(139, 30, 30, 0.2);
+    }
+    .image-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(0,0,0,0.8));
+        color: white;
+        padding: 0.5rem;
+        font-size: 0.8rem;
+        text-align: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        transform: translateY(0);
+    }
+    .image-frame:hover .image-overlay {
+        opacity: 1;
+    }
+</style>
+
+{% block extra_js %}
+<script>
+function openImageModal(imageUrl, caption) {
+    document.getElementById('modalImage').src = imageUrl;
+    document.getElementById('modalCaption').textContent = caption || '';
+    new bootstrap.Modal(document.getElementById('imageModal')).show();
+}
+</script>
+{% endblock %}
+{% endblock %}

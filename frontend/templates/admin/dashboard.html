@@ -1,0 +1,240 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Dashboard - EFFOI Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Dashboard</h1>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-muted mb-2">Pending Blog Posts</h6>
+                    <h2 class="mb-0">{{ pending_posts }}</h2>
+                </div>
+                <div class="bg-warning bg-opacity-10 p-3 rounded-circle">
+                    <i class="fas fa-blog fa-2x text-warning"></i>
+                </div>
+            </div>
+            <a href="{{ url_for('admin_blog') }}" class="btn btn-sm btn-outline-warning w-100 mt-3">Manage</a>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-muted mb-2">Pending Comments</h6>
+                    <h2 class="mb-0">{{ pending_comments }}</h2>
+                </div>
+                <div class="bg-info bg-opacity-10 p-3 rounded-circle">
+                    <i class="fas fa-comments fa-2x text-info"></i>
+                </div>
+            </div>
+            <a href="{{ url_for('admin_comments') }}" class="btn btn-sm btn-outline-info w-100 mt-3">Manage</a>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-muted mb-2">Pending Reviews</h6>
+                    <h2 class="mb-0">{{ pending_reviews }}</h2>
+                </div>
+                <div class="bg-danger bg-opacity-10 p-3 rounded-circle">
+                    <i class="fas fa-star fa-2x text-danger"></i>
+                </div>
+            </div>
+            <a href="{{ url_for('admin_reviews') }}" class="btn btn-sm btn-outline-danger w-100 mt-3">Manage</a>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-muted mb-2">Pending Reservations</h6>
+                    <h2 class="mb-0">{{ pending_reservations }}</h2>
+                </div>
+                <div class="bg-success bg-opacity-10 p-3 rounded-circle">
+                    <i class="fas fa-calendar-check fa-2x text-success"></i>
+                </div>
+            </div>
+            <a href="{{ url_for('admin_reservations') }}" class="btn btn-sm btn-outline-success w-100 mt-3">Manage</a>
+        </div>
+    </div>
+</div>
+
+<!-- Second Row Stats -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-muted mb-2">Total Menu Items</h6>
+                    <h2 class="mb-0">{{ total_menu }}</h2>
+                </div>
+                <div class="bg-primary bg-opacity-10 p-3 rounded-circle">
+                    <i class="fas fa-utensils fa-2x text-primary"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-muted mb-2">Hero Slides</h6>
+                    <h2 class="mb-0">{{ hero_sliders_count }}</h2>
+                </div>
+                <div class="bg-info bg-opacity-10 p-3 rounded-circle">
+                    <i class="fas fa-images fa-2x text-info"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-muted mb-2">Gallery Images</h6>
+                    <h2 class="mb-0">{{ gallery_count }}</h2>
+                </div>
+                <div class="bg-secondary bg-opacity-10 p-3 rounded-circle">
+                    <i class="fas fa-photo-video fa-2x text-secondary"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Reservations</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for res in recent_reservations %}
+                            <tr>
+                                <td>{{ res.customer_name }}</td>
+                                <td>{{ res.reservation_date.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ res.reservation_time }}</td>
+                                <td>
+                                    <span class="badge bg-{% if res.status == 'confirmed' %}success{% elif res.status == 'pending' %}warning{% else %}secondary{% endif %}">
+                                        {{ res.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center">No recent reservations</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Reviews</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Customer</th>
+                                <th>Rating</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for review in recent_reviews %}
+                            <tr>
+                                <td>{{ review.customer_name }}</td>
+                                <td>
+                                    {% for i in range(review.rating) %}
+                                        <i class="fas fa-star text-warning small"></i>
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-{% if review.is_approved %}success{% else %}warning{% endif %}">
+                                        {{ 'Approved' if review.is_approved else 'Pending' }}
+                                    </span>
+                                </td>
+                                <td>{{ review.created_at.strftime('%Y-%m-%d') }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center">No recent reviews</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ url_for('admin_add_menu_item') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Menu Item
+                    </a>
+                    <a href="{{ url_for('admin_add_event') }}" class="btn btn-success">
+                        <i class="fas fa-calendar-plus"></i> Add Event
+                    </a>
+                    <a href="{{ url_for('admin_add_faq') }}" class="btn btn-info">
+                        <i class="fas fa-question-circle"></i> Add FAQ
+                    </a>
+                    <a href="{{ url_for('admin_hero_sliders') }}" class="btn btn-warning">
+                        <i class="fas fa-images"></i> Manage Hero Sliders
+                    </a>
+                    <a href="{{ url_for('admin_gallery') }}" class="btn btn-secondary">
+                        <i class="fas fa-photo-video"></i> Manage Gallery
+                    </a>
+                    <a href="{{ url_for('admin_time_blocks') }}" class="btn btn-dark">
+                        <i class="fas fa-clock"></i> Time Blocks
+                    </a>
+                    <a href="{{ url_for('admin_settings') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-cog"></i> Site Settings
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

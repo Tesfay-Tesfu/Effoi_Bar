@@ -1,0 +1,84 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Manage Today's Specials - EFFOI Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Today's Specials</h1>
+    <a href="{{ url_for('admin_menu') }}" class="btn btn-outline-primary">
+        <i class="fas fa-utensils"></i> View Full Menu
+    </a>
+</div>
+
+<div class="alert alert-info">
+    <i class="fas fa-info-circle"></i> Mark menu items as "Special" to display them in the Today's Specials section on the homepage.
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Menu Items</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover datatable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Special</th>
+                        <th>Popular</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td>
+                            {% if item.image_url %}
+                            <img src="{{ item.image_url }}" alt="{{ item.name }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
+                            {% else %}
+                            <div class="bg-secondary" style="width: 50px; height: 50px; border-radius: 5px;"></div>
+                            {% endif %}
+                        </td>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.category.name }}</td>
+                        <td>${{ "%.2f"|format(item.price) }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('admin_toggle_special', item_id=item.id) }}" style="display: inline;">
+                                <button type="submit" class="btn btn-sm btn-{{ 'success' if item.is_special else 'outline-secondary' }}">
+                                    <i class="fas fa-{{ 'check-circle' if item.is_special else 'circle' }}"></i>
+                                </button>
+                            </form>
+                        </td>
+                        <td>
+                            <form method="POST" action="{{ url_for('admin_toggle_popular', item_id=item.id) }}" style="display: inline;">
+                                <button type="submit" class="btn btn-sm btn-{{ 'warning' if item.is_popular else 'outline-secondary' }}">
+                                    <i class="fas fa-fire"></i>
+                                </button>
+                            </form>
+                        </td>
+                        <td>
+                            {% if item.is_active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('admin_edit_menu_item', item_id=item.id) }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

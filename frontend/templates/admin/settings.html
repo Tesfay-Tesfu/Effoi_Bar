@@ -1,0 +1,175 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Site Settings - EFFOI Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Site Settings</h1>
+</div>
+
+<ul class="nav nav-tabs mb-4" id="settingsTabs" role="tablist">
+    <li class="nav-item">
+        <button class="nav-link active" id="restaurant-tab" data-bs-toggle="tab" data-bs-target="#restaurant" type="button" role="tab">Restaurant Info</button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="header-tab" data-bs-toggle="tab" data-bs-target="#header" type="button" role="tab">Header</button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="footer-tab" data-bs-toggle="tab" data-bs-target="#footer" type="button" role="tab">Footer</button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="social-tab" data-bs-toggle="tab" data-bs-target="#social" type="button" role="tab">Social Media</button>
+    </li>
+</ul>
+
+<form method="POST" action="{{ url_for('admin_update_settings') }}">
+    <div class="tab-content">
+        <!-- Restaurant Info Tab - UPDATED WITH DETAILED HOURS -->
+        <div class="tab-pane fade show active" id="restaurant" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Restaurant Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Restaurant Name</label>
+                            <input type="text" class="form-control" name="restaurant_name" value="{{ settings.get('restaurant_name', {}).value if settings.get('restaurant_name') else 'EFFOI RESTAURANT' }}">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Logo URL</label>
+                            <input type="url" class="form-control" name="logo_url" value="{{ settings.get('logo_url', {}).value if settings.get('logo_url') else 'https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Effoi_Logo.png' }}">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Logo Text</label>
+                            <input type="text" class="form-control" name="logo_text" value="{{ settings.get('logo_text', {}).value if settings.get('logo_text') else 'EFFOI RESTAURANT' }}">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Phone</label>
+                            <input type="text" class="form-control" name="phone" value="{{ settings.get('phone', {}).value if settings.get('phone') else '+1 (240) 660-1337' }}">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" value="{{ settings.get('email', {}).value if settings.get('email') else 'nigistme1277@gmail.com' }}">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Address</label>
+                            <input type="text" class="form-control" name="address" value="{{ settings.get('address', {}).value if settings.get('address') else '8233 Fenton St, Silver Spring, MD 20910' }}">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Hours (Header Display)</label>
+                            <input type="text" class="form-control" name="hours" value="{{ settings.get('hours', {}).value if settings.get('hours') else 'Mon-Sun: 11:00 AM - 10:00 PM' }}">
+                            <small class="text-muted">Shown in header and contact info</small>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Detailed Hours (Footer)</label>
+                            <input type="text" class="form-control" name="hours_detailed" value="{{ settings.get('hours_detailed', {}).value if settings.get('hours_detailed') else 'Monday-Friday:11am-10pm,Saturday:11am-11pm,Sunday:11am-9pm' }}">
+                            <small class="text-muted">Format: Day:time,Day:time (comma separated)</small>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Map Icon Color</label>
+                            <input type="color" class="form-control form-control-color" name="map_icon_color" value="{{ settings.get('map_icon_color', {}).value if settings.get('map_icon_color') else '#4285F4' }}" style="height: 50px; width: 100%;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Header Tab -->
+        <div class="tab-pane fade" id="header" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Header Settings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Header Background Color</label>
+                        <input type="color" class="form-control form-control-color" name="header_bg_color" value="{{ settings.get('header_bg_color', {}).value if settings.get('header_bg_color') else '#8B1E1E' }}" style="height: 50px; width: 100%;">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Header Text Color</label>
+                        <input type="color" class="form-control form-control-color" name="header_text_color" value="{{ settings.get('header_text_color', {}).value if settings.get('header_text_color') else '#ffffff' }}" style="height: 50px; width: 100%;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer Tab -->
+        <div class="tab-pane fade" id="footer" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Footer Settings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Footer Text</label>
+                        <textarea class="form-control" name="footer_text" rows="3">{{ settings.get('footer_text', {}).value if settings.get('footer_text') else 'Experience the taste of Ethiopia at EFFOI' }}</textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Copyright Text</label>
+                        <input type="text" class="form-control" name="copyright_text" value="{{ settings.get('copyright_text', {}).value if settings.get('copyright_text') else '© 2026 EFFOI RESTAURANT. All rights reserved.' }}">
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Footer Background Color</label>
+                            <input type="color" class="form-control form-control-color" name="footer_bg_color" value="{{ settings.get('footer_bg_color', {}).value if settings.get('footer_bg_color') else '#1a2c3e' }}" style="height: 50px; width: 100%;">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Footer Text Color</label>
+                            <input type="color" class="form-control form-control-color" name="footer_text_color" value="{{ settings.get('footer_text_color', {}).value if settings.get('footer_text_color') else '#ffffff' }}" style="height: 50px; width: 100%;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Social Media Tab -->
+        <div class="tab-pane fade" id="social" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Social Media Links</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Facebook URL</label>
+                            <input type="url" class="form-control" name="facebook_url" value="{{ settings.get('facebook_url', {}).value if settings.get('facebook_url') else '#' }}">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Instagram URL</label>
+                            <input type="url" class="form-control" name="instagram_url" value="{{ settings.get('instagram_url', {}).value if settings.get('instagram_url') else '#' }}">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Twitter URL</label>
+                            <input type="url" class="form-control" name="twitter_url" value="{{ settings.get('twitter_url', {}).value if settings.get('twitter_url') else '#' }}">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Yelp URL</label>
+                            <input type="url" class="form-control" name="yelp_url" value="{{ settings.get('yelp_url', {}).value if settings.get('yelp_url') else '#' }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Save All Settings</button>
+    </div>
+</form>
+{% endblock %}

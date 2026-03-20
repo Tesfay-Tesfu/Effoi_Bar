@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}{{ item.name }} - EFFOI Menu{% endblock %}
+
+{% block content %}
+<div class="my-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('menu') }}" class="text-decoration-none">Menu</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('menu') }}#cat-{{ item.category.id }}" class="text-decoration-none">{{ item.category.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ item.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-5">
+        <div class="col-md-6">
+            <div class="position-relative">
+                {% if item.image_url %}
+                <img src="{{ item.image_url }}" class="img-fluid rounded-4 shadow-lg" alt="{{ item.name }}" style="width: 100%; max-height: 500px; object-fit: cover;">
+                {% else %}
+                <div class="bg-light rounded-4 d-flex align-items-center justify-content-center" style="height: 400px;">
+                    <i class="fas fa-utensils fa-5x text-muted"></i>
+                </div>
+                {% endif %}
+                {% if item.is_popular %}
+                <span class="position-absolute top-0 start-0 badge bg-warning text-dark m-3 px-3 py-2 rounded-pill">
+                    <i class="fas fa-fire me-1"></i> Popular
+                </span>
+                {% endif %}
+                {% if item.is_special %}
+                <span class="position-absolute top-0 end-0 badge bg-danger m-3 px-3 py-2 rounded-pill">
+                    <i class="fas fa-star me-1"></i> Special
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card border-0 shadow-lg rounded-4 p-4">
+                <div class="mb-4">
+                    <h1 class="display-5 mb-2">{{ item.name }}</h1>
+                    <p class="text-muted">{{ item.category.name }}</p>
+                </div>
+                
+                <div class="mb-4">
+                    <h3 class="text-danger mb-3">${{ "%.2f"|format(item.price) }}</h3>
+                    <p class="lead">{{ item.description }}</p>
+                </div>
+                
+                <div class="mb-4">
+                    <h5>Ingredients</h5>
+                    <p class="text-muted">Traditional Ethiopian spices and fresh ingredients prepared with care.</p>
+                </div>
+                
+                <div class="d-grid gap-3">
+                    <a href="{{ url_for('reserve') }}" class="btn btn-danger btn-lg rounded-pill py-3">
+                        <i class="fas fa-calendar-alt me-2"></i> Reserve a Table
+                    </a>
+                    <a href="{{ url_for('menu') }}" class="btn btn-outline-secondary btn-lg rounded-pill py-2">
+                        <i class="fas fa-arrow-left me-2"></i> Back to Menu
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- You Might Also Like -->
+    <section class="mt-5 pt-5">
+        <h2 class="text-center mb-4">You Might Also Like</h2>
+        <div class="row g-4">
+            {% for related in item.category.menu_items[:3] if related.id != item.id %}
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                    <a href="{{ url_for('menu_item_detail', item_id=related.id) }}" class="text-decoration-none">
+                        {% if related.image_url %}
+                        <img src="{{ related.image_url }}" class="card-img-top" alt="{{ related.name }}" style="height: 200px; object-fit: cover;">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title text-dark">{{ related.name }}</h5>
+                            <p class="card-text text-muted small">{{ related.description[:60] }}...</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="h6 text-danger mb-0">${{ "%.2f"|format(related.price) }}</span>
+                                <span class="btn btn-sm btn-outline-danger rounded-pill">View</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

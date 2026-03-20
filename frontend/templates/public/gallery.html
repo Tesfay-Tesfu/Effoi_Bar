@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Gallery - EFFOI Restaurant{% endblock %}
+
+{% block content %}
+<div class="my-5">
+    <h1 class="display-3 text-center mb-5" data-aos="fade-up">Our Gallery</h1>
+    
+    <!-- Category Filter -->
+    <div class="text-center mb-5" data-aos="fade-up">
+        <button class="btn btn-outline-danger rounded-pill mx-1 filter-btn active" data-filter="all">All</button>
+        <button class="btn btn-outline-danger rounded-pill mx-1 filter-btn" data-filter="restaurant">Restaurant</button>
+        <button class="btn btn-outline-danger rounded-pill mx-1 filter-btn" data-filter="food">Food</button>
+        <button class="btn btn-outline-danger rounded-pill mx-1 filter-btn" data-filter="events">Events</button>
+        <button class="btn btn-outline-danger rounded-pill mx-1 filter-btn" data-filter="culture">Culture</button>
+    </div>
+    
+    <!-- Gallery Grid -->
+    <div class="row g-4" id="galleryGrid">
+        {% for image in images %}
+        <div class="col-md-4 col-lg-3 gallery-item" data-category="{{ image.category }}" data-aos="zoom-in" data-aos-delay="{{ loop.index * 50 }}">
+            <div class="image-frame" style="height: 250px; cursor: pointer;" onclick="openImageModal('{{ image.image_url }}', '{{ image.title }}')">
+                <img src="{{ image.image_url }}" class="w-100 h-100" alt="{{ image.title }}" style="object-fit: cover;">
+                {% if image.title %}
+                <div class="image-overlay">
+                    <h6>{{ image.title }}</h6>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-body text-center">
+                <img src="" id="modalImage" class="img-fluid rounded-4" style="max-height: 80vh;">
+                <p id="modalCaption" class="text-white mt-2"></p>
+                <button type="button" class="btn btn-light mt-3" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.image-frame {
+    position: relative;
+    border-radius: 5%;
+    overflow: hidden;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+}
+.image-frame:hover {
+    transform: scale(1.05);
+    box-shadow: 0 25px 50px rgba(139, 30, 30, 0.2);
+}
+.image-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.7));
+    color: white;
+    padding: 1rem;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+}
+.image-frame:hover .image-overlay {
+    transform: translateY(0);
+}
+.filter-btn.active {
+    background: #8B1E1E;
+    color: white;
+    border-color: #8B1E1E;
+}
+</style>
+
+{% block extra_js %}
+<script>
+function openImageModal(imageUrl, caption) {
+    document.getElementById('modalImage').src = imageUrl;
+    document.getElementById('modalCaption').textContent = caption || '';
+    new bootstrap.Modal(document.getElementById('imageModal')).show();
+}
+
+// Filter functionality
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        const filter = this.dataset.filter;
+        document.querySelectorAll('.gallery-item').forEach(item => {
+            if (filter === 'all' || item.dataset.category === filter) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

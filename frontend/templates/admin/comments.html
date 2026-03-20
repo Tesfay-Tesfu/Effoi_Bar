@@ -1,0 +1,68 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Manage Comments - EFFOI Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Blog Comments</h1>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Post</th>
+                        <th>Author</th>
+                        <th>Comment</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for comment in comments %}
+                    <tr>
+                        <td>{{ comment.id }}</td>
+                        <td>{{ comment.post.title }}</td>
+                        <td>{{ comment.author_name }}</td>
+                        <td>{{ comment.content[:50] }}...</td>
+                        <td>
+                            <span class="badge bg-{% if comment.status == 'approved' %}success{% elif comment.status == 'pending' %}warning{% else %}danger{% endif %}">
+                                {{ comment.status }}
+                            </span>
+                        </td>
+                        <td>{{ comment.created_at.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            {% if comment.status == 'pending' %}
+                            <form method="POST" action="{{ url_for('admin_approve_comment', comment_id=comment.id) }}" style="display: inline;">
+                                <button type="submit" class="btn btn-sm btn-success" title="Approve">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            </form>
+                            <form method="POST" action="{{ url_for('admin_reject_comment', comment_id=comment.id) }}" style="display: inline;">
+                                <button type="submit" class="btn btn-sm btn-warning" title="Reject">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                            <form method="POST" action="{{ url_for('admin_delete_comment', comment_id=comment.id) }}" style="display: inline;" onsubmit="return confirm('Delete this comment?')">
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">No comments found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

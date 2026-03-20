@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block title %}FAQ - EFFOI Restaurant{% endblock %}
+
+{% block content %}
+<div class="my-5">
+    <h1 class="display-3 text-center mb-5" data-aos="fade-up">Frequently Asked Questions</h1>
+    
+    <!-- FAQ Categories -->
+    <div class="row mb-5">
+        <div class="col-md-4 mb-3" data-aos="fade-right">
+            <div class="nav flex-column nav-pills" id="faq-tab" role="tablist">
+                <button class="nav-link active text-start p-3 mb-2 rounded-4" id="general-tab" data-bs-toggle="pill" data-bs-target="#general" type="button" role="tab">
+                    <i class="fas fa-info-circle me-2 text-danger"></i> General Questions
+                </button>
+                <button class="nav-link text-start p-3 mb-2 rounded-4" id="reservations-tab" data-bs-toggle="pill" data-bs-target="#reservations" type="button" role="tab">
+                    <i class="fas fa-calendar-alt me-2 text-danger"></i> Reservations
+                </button>
+                <button class="nav-link text-start p-3 mb-2 rounded-4" id="menu-tab" data-bs-toggle="pill" data-bs-target="#menu-faq" type="button" role="tab">
+                    <i class="fas fa-utensils me-2 text-danger"></i> Menu & Dietary
+                </button>
+                <button class="nav-link text-start p-3 mb-2 rounded-4" id="events-tab" data-bs-toggle="pill" data-bs-target="#events-faq" type="button" role="tab">
+                    <i class="fas fa-music me-2 text-danger"></i> Events & Private Dining
+                </button>
+                <button class="nav-link text-start p-3 mb-2 rounded-4" id="payment-tab" data-bs-toggle="pill" data-bs-target="#payment" type="button" role="tab">
+                    <i class="fas fa-credit-card me-2 text-danger"></i> Payment & Gift Cards
+                </button>
+            </div>
+        </div>
+        
+        <div class="col-md-8" data-aos="fade-left">
+            <div class="tab-content" id="faq-tabContent">
+                <!-- General Questions -->
+                <div class="tab-pane fade show active" id="general" role="tabpanel">
+                    <div class="accordion" id="accordionGeneral">
+                        <div class="accordion-item mb-3 border-0 shadow-sm rounded-4 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#general1">
+                                    <i class="fas fa-question-circle text-danger me-3"></i>
+                                    What are your hours of operation?
+                                </button>
+                            </h2>
+                            <div id="general1" class="accordion-collapse collapse show" data-bs-parent="#accordionGeneral">
+                                <div class="accordion-body">
+                                    We're open Monday - Friday: 11am - 10pm, Saturday: 11am - 11pm, and Sunday: 11am - 9pm.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item mb-3 border-0 shadow-sm rounded-4 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#general2">
+                                    <i class="fas fa-question-circle text-danger me-3"></i>
+                                    Where are you located?
+                                </button>
+                            </h2>
+                            <div id="general2" class="accordion-collapse collapse" data-bs-parent="#accordionGeneral">
+                                <div class="accordion-body">
+                                    We're located at 8233 Fenton St, Silver Spring, MD 20910. Free parking is available nearby.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item mb-3 border-0 shadow-sm rounded-4 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#general3">
+                                    <i class="fas fa-question-circle text-danger me-3"></i>
+                                    Do you offer takeout and delivery?
+                                </button>
+                            </h2>
+                            <div id="general3" class="accordion-collapse collapse" data-bs-parent="#accordionGeneral">
+                                <div class="accordion-body">
+                                    Yes! We offer takeout and delivery through our website and partner apps like DoorDash, UberEats, and Grubhub.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Reservations -->
+                <div class="tab-pane fade" id="reservations" role="tabpanel">
+                    <div class="accordion" id="accordionReservations">
+                        <div class="accordion-item mb-3 border-0 shadow-sm rounded-4 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#res1">
+                                    <i class="fas fa-question-circle text-danger me-3"></i>
+                                    How do I make a reservation?
+                                </button>
+                            </h2>
+                            <div id="res1" class="accordion-collapse collapse show" data-bs-parent="#accordionReservations">
+                                <div class="accordion-body">
+                                    You can make a reservation through our website's reservation form or by calling us at (240) 660-1337.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item mb-3 border-0 shadow-sm rounded-4 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#res2">
+                                    <i class="fas fa-question-circle text-danger me-3"></i>
+                                    What's your cancellation policy?
+                                </button>
+                            </h2>
+                            <div id="res2" class="accordion-collapse collapse" data-bs-parent="#accordionReservations">
+                                <div class="accordion-body">
+                                    We kindly ask for 24-hour notice for cancellations. For no-shows, we may require a deposit for future reservations.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Menu & Dietary -->
+                <div class="tab-pane fade" id="menu-faq" role="tabpanel">
+                    <div class="accordion" id="accordionMenu">
+                        <div class="accordion-item mb-3 border-0 shadow-sm rounded-4 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#menu1">
+                                    <i class="fas fa-question-circle text-danger me-3"></i>
+                                    Do you have vegetarian/vegan options?
+                                </button>
+                            </h2>
+                            <div id="menu1" class="accordion-collapse collapse show" data-bs-parent="#accordionMenu">
+                                <div class="accordion-body">
+                                    Yes! We have an extensive vegetarian section with dishes like Vegi Combo, Misr Wot, and Shiro Wot. Many dishes can be made vegan upon request.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item mb-3 border-0 shadow-sm rounded-4 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#menu2">
+                                    <i class="fas fa-question-circle text-danger me-3"></i>
+                                    Are your dishes gluten-free friendly?
+                                </button>
+                            </h2>
+                            <div id="menu2" class="accordion-collapse collapse" data-bs-parent="#accordionMenu">
+                                <div class="accordion-body">
+                                    Our injera is traditionally made from teff flour, which is gluten-free. However, cross-contamination is possible. Please inform your server of any allergies.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item mb-3 border-0 shadow-sm rounded-4 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#menu3">
+                                    <i class="fas fa-question-circle text-danger me-3"></i>
+                                    How spicy is Ethiopian food?
+                                </button>
+                            </h2>
+                            <div id="menu3" class="accordion-collapse collapse" data-bs-parent="#accordionMenu">
+                                <div class="accordion-body">
+                                    We offer a range from mild to very spicy. Dishes like Alicha Wot are mild, while Key Wot and Doro Wot have medium heat. We can adjust spice levels to your preference.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Events -->
+                <div class="tab-pane fade" id="events-faq" role="tabpanel">
+                    <div class="accordion" id="accordionEvents">
+                        <div class="accordion-item mb-3 border-0 shadow-sm rounded-4 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#event1">
+                                    <i class="fas fa-question-circle text-danger me-3"></i>
+                                    Can I host a private event at EFFOI?
+                                </button>
+                            </h2>
+                            <div id="event1" class="accordion-collapse collapse show" data-bs-parent="#accordionEvents">
+                                <div class="accordion-body">
+                                    Yes! We offer private dining for groups of 10-50 people. Contact us for special menus and pricing.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item mb-3 border-0 shadow-sm rounded-4 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#event2">
+                                    <i class="fas fa-question-circle text-danger me-3"></i>
+                                    Do you have live music events?
+                                </button>
+                            </h2>
+                            <div id="event2" class="accordion-collapse collapse" data-bs-parent="#accordionEvents">
+                                <div class="accordion-body">
+                                    Yes! We feature live Ethiopian music every Friday and Saturday night. Check our events page for upcoming performances.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Payment -->
+                <div class="tab-pane fade" id="payment" role="tabpanel">
+                    <div class="accordion" id="accordionPayment">
+                        <div class="accordion-item mb-3 border-0 shadow-sm rounded-4 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#pay1">
+                                    <i class="fas fa-question-circle text-danger me-3"></i>
+                                    What payment methods do you accept?
+                                </button>
+                            </h2>
+                            <div id="pay1" class="accordion-collapse collapse show" data-bs-parent="#accordionPayment">
+                                <div class="accordion-body">
+                                    We accept all major credit cards (Visa, Mastercard, American Express, Discover), cash, and contactless payments.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item mb-3 border-0 shadow-sm rounded-4 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#pay2">
+                                    <i class="fas fa-question-circle text-danger me-3"></i>
+                                    Do you offer gift cards?
+                                </button>
+                            </h2>
+                            <div id="pay2" class="accordion-collapse collapse" data-bs-parent="#accordionPayment">
+                                <div class="accordion-body">
+                                    Yes! You can purchase gift cards in any denomination at our restaurant or through our website.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Still Have Questions Section -->
+    <div class="row mt-5 justify-content-center" data-aos="fade-up">
+        <div class="col-md-8 text-center">
+            <div class="curved-box p-5" style="background: linear-gradient(135deg, #f8f9fa, #ffffff);">
+                <i class="fas fa-headset fa-4x text-danger mb-4"></i>
+                <h3 class="mb-3">Still Have Questions?</h3>
+                <p class="lead mb-4">We're here to help! Contact us directly and we'll get back to you as soon as possible.</p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="tel:{{ settings.get('phone', '+12406601337') }}" class="btn btn-danger rounded-pill px-4 py-2">
+                        <i class="fas fa-phone me-2"></i> Call Us
+                    </a>
+                    <a href="{{ url_for('contact') }}" class="btn btn-outline-danger rounded-pill px-4 py-2">
+                        <i class="fas fa-envelope me-2"></i> Email Us
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .curved-box {
+        border-radius: 50px 20px 50px 20px;
+        transition: all 0.3s ease;
+    }
+    .curved-box:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(139, 30, 30, 0.1);
+    }
+    .nav-pills .nav-link {
+        color: #333;
+        transition: all 0.3s ease;
+    }
+    .nav-pills .nav-link:hover {
+        background: rgba(139, 30, 30, 0.1);
+    }
+    .nav-pills .nav-link.active {
+        background: #8B1E1E;
+        color: white;
+    }
+    .accordion-button:not(.collapsed) {
+        background: #8B1E1E;
+        color: white;
+    }
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: rgba(139, 30, 30, 0.2);
+    }
+</style>
+{% endblock %}

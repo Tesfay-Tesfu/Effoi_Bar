@@ -1,0 +1,97 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Time Blocks - EFFOI Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Time Blocks</h1>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBlockModal">
+        <i class="fas fa-plus"></i> Add Time Block
+    </button>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if blocks %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Reason</th>
+                        <th>Created By</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for block in blocks %}
+                    <tr>
+                        <td>{{ block.block_date.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ block.start_time }}</td>
+                        <td>{{ block.end_time }}</td>
+                        <td>{{ block.reason or 'Not specified' }}</td>
+                        <td>{{ block.created_by or 'System' }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('admin_delete_time_block', block_id=block.id) }}" style="display: inline;" onsubmit="return confirm('Delete this time block?')">
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-clock" style="font-size: 4rem; color: #ccc;"></i>
+            <h4 class="mt-3">No Time Blocks Found</h4>
+            <p class="text-muted">Add time blocks to block out unavailable reservation slots.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add Time Block Modal -->
+<div class="modal fade" id="addBlockModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Time Block</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('admin_add_time_block') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Block Date</label>
+                        <input type="date" class="form-control" name="block_date" required min="{{ now().strftime('%Y-%m-%d') }}">
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Start Time</label>
+                            <input type="time" class="form-control" name="start_time" required value="09:00">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">End Time</label>
+                            <input type="time" class="form-control" name="end_time" required value="17:00">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Reason</label>
+                        <input type="text" class="form-control" name="reason" placeholder="e.g., Private Event, Holiday, Maintenance">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Block</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

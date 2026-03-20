@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>About Us Data Test</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5>About Us Object</h5>
+        </div>
+        <div class="card-body">
+            <pre>{{ about_us|tojson(indent=2) }}</pre>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5>Hero Video</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>URL:</strong> {{ about_us.hero_video_url if about_us else 'None' }}</p>
+            <p><strong>Title:</strong> {{ about_us.hero_title if about_us else 'None' }}</p>
+            
+            {% if about_us and about_us.hero_video_url %}
+            <div class="mt-3">
+                <h6>Preview:</h6>
+                {% if 'youtube' in about_us.hero_video_url or 'vimeo' in about_us.hero_video_url %}
+                <iframe width="560" height="315" src="{{ about_us.hero_video_url }}" frameborder="0" allowfullscreen></iframe>
+                {% elif about_us.hero_video_url.endswith(('.mp4', '.webm')) %}
+                <video width="560" height="315" controls>
+                    <source src="{{ about_us.hero_video_url }}" type="video/mp4">
+                </video>
+                {% else %}
+                <img src="{{ about_us.hero_video_url }}" style="max-width: 560px; max-height: 315px;">
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+            <h5>Gallery Images</h5>
+        </div>
+        <div class="card-body">
+            {% if about_us and about_us.gallery_images %}
+                {% set images = about_us.gallery_images|from_json %}
+                <p>Found {{ images|length }} images</p>
+                <div class="row">
+                    {% for img in images %}
+                    <div class="col-md-3 mb-3">
+                        <div class="card">
+                            <img src="{{ img.url }}" class="card-img-top" style="height: 150px; object-fit: cover;">
+                            <div class="card-body">
+                                <p class="small">{{ img.title }}</p>
+                                <p class="small text-break">{{ img.url }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No gallery images found</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

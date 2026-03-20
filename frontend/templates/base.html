@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ settings.get('restaurant_name', 'EFFOI RESTAURANT') }}{% endblock %}</title>
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #faf7f2;
+            color: #2d2d2d;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .page-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            flex: 1;
+        }
+
+        /* ===== HEADER ===== */
+        .top-bar {
+            background: linear-gradient(135deg, #8B1E1E, #B13E3E);
+            color: white;
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 1001;
+        }
+
+        .top-bar a {
+            color: white;
+            text-decoration: none;
+            margin-right: 1.5rem;
+        }
+
+        .top-bar i {
+            margin-right: 0.5rem;
+            color: #FFD700;
+        }
+
+        .top-bar .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Blocked Times Badge */
+        .blocked-times-badge {
+            background: #FFD700;
+            color: #8B1E1E;
+            padding: 0.25rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(139, 30, 30, 0.2);
+            margin-left: 1rem;
+            position: relative;
+        }
+        
+        .blocked-times-badge:hover {
+            background: #8B1E1E;
+            color: #FFD700;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .blocked-times-badge:hover i {
+            color: #FFD700;
+        }
+        
+        /* Blocked Times Popup */
+        .blocked-times-popup {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            padding: 1rem;
+            min-width: 350px;
+            z-index: 1000;
+            display: none;
+            margin-top: 0.5rem;
+            border: 1px solid #eee;
+        }
+        
+        .blocked-times-popup.show {
+            display: block;
+        }
+        
+        .blocked-times-popup h6 {
+            color: #8B1E1E;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #FFD700;
+        }
+        
+        .blocked-time-item {
+            padding: 0.75rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .blocked-time-item:last-child {
+            border-bottom: none;
+        }
+        
+        .blocked-time-item .date {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+        }
+        
+        .blocked-time-item .time {
+            color: #8B1E1E;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .blocked-time-item .reason {
+            color: #666;
+            font-size: 0.85rem;
+            font-style: italic;
+            margin-top: 0.25rem;
+            padding-left: 1.5rem;
+        }
+
+        .main-header {
+            background: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            height: 70px;
+            width: auto;
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #8B1E1E;
+            line-height: 1.2;
+            text-align: left;
+        }
+        .logo-text small {
+            font-size: 0.9rem;
+            color: #666;
+            font-family: 'Inter', sans-serif;
+            display: block;
+            font-weight: 400;
+            text-align: left;
+        }
+        .logo-text .bar-text {
+            font-size: 1.2rem;
+            color: #8B1E1E;
+            font-weight: 500;
+            letter-spacing: 1px;
+            margin-top: -5px;
+            display: block;
+            text-align: center;
+            width: 100%;
+        }
+
+        .main-nav {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .main-nav a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+            font-size: 0.95rem;
+        }
+
+        .main-nav a:hover,
+        .main-nav a.active {
+            color: #8B1E1E;
+        }
+
+        .main-nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #8B1E1E;
+            transition: width 0.3s ease;
+        }
+
+        .main-nav a:hover::after,
+        .main-nav a.active::after {
+            width: 100%;
+        }
+
+        .reserve-btn {
+            background: #8B1E1E;
+            color: white !important;
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .reserve-btn:hover {
+            background: #B13E3E;
+            color: white !important;
+        }
+
+        .reserve-btn::after {
+            display: none !important;
+        }
+
+        /* Elegant White Hamburger Button */
+        .mobile-toggle {
+            display: none;
+            background: white;
+            border: 1px solid rgba(139, 30, 30, 0.2);
+            font-size: 1.5rem;
+            color: #8B1E1E;
+            cursor: pointer;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .mobile-toggle:hover {
+            background: #8B1E1E;
+            color: white;
+            border-color: #8B1E1E;
+            box-shadow: 0 6px 16px rgba(139, 30, 30, 0.2);
+        }
+        
+        .mobile-toggle i {
+            font-size: 1.3rem;
+        }
+
+        @media (max-width: 992px) {
+            .top-bar .header-container {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+            
+            .blocked-times-badge {
+                margin-left: 0;
+                margin-top: 0.5rem;
+            }
+            
+            .mobile-toggle {
+                display: flex;
+            }
+            
+            .main-nav {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 1.5rem;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                gap: 0.8rem;
+                border-top: 1px solid rgba(139, 30, 30, 0.1);
+                border-bottom: 2px solid #8B1E1E;
+                z-index: 1000;
+            }
+            
+            .main-nav.show {
+                display: flex;
+            }
+            
+            .main-nav a {
+                width: 100%;
+                text-align: left;
+                padding: 0.7rem 1rem;
+                border-radius: 12px;
+                font-size: 1rem;
+                background: #f9f9f9;
+                transition: all 0.3s ease;
+            }
+            
+            .main-nav a:hover,
+            .main-nav a.active {
+                background: #8B1E1E;
+                color: white;
+                padding-left: 1.5rem;
+            }
+            
+            .main-nav a::after {
+                display: none;
+            }
+            
+            .reserve-btn {
+                text-align: center !important;
+                background: #8B1E1E;
+                color: white !important;
+                margin-top: 0.5rem;
+            }
+            
+            .reserve-btn:hover {
+                background: #B13E3E;
+            }
+            
+            .header-container {
+                flex-wrap: wrap;
+            }
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero-section {
+            width: 100%;
+            height: 600px;
+            display: flex;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .hero-left {
+            width: 50%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-right {
+            width: 50%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            background: #000;
+        }
+        
+        .hero-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .hero-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            width: 100%;
+            height: 100%;
+            gap: 2px;
+            background: #8B1E1E;
+        }
+        
+        .hero-grid-item {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-grid-item img,
+        .hero-grid-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .hero-grid-item:hover img,
+        .hero-grid-item:hover video {
+            transform: scale(1.05);
+        }
+        
+        .hero-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            color: white;
+            padding: 1rem;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .hero-grid-item:hover .hero-overlay {
+            transform: translateY(0);
+        }
+        
+        .hero-overlay h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .hero-overlay p {
+            font-size: 0.8rem;
+            margin-bottom: 0;
+            opacity: 0.9;
+        }
+
+        /* ===== ETHIOPIAN COFFEE CEREMONY SECTION ===== */
+        .coffee-ceremony-section {
+            max-width: 1400px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+        
+        .coffee-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 1.5rem;
+            height: 600px;
+        }
+        
+        .coffee-grid-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .coffee-grid-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .coffee-grid-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        .coffee-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(139, 30, 30, 0.9));
+            color: white;
+            padding: 2rem 1.5rem;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .coffee-grid-item:hover .coffee-overlay {
+            transform: translateY(0);
+        }
+        
+        .coffee-overlay h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .coffee-overlay p {
+            font-size: 0.9rem;
+            margin: 0;
+            opacity: 0.9;
+        }
+        
+        @media (max-width: 768px) {
+            .coffee-grid {
+                grid-template-columns: 1fr !important;
+                grid-template-rows: repeat(4, 300px) !important;
+                height: auto !important;
+            }
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: {{ settings.get('footer_bg_color', '#1a2c3e') }};
+            color: {{ settings.get('footer_text_color', '#ffffff') }};
+            padding: 4rem 0 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-col h4 {
+            color: white;
+            margin-bottom: 1.5rem;
+            position: relative;
+            font-size: 1.2rem;
+        }
+
+        .footer-col h4::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: #FFD700;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #FFD700;
+        }
+
+        .contact-info p {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .contact-info i {
+            width: 20px;
+            color: #FFD700;
+        }
+
+        .contact-info i.fa-map-marker-alt {
+            color: {{ settings.get('map_icon_color', '#4285F4') }};
+        }
+
+        .contact-info a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+        }
+
+        .contact-info a:hover {
+            color: #FFD700;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-icons a {
+            color: white;
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            color: #FFD700;
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .hero-section {
+                flex-direction: column;
+                height: auto;
+            }
+            .hero-left, .hero-right {
+                width: 100%;
+                height: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Reviews section (displayed above footer) */
+        .reviews-section {
+            max-width: 1400px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .review-card {
+            background: white;
+            border-radius: 30px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .review-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stars {
+            color: #FFD700;
+            margin-bottom: 0.8rem;
+        }
+
+        .stars i {
+            margin-right: 2px;
+        }
+
+        .review-author {
+            font-weight: 600;
+            margin-top: 0.8rem;
+            color: #333;
+        }
+
+        .review-date {
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+        /* Curved box styles */
+        .curved-box {
+            border-radius: 30px 30px 30px 5px;
+            background: white;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .curved-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(139, 30, 30, 0.1);
+        }
+
+        .curved-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #8B1E1E, #FFD700);
+        }
+
+        .curved-box-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #8B1E1E;
+        }
+
+        /* Image frame styles */
+        .image-frame {
+            border-radius: 5%;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .image-frame:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 40px rgba(139, 30, 30, 0.2);
+        }
+
+        .image-frame img,
+        .image-frame video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Video wrapper */
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 5%;
+        }
+
+        .video-wrapper video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Top bar with contact -->
+    <div class="top-bar">
+        <div class="header-container">
+            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <a href="tel:{{ settings.get('phone', '+12406601337') }}"><i class="fas fa-phone"></i> {{ settings.get('phone', '+1 (240) 660-1337') }}</a>
+                <a href="mailto:{{ settings.get('email', 'nigistme1277@gmail.com') }}"><i class="fas fa-envelope"></i> {{ settings.get('email', 'nigistme1277@gmail.com') }}</a>
+                
+                <!-- Blocked Times Badge -->
+                <div class="blocked-times-badge" id="blockedTimesBadge">
+                    <i class="fas fa-clock"></i>
+                    <span id="blockedCount">0</span> Blocked Slots
+                    <i class="fas fa-chevron-down" style="font-size: 0.7rem;"></i>
+                </div>
+                
+                <!-- Blocked Times Popup -->
+                <div class="blocked-times-popup" id="blockedTimesPopup">
+                    <h6><i class="fas fa-ban me-2"></i>Unavailable Times</h6>
+                    <div id="blockedTimesList">
+                        <div class="text-center text-muted py-3">Loading...</div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <i class="fas fa-clock"></i> {{ settings.get('hours', 'Mon-Sun: 11:00 AM - 10:00 PM') }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Main header -->
+    <div class="main-header">
+        <div class="header-container">
+            <div class="logo-area">
+                <img src="{{ settings.get('logo_url', 'https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Effoi_logo3.png') }}" 
+                     alt="{{ settings.get('restaurant_name', 'EFFOI') }}" 
+                     class="logo"
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/70x70/8B1E1E/ffffff?text=EFFOI';">
+                <div class="logo-text">
+                    {{ settings.get('logo_text', 'EFFOI RESTAURANT') }}
+                    <small class="bar-text">& BAR</small>
+                </div>
+            </div>
+
+            <!-- Elegant White Hamburger Button -->
+            <button class="mobile-toggle" id="mobileToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Navigation - FAQ REMOVED from header -->
+            <nav class="main-nav" id="mainNav">
+                <a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">Home</a>
+                <a href="{{ url_for('menu') }}" class="{% if request.endpoint == 'menu' %}active{% endif %}">Menu</a>
+                <a href="{{ url_for('events') }}" class="{% if request.endpoint == 'events' %}active{% endif %}">Club Events</a>
+                <a href="{{ url_for('about') }}" class="{% if request.endpoint == 'about' %}active{% endif %}">About Us</a>
+                <a href="{{ url_for('blog') }}" class="{% if request.endpoint == 'blog' %}active{% endif %}">Blog</a>
+                <a href="{{ url_for('contact') }}" class="{% if request.endpoint == 'contact' %}active{% endif %}">Contact</a>
+                <a href="{{ url_for('reserve') }}" class="reserve-btn">Reserve Table</a>
+            </nav>
+        </div>
+    </div>
+
+    <div class="page-wrapper">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Main Content - This is where child templates will inject content -->
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Reviews Section (displayed above footer) -->
+    <div class="reviews-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="h3">What Our Customers Say</h2>
+            <a href="{{ url_for('reviews') }}" class="btn btn-outline-danger">View All Reviews</a>
+        </div>
+        <div class="row g-4">
+            {% for review in recent_reviews %}
+            <div class="col-md-3">
+                <div class="review-card">
+                    <div class="stars">
+                        {% for i in range(review.rating) %}
+                            <i class="fas fa-star"></i>
+                        {% endfor %}
+                    </div>
+                    <p class="mb-2">"{{ review.comment[:100] }}{% if review.comment|length > 100 %}...{% endif %}"</p>
+                    <div class="review-author">- {{ review.customer_name }}</div>
+                    <div class="review-date">{{ review.created_at.strftime('%B %d, %Y') }}</div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12 text-center py-4">
+                <p class="text-muted">No reviews yet. Be the first to review!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Footer - FAQ KEPT HERE in Quick Links -->
+    <div class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About EFFOI</h4>
+                    <p>{{ settings.get('footer_text', 'Experience the taste of Ethiopia at EFFOI. Authentic cuisine, warm hospitality, and unforgettable moments.') }}</p>
+                    <div class="social-icons">
+                        <a href="{{ settings.get('facebook_url', '#') }}" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                        <a href="{{ settings.get('instagram_url', '#') }}" target="_blank"><i class="fab fa-instagram"></i></a>
+                        <a href="{{ settings.get('twitter_url', '#') }}" target="_blank"><i class="fab fa-x-twitter"></i></a>
+                        <a href="{{ settings.get('yelp_url', '#') }}" target="_blank"><i class="fab fa-yelp"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('menu') }}">Our Menu</a></li>
+                        <li><a href="{{ url_for('events') }}">Events</a></li>
+                        <li><a href="{{ url_for('blog') }}">Blog</a></li>
+                        <li><a href="{{ url_for('about') }}">About Us</a></li>
+                        <li><a href="{{ url_for('policy') }}">Policies</a></li>
+                        <li><a href="{{ url_for('faq') }}">FAQ</a></li>
+                        <li><a href="{{ url_for('contact') }}">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Contact Info</h4>
+                    <div class="contact-info">
+                        <p>
+                            <i class="fas fa-map-marker-alt" style="color: {{ settings.get('map_icon_color', '#4285F4') }};"></i>
+                            <a href="https://maps.google.com/?q={{ settings.get('address', '8233 Fenton St, Silver Spring, MD 20910')|urlencode }}" target="_blank">
+                                {{ settings.get('address', '8233 Fenton St, Silver Spring, MD 20910') }}
+                            </a>
+                        </p>
+                        <p>
+                            <i class="fas fa-phone"></i>
+                            <a href="tel:{{ settings.get('phone', '+12406601337') }}">{{ settings.get('phone', '+1 (240) 660-1337') }}</a>
+                        </p>
+                        <p>
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:{{ settings.get('email', 'nigistme1277@gmail.com') }}">{{ settings.get('email', 'nigistme1277@gmail.com') }}</a>
+                        </p>
+                        <p>
+                            <i class="fas fa-clock"></i>
+                            {{ settings.get('hours', 'Mon-Sun: 11:00 AM - 10:00 PM') }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Hours</h4>
+                    <ul class="footer-links">
+                        {% set detailed_hours = settings.get('hours_detailed', 'Monday-Friday:11am-10pm,Saturday:11am-11pm,Sunday:11am-9pm') %}
+                        {% set hours_list = detailed_hours.split(',') %}
+                        {% for hour in hours_list %}
+                            <li>{{ hour }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="copyright">
+                {{ settings.get('copyright_text', '© 2026 EFFOI RESTAURANT. All rights reserved.') }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+
+        // Mobile menu toggle
+        document.getElementById('mobileToggle').addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById('mainNav').classList.toggle('show');
+            
+            // Change icon based on menu state
+            const icon = this.querySelector('i');
+            if (document.getElementById('mainNav').classList.contains('show')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const nav = document.getElementById('mainNav');
+            const toggle = document.getElementById('mobileToggle');
+            
+            if (nav.classList.contains('show') && 
+                !nav.contains(event.target) && 
+                !toggle.contains(event.target)) {
+                nav.classList.remove('show');
+                const icon = toggle.querySelector('i');
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+
+        // Blocked Times Popup
+        const badge = document.getElementById('blockedTimesBadge');
+        const popup = document.getElementById('blockedTimesPopup');
+        
+        if (badge) {
+            badge.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                popup.classList.toggle('show');
+            });
+        }
+
+        // Close popup when clicking outside
+        document.addEventListener('click', function(e) {
+            if (badge && popup) {
+                if (!badge.contains(e.target) && !popup.contains(e.target)) {
+                    popup.classList.remove('show');
+                }
+            }
+        });
+
+        // Load blocked times
+        function loadBlockedTimes() {
+            fetch('/api/blocked-times')
+                .then(response => response.json())
+                .then(data => {
+                    const countSpan = document.getElementById('blockedCount');
+                    const listDiv = document.getElementById('blockedTimesList');
+                    
+                    if (countSpan) countSpan.textContent = data.length;
+                    
+                    if (data.length === 0) {
+                        if (listDiv) listDiv.innerHTML = '<div class="text-center text-muted py-3"><i class="fas fa-check-circle me-2"></i>No blocked times</div>';
+                        return;
+                    }
+                    
+                    let html = '';
+                    data.forEach(block => {
+                        html += `
+                            <div class="blocked-time-item">
+                                <div>
+                                    <span class="date"><i class="fas fa-calendar-alt me-2"></i>${block.date}</span>
+                                    <span class="time ms-3"><i class="fas fa-clock me-2"></i>${block.start_time} - ${block.end_time}</span>
+                                </div>
+                                <div class="reason mt-1"><i class="fas fa-info-circle me-2"></i>${block.reason}</div>
+                            </div>
+                        `;
+                    });
+                    if (listDiv) listDiv.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error loading blocked times:', error);
+                    const listDiv = document.getElementById('blockedTimesList');
+                    if (listDiv) listDiv.innerHTML = '<div class="text-center text-danger py-3">Error loading data</div>';
+                });
+        }
+
+        // Load on page load
+        loadBlockedTimes();
+        
+        // Refresh every 30 seconds
+        setInterval(loadBlockedTimes, 30000);
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

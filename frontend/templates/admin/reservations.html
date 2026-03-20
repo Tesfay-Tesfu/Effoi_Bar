@@ -1,0 +1,97 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Manage Reservations - EFFOI Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Reservations</h1>
+    <div>
+        <select class="form-select" onchange="window.location.href='?status='+this.value" style="width: 200px;">
+            <option value="all" {% if status == 'all' %}selected{% endif %}>All Reservations</option>
+            <option value="pending" {% if status == 'pending' %}selected{% endif %}>Pending</option>
+            <option value="confirmed" {% if status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+            <option value="cancelled" {% if status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+        </select>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if reservations %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Party</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for res in reservations %}
+                    <tr>
+                        <td>{{ res.id }}</td>
+                        <td>{{ res.customer_name }}</td>
+                        <td>{{ res.reservation_date.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ res.reservation_time }}</td>
+                        <td>{{ res.party_size }}</td>
+                        <td>{{ res.customer_phone }}</td>
+                        <td>{{ res.customer_email }}</td>
+                        <td>
+                            <span class="badge bg-{% if res.status == 'confirmed' %}success{% elif res.status == 'pending' %}warning{% else %}danger{% endif %}">
+                                {{ res.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                                    Update Status
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <form method="POST" action="{{ url_for('admin_update_reservation', reservation_id=res.id) }}">
+                                            <input type="hidden" name="status" value="confirmed">
+                                            <button type="submit" class="dropdown-item">Confirm</button>
+                                        </form>
+                                    </li>
+                                    <li>
+                                        <form method="POST" action="{{ url_for('admin_update_reservation', reservation_id=res.id) }}">
+                                            <input type="hidden" name="status" value="cancelled">
+                                            <button type="submit" class="dropdown-item">Cancel</button>
+                                        </form>
+                                    </li>
+                                    <li>
+                                        <form method="POST" action="{{ url_for('admin_update_reservation', reservation_id=res.id) }}">
+                                            <input type="hidden" name="status" value="pending">
+                                            <button type="submit" class="dropdown-item">Mark Pending</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                            <form method="POST" action="{{ url_for('admin_delete_reservation', reservation_id=res.id) }}" style="display: inline;" onsubmit="return confirm('Delete this reservation? This action cannot be undone.')">
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+            <h4>No Reservations Found</h4>
+            <p class="text-muted">Reservations will appear here when customers book.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

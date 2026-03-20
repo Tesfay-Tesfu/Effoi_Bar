@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Blog - EFFOI Restaurant{% endblock %}
+
+{% block content %}
+<div class="my-5">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h1 class="display-4" data-aos="fade-right">Customer Stories</h1>
+        <a href="{{ url_for('submit_blog') }}" class="btn btn-danger rounded-pill px-4 py-2" data-aos="fade-left">
+            <i class="fas fa-plus-circle me-2"></i>Share Your Story
+        </a>
+    </div>
+
+    {% if posts.items %}
+    <div class="row g-4">
+        {% for post in posts.items %}
+        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden h-100">
+                <div class="position-relative">
+                    {% if post.image_url %}
+                    <img src="{{ post.image_url }}" class="card-img-top" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="fas fa-image fa-4x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    <span class="position-absolute top-0 start-0 bg-danger text-white px-3 py-2 m-3 rounded-pill small">
+                        <i class="far fa-eye me-1"></i> {{ post.views }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title">{{ post.title }}</h5>
+                    </div>
+                    <p class="card-text text-muted small mb-3">{{ post.content[:120] }}...</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-muted">
+                                <i class="far fa-user me-1"></i> {{ post.author_name }}
+                            </small>
+                            <br>
+                            <small class="text-muted">
+                                <i class="far fa-calendar-alt me-1"></i> {{ post.created_at.strftime('%b %d, %Y') }}
+                            </small>
+                        </div>
+                        <a href="{{ url_for('blog_post', post_id=post.id) }}" class="btn btn-outline-danger btn-sm rounded-pill px-3">Read More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if posts.pages > 1 %}
+    <nav class="mt-5">
+        <ul class="pagination justify-content-center">
+            {% if posts.has_prev %}
+            <li class="page-item">
+                <a class="page-link rounded-pill" href="{{ url_for('blog', page=posts.prev_num) }}">Previous</a>
+            </li>
+            {% endif %}
+            
+            {% for page_num in posts.iter_pages() %}
+                {% if page_num %}
+                    <li class="page-item {% if page_num == posts.page %}active{% endif %}">
+                        <a class="page-link rounded-pill" href="{{ url_for('blog', page=page_num) }}">{{ page_num }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if posts.has_next %}
+            <li class="page-item">
+                <a class="page-link rounded-pill" href="{{ url_for('blog', page=posts.next_num) }}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    
+    {% else %}
+    <div class="text-center py-5" data-aos="fade-up">
+        <i class="fas fa-blog fa-5x text-muted mb-4"></i>
+        <h3>No Blog Posts Yet</h3>
+        <p class="lead text-muted mb-4">Be the first to share your EFFOI experience!</p>
+        <a href="{{ url_for('submit_blog') }}" class="btn btn-danger btn-lg rounded-pill px-5">Write a Post</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

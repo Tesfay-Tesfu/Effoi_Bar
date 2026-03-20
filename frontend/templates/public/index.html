@@ -1,0 +1,2482 @@
+{% extends "base.html" %}
+
+{% block title %}EFFOI RESTAURANT - Authentic Ethiopian Cuisine{% endblock %}
+
+{% block content %}
+<!-- Hero Section - Dynamic from Database -->
+<div class="hero-section">
+    <!-- Left Side - First Slider Image or Video -->
+    <div class="hero-left">
+        {% if hero_sliders and hero_sliders|length > 0 %}
+            {% set main_slider = hero_sliders[0] %}
+            {% if main_slider.image_url %}
+            <img src="{{ main_slider.image_url }}" class="hero-video" alt="{{ main_slider.title }}" style="width:100%; height:100%; object-fit:cover;">
+            {% else %}
+            <video class="hero-video" autoplay loop muted playsinline>
+                <source src="https://player.vimeo.com/external/370468733.sd.mp4?s=90d2b19a3b4d1b3e4d1b3e4d1b3e4d1b3e4d1b3e4&profile_id=139" type="video/mp4">
+                <img src="https://images.unsplash.com/photo-1517244683847-7456bb63ff54?q=80&w=2070" alt="EFFOI Restaurant" style="width:100%; height:100%; object-fit:cover;">
+            </video>
+            {% endif %}
+            <div class="hero-overlay" style="transform: translateY(0); background: linear-gradient(transparent, rgba(139,30,30,0.9));">
+                <h2>{{ main_slider.title }}</h2>
+                <p>{{ main_slider.subtitle or 'Experience Authentic Ethiopian Cuisine' }}</p>
+                <a href="{{ main_slider.button_link or '/menu' }}" class="btn btn-danger mt-2">{{ main_slider.button_text or 'View Menu' }}</a>
+            </div>
+        {% else %}
+            <!-- Default video if no sliders -->
+            <video class="hero-video" autoplay loop muted playsinline>
+                <source src="https://player.vimeo.com/external/370468733.sd.mp4?s=90d2b19a3b4d1b3e4d1b3e4d1b3e4d1b3e4d1b3e4&profile_id=139" type="video/mp4">
+                <img src="https://images.unsplash.com/photo-1517244683847-7456bb63ff54?q=80&w=2070" alt="EFFOI Restaurant" style="width:100%; height:100%; object-fit:cover;">
+            </video>
+            <div class="hero-overlay" style="transform: translateY(0); background: linear-gradient(transparent, rgba(139,30,30,0.9));">
+                <h2>Welcome to EFFOI</h2>
+                <p>Experience Authentic Ethiopian Cuisine</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Right Side - Animated Grid (changes every 3 seconds) -->
+    <div class="hero-right">
+        <div class="hero-grid" id="animatedHeroGrid">
+            <!-- Grid items will be populated by JavaScript -->
+        </div>
+    </div>
+</div>
+
+<!-- ==================== STUNNING EFFOI CATERING SECTION ==================== -->
+<section class="catering-section my-5 py-5">
+    <!-- Animated Background -->
+    <div class="catering-bg">
+        <div class="bg-shape shape-1"></div>
+        <div class="bg-shape shape-2"></div>
+        <div class="bg-shape shape-3"></div>
+        <div class="bg-shape shape-4"></div>
+    </div>
+    
+    <div class="container position-relative">
+        <!-- Section Header with Animation -->
+        <div class="text-center mb-5" data-aos="fade-down">
+            <span class="badge-catering">PREMIUM CATERING</span>
+            <h2 class="display-3 fw-bold mb-3">
+                <span class="text-gradient">EFFOI</span> <span class="text-danger">CATERING</span>
+            </h2>
+            <div class="title-decoration">
+                <i class="fas fa-utensils text-danger"></i>
+                <span class="line"></span>
+                <i class="fas fa-star text-warning"></i>
+                <span class="line"></span>
+                <i class="fas fa-wine-glass-alt text-danger"></i>
+            </div>
+            <p class="lead text-muted mt-4" style="max-width: 700px; margin: 0 auto;">
+                Bringing the authentic taste of Ethiopia to your special events with elegance and style
+            </p>
+        </div>
+        
+        <!-- Two Text Cards with Floating Animation -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-6" data-aos="fade-right" data-aos-duration="1000">
+                <div class="catering-card card-left animate-float">
+                    <div class="card-inner">
+                        <div class="card-icon-wrapper">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <h3>Why Choose EFFOI Catering?</h3>
+                        <ul class="catering-list">
+                            <li><i class="fas fa-check-circle"></i> <strong>Authentic Recipes</strong> - Passed down through generations</li>
+                            <li><i class="fas fa-check-circle"></i> <strong>Fresh Ingredients</strong> - Sourced locally daily</li>
+                            <li><i class="fas fa-check-circle"></i> <strong>Professional Staff</strong> - Trained in Ethiopian hospitality</li>
+                            <li><i class="fas fa-check-circle"></i> <strong>Custom Menus</strong> - Tailored to your event theme</li>
+                            <li><i class="fas fa-check-circle"></i> <strong>Coffee Ceremony</strong> - Traditional experience included</li>
+                            <li><i class="fas fa-check-circle"></i> <strong>Live Music</strong> - Cultural performances optional</li>
+                        </ul>
+                        <div class="card-shine"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6" data-aos="fade-left" data-aos-duration="1000">
+                <div class="catering-card card-right animate-float-delay">
+                    <div class="card-inner">
+                        <div class="card-icon-wrapper">
+                            <i class="fas fa-gem"></i>
+                        </div>
+                        <h3>Our Catering Packages</h3>
+                        
+                        <div class="package-item">
+                            <div class="package-header">
+                                <span class="package-icon"><i class="fas fa-crown"></i></span>
+                                <h4>Silver Package</h4>
+                                <span class="package-price">$29<span>/person</span></span>
+                            </div>
+                            <p>3 vegetarian dishes, 2 meat dishes, injera, salad - Serves 20-30</p>
+                            <div class="package-features">
+                                <span class="badge bg-light text-dark">Vegetarian Options</span>
+                                <span class="badge bg-light text-dark">Injera Included</span>
+                            </div>
+                        </div>
+                        
+                        <div class="package-item">
+                            <div class="package-header">
+                                <span class="package-icon"><i class="fas fa-crown text-warning"></i></span>
+                                <h4>Gold Package</h4>
+                                <span class="package-price">$49<span>/person</span></span>
+                            </div>
+                            <p>5 vegetarian dishes, 4 meat dishes, injera, salad, dessert - Serves 30-50</p>
+                            <div class="package-features">
+                                <span class="badge bg-light text-dark">Dessert Included</span>
+                                <span class="badge bg-light text-dark">Extended Menu</span>
+                            </div>
+                        </div>
+                        
+                        <div class="package-item">
+                            <div class="package-header">
+                                <span class="package-icon"><i class="fas fa-crown text-danger"></i></span>
+                                <h4>Platinum Package</h4>
+                                <span class="package-price">$79<span>/person</span></span>
+                            </div>
+                            <p>Full buffet with 8+ dishes, coffee ceremony, live music - Serves 50-100+</p>
+                            <div class="package-features">
+                                <span class="badge bg-light text-dark">Coffee Ceremony</span>
+                                <span class="badge bg-light text-dark">Live Music</span>
+                                <span class="badge bg-light text-dark">Full Service</span>
+                            </div>
+                        </div>
+                        
+                        <a href="{{ url_for('contact') }}" class="btn-catering">
+                            <span>Request Quote</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                        <div class="card-shine"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Four BIG Cards with Images/Videos - 2x2 Grid with Hover Effects -->
+        <h3 class="text-center mb-5 display-6" data-aos="zoom-in">
+            <span class="gradient-text">Our Catering in Action</span>
+        </h3>
+        
+        <div class="row g-4">
+            <!-- Wedding Catering Card -->
+            <div class="col-md-6" data-aos="zoom-in" data-aos-delay="100">
+                <div class="catering-media-card">
+                    <div class="media-wrapper">
+                        <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Effoi_cattering1.gif" class="media-image" alt="Wedding Catering">
+                        <div class="media-overlay">
+                            <div class="overlay-content">
+                                <h4>Wedding Catering</h4>
+                                <p>Make your special day unforgettable</p>
+                                <div class="overlay-buttons">
+                                    <a href="{{ url_for('contact') }}" class="btn-overlay">Inquire</a>
+                                    <button class="btn-overlay-icon" onclick="openImageModal('https://images.unsplash.com/photo-1555244162-803834f70033?q=80&w=2070')">
+                                        <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="media-badge">Catering</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Corporate Events Card -->
+            <div class="col-md-6" data-aos="zoom-in" data-aos-delay="200">
+                <div class="catering-media-card">
+                    <div class="media-wrapper">
+                        <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Mar2.gif" class="media-image" alt="Corporate Events">
+                        <div class="media-overlay">
+                            <div class="overlay-content">
+                                <h4>Corporate Events</h4>
+                                <p>Impress clients and colleagues</p>
+                                <div class="overlay-buttons">
+                                    <a href="{{ url_for('contact') }}" class="btn-overlay">Inquire</a>
+                                    <button class="btn-overlay-icon" onclick="openImageModal('https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?q=80&w=2070')">
+                                        <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="media-badge">Catering</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Cultural Festivals Card with GIF -->
+            <div class="col-md-6" data-aos="zoom-in" data-aos-delay="300">
+                <div class="catering-media-card">
+                    <div class="media-wrapper">
+                        <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Effoi_cattering2.gif"
+                             class="media-image"
+                             alt="Cultural Festivals - EFFOI Catering"
+                             style="width: 100%; height: 100%; object-fit: cover;">
+                        <div class="media-overlay">
+                            <div class="overlay-content">
+                                <h4>Cultural Festivals</h4>
+                                <p>Traditional Ethiopian celebrations</p>
+                                <div class="overlay-buttons">
+                                    <a href="{{ url_for('events') }}" class="btn-overlay">Learn More</a>
+                                    <button class="btn-overlay-icon" onclick="openImageModal('https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Effoi_cattering2.gif')">
+                                        <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="media-badge">Traditional</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Private Parties Card -->
+            <div class="col-md-6" data-aos="zoom-in" data-aos-delay="400">
+                <div class="catering-media-card">
+                    <div class="media-wrapper">
+                        <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Mar3.gif" class="media-image" alt="Private Parties">
+                        <div class="media-overlay">
+                            <div class="overlay-content">
+                                <h4>Private Parties</h4>
+                                <p>Birthdays, anniversaries & more</p>
+                                <div class="overlay-buttons">
+                                    <a href="{{ url_for('contact') }}" class="btn-overlay">Inquire</a>
+                                    <button class="btn-overlay-icon" onclick="openImageModal('https://images.unsplash.com/photo-1464349153735-7db50ed83c84?q=80&w=2070')">
+                                        <i class="fas fa-expand"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="media-badge">Catering</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Call to Action Banner -->
+        <div class="catering-cta mt-5" data-aos="fade-up">
+            <div class="cta-content">
+                <h3>Ready to create an unforgettable experience?</h3>
+                <p>Contact us today for a customized catering quote</p>
+                <a href="{{ url_for('contact') }}" class="btn-cta">
+                    <span>Get Your Quote</span>
+                    <i class="fas fa-calendar-check"></i>
+                </a>
+            </div>
+            <div class="cta-particles">
+                <span></span><span></span><span></span><span></span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== ETHIOPIAN COFFEE CEREMONY SECTION ==================== -->
+<section class="coffee-ceremony-section my-5 py-5">
+    <!-- Coffee Beans Background -->
+    <div class="coffee-bg">
+        <div class="coffee-bean bean-1"></div>
+        <div class="coffee-bean bean-2"></div>
+        <div class="coffee-bean bean-3"></div>
+        <div class="coffee-bean bean-4"></div>
+        <div class="coffee-bean bean-5"></div>
+        <div class="coffee-smoke smoke-1"></div>
+        <div class="coffee-smoke smoke-2"></div>
+        <div class="coffee-smoke smoke-3"></div>
+    </div>
+    
+    <div class="container position-relative">
+        <!-- Section Header with Coffee Theme -->
+        <div class="text-center mb-5" data-aos="fade-down">
+            <span class="badge-coffee">☕ SINCE ANCIENT TIMES</span>
+            <h2 class="display-3 fw-bold mb-3">
+                <span class="text-coffee">ETHIOPIAN</span> <span class="text-espresso">COFFEE</span>
+                <span class="ceremony-word">CEREMONY</span>
+            </h2>
+            <div class="coffee-title-decoration">
+                <i class="fas fa-mug-hot coffee-icon"></i>
+                <span class="coffee-line"></span>
+                <i class="fas fa-star coffee-star"></i>
+                <span class="coffee-line"></span>
+                <i class="fas fa-mug-hot coffee-icon"></i>
+            </div>
+            <p class="lead text-coffee-muted mt-4" style="max-width: 700px; margin: 0 auto;">
+                <i class="fas fa-quote-left coffee-quote-mark"></i> 
+                The heart of Ethiopian hospitality - a sacred ritual that brings people together
+                <i class="fas fa-quote-right coffee-quote-mark"></i>
+            </p>
+        </div>
+
+        <!-- FOUR GRID IMAGES - 2x2 Layout with Coffee Theme -->
+        <div class="row g-4 mb-5">
+            <!-- Grid Image 1 - Coffee Beans Roasting -->
+            <div class="col-lg-6" data-aos="zoom-in" data-aos-delay="100">
+                <div class="coffee-premium-card">
+                    <div class="coffee-media-wrapper">
+                        <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Buna1.png" 
+                             class="coffee-media-image" 
+                             alt="Ethiopian Coffee Beans Roasting"
+                             loading="lazy">
+                        <div class="coffee-aroma-badge">
+                            <i class="fas fa-wind"></i> Aroma
+                        </div>
+                        <div class="coffee-card-overlay">
+                            <div class="coffee-overlay-content">
+                                <div class="coffee-step-indicator">Step 01</div>
+                                <h3 class="coffee-overlay-title">🌱 ROASTING</h3>
+                                <div class="coffee-overlay-divider"></div>
+                                <p class="coffee-overlay-text">
+                                    Green Ethiopian coffee beans are washed, then roasted in a flat pan over hot coals. 
+                                    The roaster shakes the pan continuously, filling the air with aromatic smoke - 
+                                    an invitation for guests to gather.
+                                </p>
+                                <div class="coffee-tradition-tag">
+                                    <i class="fas fa-fire"></i> Traditional Method
+                                </div>
+                                <div class="coffee-fact">
+                                    <i class="fas fa-lightbulb"></i> The roasting scent signals the beginning of the ceremony
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid Image 2 - Grinding with Mortar & Pestle -->
+            <div class="col-lg-6" data-aos="zoom-in" data-aos-delay="200">
+                <div class="coffee-premium-card">
+                    <div class="coffee-media-wrapper">
+                        <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Buna2.png" 
+                             class="coffee-media-image" 
+                             alt="Traditional Coffee Grinding"
+                             loading="lazy">
+                        <div class="coffee-freshness-badge">
+                            <i class="fas fa-leaf"></i> Freshly Ground
+                        </div>
+                        <div class="coffee-card-overlay">
+                            <div class="coffee-overlay-content">
+                                <div class="coffee-step-indicator">Step 02</div>
+                                <h3 class="coffee-overlay-title">⚡ GRINDING</h3>
+                                <div class="coffee-overlay-divider"></div>
+                                <p class="coffee-overlay-text">
+                                    The roasted beans are ground using a traditional mortar and pestle called a "mukecha". 
+                                    The rhythmic sound of grinding echoes through the room, building anticipation for the coffee to come.
+                                </p>
+                                <div class="coffee-tradition-tag">
+                                    <i class="fas fa-hands"></i> Artisanal Process
+                                </div>
+                                <div class="coffee-fact">
+                                    <i class="fas fa-lightbulb"></i> The fineness of grind affects the coffee's flavor
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid Image 3 - Jebena Brewing -->
+            <div class="col-lg-6" data-aos="zoom-in" data-aos-delay="300">
+                <div class="coffee-premium-card">
+                    <div class="coffee-media-wrapper">
+                        <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Buna3.png" 
+                             class="coffee-media-image" 
+                             alt="Jebena - Traditional Coffee Pot"
+                             loading="lazy">
+                        <div class="coffee-jebena-badge">
+                            <i class="fas fa-clay"></i> Jebena Pot
+                        </div>
+                        <div class="coffee-card-overlay">
+                            <div class="coffee-overlay-content">
+                                <div class="coffee-step-indicator">Step 03</div>
+                                <h3 class="coffee-overlay-title">🏺 BREWING</h3>
+                                <div class="coffee-overlay-divider"></div>
+                                <p class="coffee-overlay-text">
+                                    The ground coffee is placed in the "jebena" - a traditional clay pot with a round bottom 
+                                    and long neck. Water is added and the pot is placed on hot coals, allowing the coffee to 
+                                    simmer and develop its rich flavor.
+                                </p>
+                                <div class="coffee-tradition-tag">
+                                    <i class="fas fa-clay"></i> Authentic Vessel
+                                </div>
+                                <div class="coffee-fact">
+                                    <i class="fas fa-lightbulb"></i> The jebena is handmade by Ethiopian artisans
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid Image 4 - Serving Ceremony -->
+            <div class="col-lg-6" data-aos="zoom-in" data-aos-delay="400">
+                <div class="coffee-premium-card">
+                    <div class="coffee-media-wrapper">
+                        <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Buna4.png" 
+                             class="coffee-media-image" 
+                             alt="Ethiopian Coffee Serving"
+                             loading="lazy">
+                        <div class="coffee-blessing-badge">
+                            <i class="fas fa-hands-praying"></i> Three Rounds
+                        </div>
+                        <div class="coffee-card-overlay">
+                            <div class="coffee-overlay-content">
+                                <div class="coffee-step-indicator">Step 04</div>
+                                <h3 class="coffee-overlay-title">🎉 SERVING</h3>
+                                <div class="coffee-overlay-divider"></div>
+                                <p class="coffee-overlay-text">
+                                    The coffee is poured from height into small cups to create a layer of foam. 
+                                    Served with popcorn or traditional snacks. The ceremony includes three rounds: 
+                                    "Abol" (first), "Tona" (second), and "Baraka" (third/blessing).
+                                </p>
+                                <div class="coffee-tradition-tag">
+                                    <i class="fas fa-hands-praying"></i> Cultural Experience
+                                </div>
+                                <div class="coffee-fact">
+                                    <i class="fas fa-lightbulb"></i> The third round is considered a blessing
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coffee Ceremony Details - Three Rounds Explanation -->
+        <div class="coffee-three-rounds" data-aos="fade-up">
+            <h3 class="text-center mb-4">The Three Rounds of Blessings</h3>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="coffee-round-card round-first">
+                        <div class="round-number">1</div>
+                        <h4 class="round-title">Abol</h4>
+                        <p class="round-subtitle">The First Round</p>
+                        <div class="round-description">
+                            The strongest and most potent brew. Served first to honor the guests and begin the ceremony.
+                        </div>
+                        <div class="round-symbol">
+                            <i class="fas fa-crown"></i> Strength & Honor
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="coffee-round-card round-second">
+                        <div class="round-number">2</div>
+                        <h4 class="round-title">Tona</h4>
+                        <p class="round-subtitle">The Second Round</p>
+                        <div class="round-description">
+                            Milder than the first, allowing for deeper conversation and connection among guests.
+                        </div>
+                        <div class="round-symbol">
+                            <i class="fas fa-heart"></i> Connection & Conversation
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="coffee-round-card round-third">
+                        <div class="round-number">3</div>
+                        <h4 class="round-title">Baraka</h4>
+                        <p class="round-subtitle">The Third Round</p>
+                        <div class="round-description">
+                            The final and most blessed round. "Baraka" means blessing - it's believed this round brings good fortune.
+                        </div>
+                        <div class="round-symbol">
+                            <i class="fas fa-hands-praying"></i> Blessing & Good Fortune
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Traditional Elements & Booking -->
+        <div class="row mt-5 align-items-center">
+            <div class="col-lg-6" data-aos="fade-right">
+                <div class="coffee-tradition-card">
+                    <h3 class="mb-4">The Soul of Ethiopian Hospitality</h3>
+                    
+                    <div class="coffee-element-list">
+                        <div class="element-item">
+                            <div class="element-icon">
+                                <i class="fas fa-leaf"></i>
+                            </div>
+                            <div class="element-content">
+                                <h5>Fresh Incense</h5>
+                                <p>Frankincense or "etan" is burned to purify the air and ward off negative energy</p>
+                            </div>
+                        </div>
+                        
+                        <div class="element-item">
+                            <div class="element-icon">
+                                <i class="fas fa-seedling"></i>
+                            </div>
+                            <div class="element-content">
+                                <h5>Fresh Grass</h5>
+                                <p>The floor is scattered with fresh grass, symbolizing abundance and connection to nature</p>
+                            </div>
+                        </div>
+                        
+                        <div class="element-item">
+                            <div class="element-icon">
+                                <i class="fas fa-popcorn"></i>
+                            </div>
+                            <div class="element-content">
+                                <h5>Traditional Snacks</h5>
+                                <p>Fresh popcorn, roasted barley, or traditional bread accompanies the coffee</p>
+                            </div>
+                        </div>
+                        
+                        <div class="element-item">
+                            <div class="element-icon">
+                                <i class="fas fa-music"></i>
+                            </div>
+                            <div class="element-content">
+                                <h5>Ceremonial Music</h5>
+                                <p>Traditional music and singing often accompany the ceremony</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="coffee-booking-card">
+                    <div class="booking-badge">
+                        <i class="fas fa-crown"></i>
+                        <span>Must-Experience Ritual</span>
+                    </div>
+                    
+                    <h3 class="booking-title">Book a Coffee Ceremony</h3>
+                    
+                    <div class="ceremony-highlights">
+                        <div class="highlight-item">
+                            <i class="fas fa-clock coffee-gold"></i>
+                            <div>
+                                <strong>Duration:</strong> 45-60 minutes
+                            </div>
+                        </div>
+                        <div class="highlight-item">
+                            <i class="fas fa-users coffee-gold"></i>
+                            <div>
+                                <strong>Group Size:</strong> 2-10 people
+                            </div>
+                        </div>
+                        <div class="highlight-item">
+                            <i class="fas fa-gift coffee-gold"></i>
+                            <div>
+                                <strong>Includes:</strong> Popcorn, incense, traditional snacks
+                            </div>
+                        </div>
+                        <div class="highlight-item">
+                            <i class="fas fa-clock coffee-gold"></i>
+                            <div>
+                                <strong>Available:</strong> Daily 11:00 AM - 10:00 PM
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ceremony-price">
+                        <span class="price-label">Ceremony Fee:</span>
+                        <span class="price-value">$15</span>
+                        <span class="price-note">per person</span>
+                    </div>
+                    
+                    <a href="{{ url_for('reserve') }}" class="btn-coffee-booking">
+                        <span>Reserve Your Ceremony</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                    
+                    <p class="booking-note">
+                        <i class="fas fa-info-circle"></i> 
+                        Private ceremonies available for special events and groups
+                    </p>
+                    
+                    <div class="coffee-quote-footer">
+                        <i class="fas fa-quote-left"></i>
+                        Coffee is our bread. It brings families together and settles disputes.
+                        <i class="fas fa-quote-right"></i>
+                        <span>- Ethiopian Proverb</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Coffee Gallery Thumbnails -->
+        <div class="coffee-gallery-preview mt-5" data-aos="fade-up">
+            <h5 class="text-center mb-4">Moments from Our Coffee Ceremony</h5>
+            <div class="row g-2">
+                <div class="col-3">
+                    <div class="coffee-thumb" onclick="openImageModal('https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Ethio.png')">
+                        <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Ethio.png" alt="Coffee Ceremony">
+                        <div class="thumb-overlay">
+                            <i class="fas fa-search-plus"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="coffee-thumb" onclick="openImageModal('https://images.unsplash.com/photo-1461023058943-07fcbe16d735?q=80&w=2070')">
+                        <img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?q=80&w=2070" alt="Coffee Roasting">
+                        <div class="thumb-overlay">
+                            <i class="fas fa-search-plus"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="coffee-thumb" onclick="openImageModal('https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Jebena.png')">
+                        <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Jebena.png" alt="Jebena Pot">
+                        <div class="thumb-overlay">
+                            <i class="fas fa-search-plus"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="coffee-thumb" onclick="openImageModal('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2070')">
+                        <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2070" alt="Coffee Serving">
+                        <div class="thumb-overlay">
+                            <i class="fas fa-search-plus"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== BOOK TO HOST EVENTS SECTION ==================== -->
+<section class="events-section my-5 py-5">
+    <div class="container">
+        <h2 class="text-center mb-5 display-4" data-aos="fade-up">
+            <i class="fas fa-calendar-check text-danger me-3"></i>Book To Host Events
+            <i class="fas fa-calendar-check text-danger ms-3"></i>
+        </h2>
+        <p class="text-center lead mb-5 text-muted" data-aos="fade-up" data-aos-delay="100">
+            Your special moments deserve an authentic Ethiopian experience
+        </p>
+        
+        <div class="row g-4">
+            <!-- Weddings & Engagements -->
+            <div class="col-md-4 col-lg-3" data-aos="flip-left" data-aos-delay="100">
+                <div class="event-card">
+                    <div class="event-image" style="height: 150px; overflow: hidden;">
+                        <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=2069" class="w-100 h-100" alt="Wedding" style="object-fit: cover;">
+                    </div>
+                    <div class="event-content p-3 text-center">
+                        <div class="event-icon mb-2">
+                            <i class="fas fa-heart text-danger fa-2x"></i>
+                        </div>
+                        <h5>Weddings & Engagements</h5>
+                        <p class="small text-muted">Make your love story unforgettable</p>
+                        <a href="{{ url_for('contact') }}" class="btn btn-sm btn-outline-danger rounded-pill">Inquire</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Birthday -->
+            <div class="col-md-4 col-lg-3" data-aos="flip-left" data-aos-delay="150">
+                <div class="event-card">
+                    <div class="event-image" style="height: 150px; overflow: hidden;">
+                        <img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?q=80&w=2070" class="w-100 h-100" alt="Birthday" style="object-fit: cover;">
+                    </div>
+                    <div class="event-content p-3 text-center">
+                        <div class="event-icon mb-2">
+                            <i class="fas fa-birthday-cake text-danger fa-2x"></i>
+                        </div>
+                        <h5>Birthday</h5>
+                        <p class="small text-muted">Celebrate another year in style</p>
+                        <a href="{{ url_for('contact') }}" class="btn btn-sm btn-outline-danger rounded-pill">Inquire</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Cultural Event -->
+            <div class="col-md-4 col-lg-3" data-aos="flip-left" data-aos-delay="200">
+                <div class="event-card">
+                    <div class="event-image" style="height: 150px; overflow: hidden;">
+                        <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=2070" class="w-100 h-100" alt="Cultural Event" style="object-fit: cover;">
+                    </div>
+                    <div class="event-content p-3 text-center">
+                        <div class="event-icon mb-2">
+                            <i class="fas fa-globe-africa text-danger fa-2x"></i>
+                        </div>
+                        <h5>Cultural Event</h5>
+                        <p class="small text-muted">Share Ethiopian heritage</p>
+                        <a href="{{ url_for('contact') }}" class="btn btn-sm btn-outline-danger rounded-pill">Inquire</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Baby Shower -->
+            <div class="col-md-4 col-lg-3" data-aos="flip-left" data-aos-delay="250">
+                <div class="event-card">
+                    <div class="event-image" style="height: 150px; overflow: hidden;">
+                        <img src="https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=2070" class="w-100 h-100" alt="Baby Shower" style="object-fit: cover;">
+                    </div>
+                    <div class="event-content p-3 text-center">
+                        <div class="event-icon mb-2">
+                            <i class="fas fa-baby text-danger fa-2x"></i>
+                        </div>
+                        <h5>Baby Shower</h5>
+                        <p class="small text-muted">Welcome the new arrival</p>
+                        <a href="{{ url_for('contact') }}" class="btn btn-sm btn-outline-danger rounded-pill">Inquire</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Corporate Events -->
+            <div class="col-md-4 col-lg-3" data-aos="flip-left" data-aos-delay="300">
+                <div class="event-card">
+                    <div class="event-image" style="height: 150px; overflow: hidden;">
+                        <img src="https://images.unsplash.com/photo-1515187029135-18ee286d815b?q=80&w=2070" class="w-100 h-100" alt="Corporate" style="object-fit: cover;">
+                    </div>
+                    <div class="event-content p-3 text-center">
+                        <div class="event-icon mb-2">
+                            <i class="fas fa-building text-danger fa-2x"></i>
+                        </div>
+                        <h5>Corporate Events</h5>
+                        <p class="small text-muted">Impress clients and colleagues</p>
+                        <a href="{{ url_for('contact') }}" class="btn btn-sm btn-outline-danger rounded-pill">Inquire</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Anniversaries -->
+            <div class="col-md-4 col-lg-3" data-aos="flip-left" data-aos-delay="350">
+                <div class="event-card">
+                    <div class="event-image" style="height: 150px; overflow: hidden;">
+                        <img src="https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=2070" class="w-100 h-100" alt="Anniversary" style="object-fit: cover;">
+                    </div>
+                    <div class="event-content p-3 text-center">
+                        <div class="event-icon mb-2">
+                            <i class="fas fa-ring text-danger fa-2x"></i>
+                        </div>
+                        <h5>Anniversaries</h5>
+                        <p class="small text-muted">Celebrate years of love</p>
+                        <a href="{{ url_for('contact') }}" class="btn btn-sm btn-outline-danger rounded-pill">Inquire</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Graduation Parties -->
+            <div class="col-md-4 col-lg-3" data-aos="flip-left" data-aos-delay="400">
+                <div class="event-card">
+                    <div class="event-image" style="height: 150px; overflow: hidden;">
+                        <img src="https://plus.unsplash.com/premium_photo-1713296255442-e9338f42aad8?w=900&auto=format&fit=crop&q=60" class="w-100 h-100" alt="Graduation" style="object-fit: cover;">
+                    </div>
+                    <div class="event-content p-3 text-center">
+                        <div class="event-icon mb-2">
+                            <i class="fas fa-graduation-cap text-danger fa-2x"></i>
+                        </div>
+                        <h5>Graduation Parties</h5>
+                        <p class="small text-muted">Honor achievements</p>
+                        <a href="{{ url_for('contact') }}" class="btn btn-sm btn-outline-danger rounded-pill">Inquire</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Ritual and Cultural Events -->
+            <div class="col-md-4 col-lg-3" data-aos="flip-left" data-aos-delay="450">
+                <div class="event-card">
+                    <div class="event-image" style="height: 150px; overflow: hidden;">
+                        <img src="https://images.unsplash.com/photo-1465147264724-326b45c3c59b?q=80&w=2070" class="w-100 h-100" alt="Ritual" style="object-fit: cover;">
+                    </div>
+                    <div class="event-content p-3 text-center">
+                        <div class="event-icon mb-2">
+                            <i class="fas fa-hands text-danger fa-2x"></i>
+                        </div>
+                        <h5>Ritual & Cultural</h5>
+                        <p class="small text-muted">Traditional ceremonies</p>
+                        <a href="{{ url_for('contact') }}" class="btn btn-sm btn-outline-danger rounded-pill">Inquire</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Club For Events -->
+            <div class="col-md-4 col-lg-3" data-aos="flip-left" data-aos-delay="500">
+                <div class="event-card">
+                    <div class="event-image" style="height: 150px; overflow: hidden;">
+                        <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=2074" class="w-100 h-100" alt="Club Event" style="object-fit: cover;">
+                    </div>
+                    <div class="event-content p-3 text-center">
+                        <div class="event-icon mb-2">
+                            <i class="fas fa-music text-danger fa-2x"></i>
+                        </div>
+                        <h5>Club Events</h5>
+                        <p class="small text-muted">Live music and dance</p>
+                        <a href="{{ url_for('events') }}" class="btn btn-sm btn-outline-danger rounded-pill">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Family Reunions -->
+            <div class="col-md-4 col-lg-3" data-aos="flip-left" data-aos-delay="550">
+                <div class="event-card">
+                    <div class="event-image" style="height: 150px; overflow: hidden;">
+                        <img src="https://images.unsplash.com/photo-1528605248644-14dd04022da1?q=80&w=2070" class="w-100 h-100" alt="Family Reunion" style="object-fit: cover;">
+                    </div>
+                    <div class="event-content p-3 text-center">
+                        <div class="event-icon mb-2">
+                            <i class="fas fa-users text-danger fa-2x"></i>
+                        </div>
+                        <h5>Family Reunions</h5>
+                        <p class="small text-muted">Bring the family together</p>
+                        <a href="{{ url_for('contact') }}" class="btn btn-sm btn-outline-danger rounded-pill">Inquire</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Religious Events -->
+            <div class="col-md-4 col-lg-3" data-aos="flip-left" data-aos-delay="600">
+                <div class="event-card">
+                    <div class="event-image" style="height: 150px; overflow: hidden;">
+                        <img src="https://images.unsplash.com/photo-1438232992991-995b7058bbb3?q=80&w=2073" class="w-100 h-100" alt="Religious Event" style="object-fit: cover;">
+                    </div>
+                    <div class="event-content p-3 text-center">
+                        <div class="event-icon mb-2">
+                            <i class="fas fa-church text-danger fa-2x"></i>
+                        </div>
+                        <h5>Religious Events</h5>
+                        <p class="small text-muted">Church gatherings</p>
+                        <a href="{{ url_for('contact') }}" class="btn btn-sm btn-outline-danger rounded-pill">Inquire</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Rehearsal Dinners -->
+            <div class="col-md-4 col-lg-3" data-aos="flip-left" data-aos-delay="650">
+                <div class="event-card">
+                    <div class="event-image" style="height: 150px; overflow: hidden;">
+                        <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=2070" class="w-100 h-100" alt="Rehearsal Dinner" style="object-fit: cover;">
+                    </div>
+                    <div class="event-content p-3 text-center">
+                        <div class="event-icon mb-2">
+                            <i class="fas fa-glass-cheers text-danger fa-2x"></i>
+                        </div>
+                        <h5>Rehearsal Dinners</h5>
+                        <p class="small text-muted">Pre-wedding celebrations</p>
+                        <a href="{{ url_for('contact') }}" class="btn btn-sm btn-outline-danger rounded-pill">Inquire</a>
+                    </div>
+                </div>
+            </div>
+        
+        <!-- Call to Action -->
+        <div class="text-center mt-5" data-aos="fade-up">
+            <a href="{{ url_for('contact') }}" class="btn btn-danger btn-lg rounded-pill px-5 py-3">
+                <i class="fas fa-calendar-check me-2"></i>Book Your Event Now
+            </a>
+            <p class="mt-3 text-muted">Call us at {{ settings.get('phone', '+1 (240) 660-1337') }} for immediate assistance</p>
+        </div>
+    </div>
+</section>
+
+<!-- Today's Specials -->
+<section class="my-5 py-5">
+    <h2 class="text-center mb-5 display-4" data-aos="fade-up">Today's Specials</h2>
+    <div class="row g-4">
+        {% for item in specials %}
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                {% if item.image_url %}
+                <img src="{{ item.image_url }}" class="card-img-top" alt="{{ item.name }}" style="height: 250px; object-fit: cover; cursor: pointer;" onclick="openImageModal('{{ item.image_url }}')">
+                {% else %}
+                <div class="bg-secondary" style="height: 250px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-utensils fa-4x text-white-50"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    {% if item.is_popular %}
+                    <span class="badge bg-warning text-dark mb-2">Popular</span>
+                    {% endif %}
+                    <h5 class="card-title">{{ item.name }}</h5>
+                    <p class="card-text text-muted">{{ item.description[:100] }}...</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="h5 text-danger mb-0">${{ "%.2f"|format(item.price) }}</span>
+                        <a href="{{ url_for('menu_item_detail', item_id=item.id) }}" class="btn btn-outline-danger btn-sm">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Features -->
+<section class="py-5 bg-light rounded-4">
+    <div class="row g-4">
+        <div class="col-md-4 text-center" data-aos="fade-up">
+            <i class="fas fa-utensils fa-4x text-danger mb-3"></i>
+            <h3>Authentic Recipes</h3>
+            <p class="text-muted">Traditional Ethiopian recipes passed down through generations</p>
+        </div>
+        <div class="col-md-4 text-center" data-aos="fade-up" data-aos-delay="100">
+            <i class="fas fa-wine-glass-alt fa-4x text-danger mb-3"></i>
+            <h3>Warm Hospitality</h3>
+            <p class="text-muted">Experience the famous Ethiopian welcome and service</p>
+        </div>
+        <div class="col-md-4 text-center" data-aos="fade-up" data-aos-delay="200">
+            <i class="fas fa-music fa-4x text-danger mb-3"></i>
+            <h3>Live Events</h3>
+            <p class="text-muted">Enjoy cultural music and events at our club</p>
+        </div>
+    </div>
+</section>
+
+<!-- Upcoming Events -->
+<section class="my-5 py-5">
+    <h2 class="text-center mb-5 display-4" data-aos="fade-up">Upcoming Events</h2>
+    <div class="row g-4">
+        {% for event in events %}
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+            <div class="card h-100 border-0 shadow-sm rounded-4">
+                {% if event.image_url %}
+                <img src="{{ event.image_url }}" class="card-img-top" alt="{{ event.title }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="bg-secondary" style="height: 200px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-calendar fa-4x text-white-50"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge bg-danger">{{ event.event_date.strftime('%b %d') }}</span>
+                        <small class="text-muted">{{ event.event_time }}</small>
+                    </div>
+                    <h5 class="card-title">{{ event.title }}</h5>
+                    <p class="card-text text-muted">{{ event.description[:100] }}...</p>
+                    {% if event.price > 0 %}
+                    <p class="fw-bold text-danger">${{ "%.2f"|format(event.price) }}</p>
+                    {% else %}
+                    <p class="fw-bold text-success">Free Entry</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-body text-center">
+                <img src="" id="modalImage" class="img-fluid rounded-4" style="max-height: 80vh;">
+                <button type="button" class="btn btn-light mt-3" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* ==================== CATERING SECTION STYLES ==================== */
+.catering-section {
+    position: relative;
+    background: linear-gradient(135deg, #fff9f9 0%, #ffffff 100%);
+    overflow: hidden;
+}
+
+/* Animated Background Shapes */
+.catering-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    opacity: 0.5;
+}
+
+.bg-shape {
+    position: absolute;
+    background: linear-gradient(45deg, #8B1E1E, #FFD700);
+    border-radius: 50%;
+    filter: blur(60px);
+    animation: float 20s infinite;
+}
+
+.shape-1 {
+    width: 300px;
+    height: 300px;
+    top: -100px;
+    right: -100px;
+    opacity: 0.1;
+    animation-delay: 0s;
+}
+
+.shape-2 {
+    width: 400px;
+    height: 400px;
+    bottom: -150px;
+    left: -150px;
+    opacity: 0.1;
+    animation-delay: -5s;
+}
+
+.shape-3 {
+    width: 200px;
+    height: 200px;
+    top: 50%;
+    left: 30%;
+    opacity: 0.05;
+    animation-delay: -10s;
+}
+
+.shape-4 {
+    width: 250px;
+    height: 250px;
+    bottom: 20%;
+    right: 20%;
+    opacity: 0.05;
+    animation-delay: -15s;
+}
+
+@keyframes float {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(50px, 50px) rotate(90deg); }
+    50% { transform: translate(0, 100px) rotate(180deg); }
+    75% { transform: translate(-50px, 50px) rotate(270deg); }
+}
+
+/* Section Header */
+.badge-catering {
+    display: inline-block;
+    padding: 0.5rem 1.5rem;
+    background: linear-gradient(45deg, #8B1E1E, #B13E3E);
+    color: #FFD700;
+    border-radius: 50px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    margin-bottom: 1rem;
+    box-shadow: 0 5px 15px rgba(139, 30, 30, 0.3);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.text-gradient {
+    background: linear-gradient(45deg, #8B1E1E, #B13E3E);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.title-decoration {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.title-decoration .line {
+    width: 50px;
+    height: 2px;
+    background: linear-gradient(90deg, #8B1E1E, #FFD700, #8B1E1E);
+    animation: lineWidth 3s infinite;
+}
+
+@keyframes lineWidth {
+    0%, 100% { width: 50px; opacity: 0.5; }
+    50% { width: 100px; opacity: 1; }
+}
+
+/* Catering Cards */
+.catering-card {
+    position: relative;
+    height: 100%;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.card-inner {
+    position: relative;
+    padding: 2.5rem;
+    background: white;
+    height: 100%;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.card-left .card-inner {
+    background: linear-gradient(135deg, #8B1E1E, #B13E3E);
+    color: white;
+}
+
+.card-right .card-inner {
+    background: linear-gradient(135deg, #fff9e6, #ffffff);
+}
+
+.card-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    background: rgba(255,215,0,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    font-size: 2.5rem;
+    color: #FFD700;
+    animation: rotate 10s linear infinite;
+}
+
+.card-left .card-icon-wrapper {
+    background: rgba(255,255,255,0.2);
+    color: #FFD700;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Floating Animations */
+.animate-float {
+    animation: floatCard 3s ease-in-out infinite;
+}
+
+.animate-float-delay {
+    animation: floatCard 3s ease-in-out 1.5s infinite;
+}
+
+@keyframes floatCard {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Card Shine Effect */
+.card-shine {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(255,255,255,0.1),
+        transparent
+    );
+    transform: rotate(45deg);
+    animation: shine 6s infinite;
+    pointer-events: none;
+}
+
+@keyframes shine {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    20%, 100% { transform: translateX(100%) rotate(45deg); }
+}
+
+/* Catering List */
+.catering-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.catering-list li {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    animation: slideIn 0.5s ease-out;
+    animation-fill-mode: both;
+}
+
+.catering-list li:nth-child(1) { animation-delay: 0.1s; }
+.catering-list li:nth-child(2) { animation-delay: 0.2s; }
+.catering-list li:nth-child(3) { animation-delay: 0.3s; }
+.catering-list li:nth-child(4) { animation-delay: 0.4s; }
+.catering-list li:nth-child(5) { animation-delay: 0.5s; }
+.catering-list li:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.catering-list i {
+    color: #FFD700;
+    font-size: 1.2rem;
+}
+
+/* Package Items */
+.package-item {
+    background: rgba(139, 30, 30, 0.05);
+    border-radius: 15px;
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+}
+
+.package-item:hover {
+    transform: translateX(5px);
+    background: rgba(139, 30, 30, 0.1);
+    border-left-color: #8B1E1E;
+}
+
+.package-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.package-header h4 {
+    margin: 0;
+    flex: 1;
+    font-size: 1.1rem;
+}
+
+.package-price {
+    font-weight: bold;
+    color: #8B1E1E;
+    font-size: 1.2rem;
+}
+
+.package-price span {
+    font-size: 0.8rem;
+    color: #999;
+    font-weight: normal;
+}
+
+.package-features {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+}
+
+.package-features .badge {
+    background: #f8f9fa !important;
+    color: #333 !important;
+    padding: 0.3rem 0.8rem;
+    border-radius: 50px;
+    font-weight: normal;
+}
+
+/* Catering Button */
+.btn-catering {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 2rem;
+    background: linear-gradient(45deg, #8B1E1E, #B13E3E);
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 600;
+    margin-top: 1rem;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.btn-catering:hover {
+    background: white;
+    color: #8B1E1E;
+    border-color: #8B1E1E;
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(139,30,30,0.2);
+}
+
+.btn-catering i {
+    transition: transform 0.3s ease;
+}
+
+.btn-catering:hover i {
+    transform: translateX(5px);
+}
+
+/* Media Cards */
+.catering-media-card {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    height: 350px;
+}
+
+.catering-media-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 25px 50px rgba(139,30,30,0.3);
+}
+
+.media-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.media-image, .media-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.catering-media-card:hover .media-image,
+.catering-media-card:hover .media-video {
+    transform: scale(1.1);
+}
+
+.media-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(139,30,30,0.9), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: flex-end;
+    padding: 2rem;
+}
+
+.catering-media-card:hover .media-overlay {
+    opacity: 1;
+}
+
+.overlay-content {
+    color: white;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.catering-media-card:hover .overlay-content {
+    transform: translateY(0);
+}
+
+.overlay-content h4 {
+    margin-bottom: 0.3rem;
+    font-size: 1.5rem;
+}
+
+.overlay-content p {
+    margin-bottom: 1rem;
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+.overlay-buttons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.btn-overlay {
+    padding: 0.4rem 1rem;
+    background: #FFD700;
+    color: #8B1E1E;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.btn-overlay:hover {
+    background: white;
+    transform: scale(1.05);
+}
+
+.btn-overlay-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid white;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-overlay-icon:hover {
+    background: white;
+    color: #8B1E1E;
+}
+
+.media-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: #FFD700;
+    color: #8B1E1E;
+    padding: 0.3rem 1rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    z-index: 2;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+
+.video-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: rgba(255,255,255,0.2);
+    padding: 0.2rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+}
+
+.video-indicator i {
+    animation: pulse 1.5s infinite;
+}
+
+/* CTA Banner */
+.catering-cta {
+    position: relative;
+    background: linear-gradient(45deg, #8B1E1E, #B13E3E);
+    border-radius: 30px;
+    padding: 3rem;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(139,30,30,0.3);
+}
+
+.cta-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: white;
+}
+
+.cta-content h3 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    animation: fadeInUp 1s ease;
+}
+
+.cta-content p {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.9;
+}
+
+.btn-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 2.5rem;
+    background: #FFD700;
+    color: #8B1E1E;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.btn-cta:hover {
+    background: transparent;
+    color: #FFD700;
+    border-color: #FFD700;
+    transform: scale(1.05);
+}
+
+.btn-cta i {
+    transition: transform 0.3s ease;
+}
+
+.btn-cta:hover i {
+    transform: rotate(15deg);
+}
+
+.cta-particles span {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: rgba(255,215,0,0.3);
+    border-radius: 50%;
+    animation: particles 10s infinite;
+}
+
+.cta-particles span:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+.cta-particles span:nth-child(2) { top: 70%; left: 20%; animation-delay: 2s; }
+.cta-particles span:nth-child(3) { top: 30%; right: 15%; animation-delay: 4s; }
+.cta-particles span:nth-child(4) { bottom: 20%; right: 25%; animation-delay: 6s; }
+
+@keyframes particles {
+    0%, 100% { transform: translate(0, 0); opacity: 0.3; }
+    25% { transform: translate(20px, -20px); opacity: 0.6; }
+    50% { transform: translate(40px, 0); opacity: 0.3; }
+    75% { transform: translate(20px, 20px); opacity: 0.6; }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Gradient Text */
+.gradient-text {
+    background: linear-gradient(45deg, #8B1E1E, #B13E3E, #FFD700);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 5s infinite;
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+/* Hero grid items overlay (keep existing) */
+.hero-grid-item {
+    position: relative;
+    cursor: pointer;
+    animation: fadeIn 0.5s ease;
+}
+@keyframes fadeIn {
+    from { opacity: 0.5; }
+    to { opacity: 1; }
+}
+.hero-grid-item .item-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    color: white;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.hero-grid-item:hover .item-label {
+    opacity: 1;
+}
+.hero-overlay a.btn {
+    background: #FFD700;
+    color: #8B1E1E;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 1rem;
+}
+.hero-overlay a.btn:hover {
+    background: #8B1E1E;
+    color: #FFD700;
+}
+
+/* Event Cards */
+.event-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    height: 100%;
+}
+.event-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(139, 30, 30, 0.15);
+}
+.event-image {
+    border-radius: 20px 20px 0 0;
+}
+.event-image img {
+    transition: transform 0.5s ease;
+}
+.event-card:hover .event-image img {
+    transform: scale(1.1);
+}
+.event-content {
+    background: white;
+}
+
+/* ==================== COFFEE CEREMONY STYLES ==================== */
+.coffee-ceremony-section {
+    position: relative;
+    background: linear-gradient(135deg, #FDF5E6 0%, #FFF8E7 100%);
+    overflow: hidden;
+    padding: 5rem 0;
+}
+
+/* Coffee Beans Background */
+.coffee-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    opacity: 0.1;
+}
+
+.coffee-bean {
+    position: absolute;
+    background: #6B4F3C;
+    border-radius: 50% 50% 40% 40%;
+    transform: rotate(45deg);
+    animation: floatBean 15s infinite;
+}
+
+.coffee-bean::after {
+    content: '';
+    position: absolute;
+    width: 60%;
+    height: 30%;
+    background: #8B5A2B;
+    border-radius: 50%;
+    top: 35%;
+    left: 20%;
+}
+
+.bean-1 {
+    width: 60px;
+    height: 30px;
+    top: 10%;
+    left: 5%;
+    animation-delay: 0s;
+}
+
+.bean-2 {
+    width: 80px;
+    height: 40px;
+    bottom: 15%;
+    right: 10%;
+    animation-delay: 3s;
+}
+
+.bean-3 {
+    width: 40px;
+    height: 20px;
+    top: 30%;
+    right: 20%;
+    animation-delay: 6s;
+}
+
+.bean-4 {
+    width: 100px;
+    height: 50px;
+    bottom: 30%;
+    left: 15%;
+    animation-delay: 9s;
+}
+
+.bean-5 {
+    width: 50px;
+    height: 25px;
+    top: 70%;
+    left: 30%;
+    animation-delay: 12s;
+}
+
+@keyframes floatBean {
+    0%, 100% { transform: translate(0, 0) rotate(45deg); }
+    25% { transform: translate(20px, -20px) rotate(90deg); }
+    50% { transform: translate(-10px, 20px) rotate(135deg); }
+    75% { transform: translate(15px, 10px) rotate(180deg); }
+}
+
+/* Coffee Smoke Animation */
+.coffee-smoke {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    filter: blur(20px);
+    animation: smoke 8s infinite;
+}
+
+.smoke-1 {
+    top: 20%;
+    right: 30%;
+    animation-delay: 0s;
+}
+
+.smoke-2 {
+    bottom: 30%;
+    left: 25%;
+    animation-delay: 2s;
+}
+
+.smoke-3 {
+    top: 60%;
+    right: 40%;
+    animation-delay: 4s;
+}
+
+@keyframes smoke {
+    0% { transform: scale(1) translate(0, 0); opacity: 0.3; }
+    50% { transform: scale(1.5) translate(-30px, -30px); opacity: 0.6; }
+    100% { transform: scale(1) translate(0, 0); opacity: 0.3; }
+}
+
+/* Coffee Section Header */
+.badge-coffee {
+    display: inline-block;
+    padding: 0.5rem 1.5rem;
+    background: #8B5A2B;
+    color: #F5DEB3;
+    border-radius: 50px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    margin-bottom: 1rem;
+    box-shadow: 0 5px 15px rgba(139, 90, 43, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.badge-coffee::before {
+    content: '☕';
+    position: absolute;
+    left: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.3;
+    animation: moveBadge 3s infinite;
+}
+
+@keyframes moveBadge {
+    0% { left: -20px; }
+    50% { left: 100%; }
+    100% { left: -20px; }
+}
+
+.text-coffee {
+    background: linear-gradient(45deg, #6B4F3C, #8B5A2B);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.text-espresso {
+    color: #2C1810 !important;
+}
+
+.ceremony-word {
+    background: linear-gradient(45deg, #D4A373, #8B5A2B);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: block;
+    font-size: 2.5rem;
+    margin-top: -0.5rem;
+}
+
+.coffee-title-decoration {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.coffee-icon {
+    color: #8B5A2B;
+    font-size: 1.8rem;
+    animation: steam 2s infinite;
+}
+
+@keyframes steam {
+    0%, 100% { transform: translateY(0); opacity: 1; }
+    50% { transform: translateY(-5px); opacity: 0.8; }
+}
+
+.coffee-star {
+    color: #D4A373;
+    font-size: 1.2rem;
+    animation: spin 4s infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.coffee-line {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, #8B5A2B, #D4A373, #8B5A2B);
+    animation: lineWidth 3s infinite;
+}
+
+.text-coffee-muted {
+    color: #6B4F3C;
+    font-style: italic;
+}
+
+.coffee-quote-mark {
+    color: #D4A373;
+    font-size: 1rem;
+    margin: 0 0.5rem;
+    opacity: 0.7;
+}
+
+/* Coffee Premium Cards - 4 Grid Images */
+.coffee-premium-card {
+    position: relative;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(107, 79, 60, 0.2);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    height: 450px;
+    cursor: pointer;
+    border: 3px solid transparent;
+    background: linear-gradient(45deg, #8B5A2B, #D4A373);
+    padding: 3px;
+}
+
+.coffee-premium-card:hover {
+    transform: translateY(-15px) scale(1.02);
+    box-shadow: 0 35px 70px rgba(107, 79, 60, 0.3);
+    border-color: #D4A373;
+}
+
+.coffee-media-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 28px;
+}
+
+.coffee-media-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s ease;
+    filter: brightness(0.9);
+}
+
+.coffee-premium-card:hover .coffee-media-image {
+    transform: scale(1.1);
+    filter: brightness(1);
+}
+
+/* Badges */
+.coffee-aroma-badge, .coffee-freshness-badge, .coffee-jebena-badge, .coffee-blessing-badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(139, 90, 43, 0.9);
+    backdrop-filter: blur(5px);
+    color: #F5DEB3;
+    padding: 0.6rem 1.2rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    z-index: 10;
+    border: 1px solid #D4A373;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    animation: badgePulse 2s infinite;
+}
+
+@keyframes badgePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.coffee-aroma-badge i, .coffee-freshness-badge i, .coffee-jebena-badge i, .coffee-blessing-badge i {
+    margin-right: 0.5rem;
+    color: #FFD700;
+}
+
+/* Card Overlay */
+.coffee-card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, 
+        rgba(44, 24, 16, 0.95) 0%,
+        rgba(107, 79, 60, 0.7) 50%,
+        transparent 100%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    display: flex;
+    align-items: flex-end;
+    padding: 2rem;
+}
+
+.coffee-premium-card:hover .coffee-card-overlay {
+    opacity: 1;
+}
+
+.coffee-overlay-content {
+    color: white;
+    transform: translateY(30px);
+    transition: transform 0.4s ease;
+    width: 100%;
+}
+
+.coffee-premium-card:hover .coffee-overlay-content {
+    transform: translateY(0);
+}
+
+.coffee-step-indicator {
+    display: inline-block;
+    padding: 0.3rem 1rem;
+    background: #D4A373;
+    color: #2C1810;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+}
+
+.coffee-overlay-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.coffee-overlay-divider {
+    width: 60px;
+    height: 3px;
+    background: #D4A373;
+    margin: 1rem 0;
+    border-radius: 3px;
+}
+
+.coffee-overlay-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    opacity: 0.9;
+}
+
+.coffee-tradition-tag {
+    display: inline-block;
+    padding: 0.3rem 1rem;
+    background: rgba(212, 163, 115, 0.2);
+    border: 1px solid #D4A373;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+.coffee-fact {
+    background: rgba(0,0,0,0.3);
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    border-left: 3px solid #D4A373;
+}
+
+.coffee-fact i {
+    color: #D4A373;
+    margin-right: 0.5rem;
+}
+
+/* Three Rounds Cards */
+.coffee-three-rounds {
+    background: white;
+    border-radius: 50px;
+    padding: 3rem 2rem;
+    margin: 3rem 0;
+    box-shadow: 0 20px 40px rgba(107, 79, 60, 0.1);
+    border: 1px solid rgba(212, 163, 115, 0.3);
+}
+
+.coffee-round-card {
+    background: linear-gradient(135deg, #FFF8E7, #FFFFFF);
+    border-radius: 30px;
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(139, 90, 43, 0.1);
+    height: 100%;
+}
+
+.coffee-round-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(139, 90, 43, 0.2);
+    border-color: #D4A373;
+}
+
+.round-first:hover {
+    background: linear-gradient(135deg, #8B5A2B, #D4A373);
+    color: white;
+}
+
+.round-second:hover {
+    background: linear-gradient(135deg, #6B4F3C, #8B5A2B);
+    color: white;
+}
+
+.round-third:hover {
+    background: linear-gradient(135deg, #2C1810, #6B4F3C);
+    color: white;
+}
+
+.round-number {
+    width: 50px;
+    height: 50px;
+    background: #D4A373;
+    color: #2C1810;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 auto 1rem;
+    box-shadow: 0 10px 20px rgba(212, 163, 115, 0.3);
+}
+
+.round-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+}
+
+.round-subtitle {
+    color: #8B5A2B;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 1rem;
+}
+
+.round-description {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    opacity: 0.8;
+}
+
+.round-symbol {
+    padding-top: 1rem;
+    border-top: 1px dashed #D4A373;
+    font-size: 0.9rem;
+}
+
+.round-symbol i {
+    color: #D4A373;
+    margin-right: 0.5rem;
+}
+
+/* Tradition Elements List */
+.coffee-tradition-card {
+    background: white;
+    border-radius: 40px;
+    padding: 2.5rem;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+    border: 1px solid rgba(139, 90, 43, 0.1);
+}
+
+.element-item {
+    display: flex;
+    gap: 1.2rem;
+    margin-bottom: 1.8rem;
+    align-items: flex-start;
+    transition: all 0.3s ease;
+}
+
+.element-item:hover {
+    transform: translateX(10px);
+}
+
+.element-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #8B5A2B, #D4A373);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    box-shadow: 0 10px 20px rgba(139, 90, 43, 0.2);
+}
+
+.element-content h5 {
+    color: #8B5A2B;
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+}
+
+.element-content p {
+    color: #666;
+    margin-bottom: 0;
+    line-height: 1.6;
+}
+
+/* Coffee Booking Card */
+.coffee-booking-card {
+    background: linear-gradient(135deg, #2C1810, #6B4F3C);
+    color: white;
+    border-radius: 40px;
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(44, 24, 16, 0.4);
+    height: 100%;
+}
+
+.coffee-booking-card::before {
+    content: '☕';
+    position: absolute;
+    bottom: -30px;
+    right: -30px;
+    font-size: 200px;
+    opacity: 0.1;
+    transform: rotate(15deg);
+}
+
+.booking-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(212, 163, 115, 0.2);
+    backdrop-filter: blur(5px);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    margin-bottom: 1.5rem;
+    border: 1px solid #D4A373;
+}
+
+.booking-badge i {
+    color: #FFD700;
+}
+
+.booking-title {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.ceremony-highlights {
+    margin: 2rem 0;
+}
+
+.highlight-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+.highlight-item:hover {
+    background: rgba(212, 163, 115, 0.3);
+    transform: translateX(5px);
+}
+
+.highlight-item i {
+    width: 30px;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+.coffee-gold {
+    color: #FFD700;
+}
+
+.ceremony-price {
+    background: rgba(212, 163, 115, 0.2);
+    border-radius: 50px;
+    padding: 1rem 1.5rem;
+    margin: 1.5rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #D4A373;
+}
+
+.price-label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.price-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #FFD700;
+}
+
+.price-note {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+.btn-coffee-booking {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem 2rem;
+    background: #D4A373;
+    color: #2C1810;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    width: 100%;
+    margin: 1.5rem 0;
+}
+
+.btn-coffee-booking:hover {
+    background: transparent;
+    color: #D4A373;
+    border-color: #D4A373;
+    transform: scale(1.02);
+}
+
+.btn-coffee-booking i {
+    transition: transform 0.3s ease;
+}
+
+.btn-coffee-booking:hover i {
+    transform: translateX(5px);
+}
+
+.booking-note {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    text-align: center;
+}
+
+.booking-note i {
+    color: #D4A373;
+}
+
+.coffee-quote-footer {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(212, 163, 115, 0.3);
+    font-style: italic;
+    font-size: 0.95rem;
+    text-align: center;
+    position: relative;
+}
+
+.coffee-quote-footer i {
+    color: #D4A373;
+    margin: 0 0.3rem;
+    font-size: 0.8rem;
+}
+
+.coffee-quote-footer span {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+/* Coffee Gallery Thumbnails */
+.coffee-gallery-preview {
+    background: white;
+    border-radius: 30px;
+    padding: 2rem;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.05);
+}
+
+.coffee-thumb {
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    cursor: pointer;
+    height: 80px;
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+}
+
+.coffee-thumb:hover {
+    transform: scale(1.05);
+    border-color: #8B5A2B;
+    box-shadow: 0 10px 20px rgba(139, 90, 43, 0.3);
+}
+
+.coffee-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.thumb-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(107, 79, 60, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.coffee-thumb:hover .thumb-overlay {
+    opacity: 1;
+}
+
+.thumb-overlay i {
+    color: white;
+    font-size: 1.2rem;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .coffee-premium-card {
+        height: 400px;
+    }
+    
+    .coffee-overlay-title {
+        font-size: 1.5rem;
+    }
+    
+    .coffee-round-card {
+        margin-bottom: 1rem;
+    }
+    
+    .booking-title {
+        font-size: 1.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .coffee-premium-card {
+        height: 350px;
+    }
+    
+    .coffee-overlay-content {
+        padding: 1rem;
+    }
+    
+    .coffee-step-indicator {
+        font-size: 0.7rem;
+    }
+    
+    .coffee-overlay-title {
+        font-size: 1.3rem;
+    }
+    
+    .coffee-overlay-text {
+        font-size: 0.85rem;
+    }
+    
+    .coffee-three-rounds {
+        padding: 2rem 1rem;
+    }
+    
+    .element-item {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .element-icon {
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Curved boxes */
+.curved-box {
+    border-radius: 50px 20px 50px 20px;
+    transition: all 0.3s ease;
+}
+.curved-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 25px 50px rgba(139, 30, 30, 0.2);
+}
+</style>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Hero grid content from database
+let heroSliders = [
+    {% if hero_sliders and hero_sliders|length > 1 %}
+        {% for slider in hero_sliders[1:] %}
+        {
+            id: {{ slider.id }},
+            title: "{{ slider.title|replace('"', '\\"')|safe }}",
+            subtitle: "{{ slider.subtitle|replace('"', '\\"')|safe if slider.subtitle else '' }}",
+            image_url: "{{ slider.image_url|replace('"', '\\"')|safe }}",
+            button_text: "{{ slider.button_text|replace('"', '\\"')|safe }}",
+            button_link: "{{ slider.button_link|replace('"', '\\"')|safe }}"
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    {% endif %}
+];
+
+// If no sliders from database, use default images
+if (heroSliders.length === 0) {
+    heroSliders = [
+        { title: 'Doro Wot', subtitle: 'Spicy Chicken Stew', image_url: 'https://images.unsplash.com/photo-1552566624-52f8b3c8b3c9?q=80&w=2070' },
+        { title: 'Kitfo', subtitle: 'Seasoned Raw Beef', image_url: 'https://images.unsplash.com/photo-1544148103-0773bf10d330?q=80&w=2070' },
+        { title: 'Coffee Ceremony', subtitle: 'Traditional Ethiopian Coffee', image_url: 'https://images.unsplash.com/photo-1551218808-94e220e084d2?q=80&w=2070' },
+        { title: 'Live Music', subtitle: 'Cultural Entertainment', image_url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2070' },
+        { title: 'Injera', subtitle: 'Traditional Bread', image_url: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=2070' },
+        { title: 'Restaurant', subtitle: 'Warm Ambiance', image_url: 'https://images.unsplash.com/photo-1517244683847-7456bb63ff54?q=80&w=2070' },
+        { title: 'Tibs', subtitle: 'Sizzling Beef', image_url: 'https://images.unsplash.com/photo-1552566624-52f8b3c8b3c9?q=80&w=2070' }
+    ];
+}
+
+let currentIndex = 0;
+const gridSize = 4; // 4 items in grid (2x2)
+
+function updateHeroGrid() {
+    const grid = document.getElementById('animatedHeroGrid');
+    if (!grid) return;
+    
+    let html = '';
+    
+    // Get 4 items starting from currentIndex, cycling through the array
+    for (let i = 0; i < gridSize; i++) {
+        const itemIndex = (currentIndex + i) % heroSliders.length;
+        const item = heroSliders[itemIndex];
+        
+        html += `
+            <div class="hero-grid-item" onclick="window.location.href='${item.button_link || '/menu'}'">
+                <img src="${item.image_url}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover;">
+                <div class="item-label">
+                    <strong>${item.title}</strong><br>
+                    <small>${item.subtitle || ''}</small>
+                </div>
+            </div>
+        `;
+    }
+    
+    grid.innerHTML = html;
+    currentIndex = (currentIndex + 1) % heroSliders.length;
+}
+
+// Initialize grid
+updateHeroGrid();
+
+// Rotate every 3 seconds
+setInterval(updateHeroGrid, 3000);
+
+function openImageModal(imageUrl) {
+    document.getElementById('modalImage').src = imageUrl;
+    new bootstrap.Modal(document.getElementById('imageModal')).show();
+}
+</script>
+{% endblock %}

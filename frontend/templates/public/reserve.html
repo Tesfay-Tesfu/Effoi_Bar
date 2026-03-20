@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Make a Reservation - EFFOI{% endblock %}
+
+{% block content %}
+<div class="my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="row g-0">
+                    <div class="col-md-5 bg-danger text-white p-5 d-flex flex-column justify-content-center">
+                        <h3 class="mb-4">Reserve Your Table</h3>
+                        <p><i class="fas fa-phone me-2"></i> {{ settings.get('phone', '+1 (240) 660-1337') }}</p>
+                        <p><i class="fas fa-envelope me-2"></i> {{ settings.get('email', 'nigistme1277@gmail.com') }}</p>
+                        <p><i class="fas fa-clock me-2"></i> {{ settings.get('hours', 'Mon-Sun: 11am-10pm') }}</p>
+                        <hr class="bg-white">
+                        <p class="small">For parties larger than 8, please call us directly.</p>
+                    </div>
+                    <div class="col-md-7 p-5">
+                        <h4 class="mb-4">Make a Reservation</h4>
+                        <form method="POST" action="{{ url_for('reserve') }}" id="reservationForm">
+                            <div class="mb-3">
+                                <label class="form-label">Your Name *</label>
+                                <input type="text" class="form-control" name="name" required>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Email *</label>
+                                    <input type="email" class="form-control" name="email" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Phone *</label>
+                                    <input type="tel" class="form-control" name="phone" required>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Date *</label>
+                                    <input type="date" class="form-control" name="date" id="resDate" min="{{ now().strftime('%Y-%m-%d') }}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Time *</label>
+                                    <select class="form-control" name="time" id="resTime" required>
+                                        <option value="">Select date first</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Party Size *</label>
+                                <select class="form-control" name="party_size" required>
+                                    <option value="1">1 person</option>
+                                    <option value="2">2 people</option>
+                                    <option value="3">3 people</option>
+                                    <option value="4">4 people</option>
+                                    <option value="5">5 people</option>
+                                    <option value="6">6 people</option>
+                                    <option value="7">7 people</option>
+                                    <option value="8">8 people</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label">Special Requests (optional)</label>
+                                <textarea class="form-control" name="special_requests" rows="3"></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-danger w-100 py-3 rounded-pill">Confirm Reservation</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#resDate').change(function() {
+        var date = $(this).val();
+        $('#resTime').html('<option value="">Loading...</option>');
+        
+        $.get('{{ url_for("get_available_times_route") }}', {date: date}, function(data) {
+            var options = '<option value="">Select time</option>';
+            data.times.forEach(function(time) {
+                options += '<option value="' + time + '">' + time + '</option>';
+            });
+            $('#resTime').html(options);
+        });
+    });
+});
+</script>
+{% endblock %}
