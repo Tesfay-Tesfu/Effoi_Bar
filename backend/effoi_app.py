@@ -1,7 +1,7 @@
 
+
 """
 EFFOI RESTAURANT - Complete Clean Flask Application
-Production-ready for Render.com with PostgreSQL
 """
 import os
 import json
@@ -23,82 +23,25 @@ load_dotenv()
 app = Flask(__name__, 
             template_folder='../frontend/templates',
             static_folder='../frontend/static')
-
-# ==================== PRODUCTION CONFIGURATION ====================
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', secrets.token_hex(32))
-
-# Database configuration - Support both SQLite (local) and PostgreSQL (Render)
-database_url = os.getenv('DATABASE_URL')
-if database_url and database_url.startswith('postgres://'):
-    database_url = database_url.replace('postgres://', 'postgresql://', 1)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///effoi.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///effoi.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 100MB
 
-# Connection pool settings for PostgreSQL
-if database_url and 'postgresql' in database_url:
-    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-        'pool_pre_ping': True,
-        'pool_recycle': 300,
-        'pool_size': 5,
-        'max_overflow': 10
-    }
+# Email configuration
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME', 'tesfaymn402@gmail.com')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD','hkdc ohxr ptoo xmhz')
+app.config['MAIL_DEFAULT_SENDER'] = ('EFFOI Restaurant', 'nigistme1277@gmail.com')
 
-app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500MB
-
-# Email configuration (optional - won't crash if not set)
-app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
-app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
-app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'True') == 'True'
-app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
-app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', ('EFFOI Restaurant', 'noreply@effoirestaurant.com'))
-
-# Base URL for absolute paths
-app.config['BASE_URL'] = os.getenv('BASE_URL', 'https://www.effoirestaurant.com')
+# Base URL
+app.config['BASE_URL'] = os.getenv('BASE_URL', 'http://localhost:5001')
 
 # Initialize extensions
 db = SQLAlchemy(app)
 mail = Mail(app)
-
-# ==================== HELPER FUNCTIONS ====================
-def get_upload_path(subfolder):
-    """Get absolute upload path that works on both local and Render"""
-    base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    upload_dir = os.path.join(base_path, 'frontend', 'static', 'uploads', subfolder)
-    os.makedirs(upload_dir, exist_ok=True)
-    return upload_dir
-
-def get_available_times(date):
-    """Get available reservation times for a given date"""
-    all_times = []
-    for hour in range(11, 22):  # 11 AM to 10 PM
-        for minute in [0, 30]:
-            time_str = f"{hour:02d}:{minute:02d}"
-            all_times.append(time_str)
-    
-    # Get booked times from reservations
-    booked_times = []
-    reservations = Reservation.query.filter(
-        Reservation.reservation_date == date,
-        Reservation.status.in_(['pending', 'confirmed'])
-    ).all()
-    for res in reservations:
-        booked_times.append(res.reservation_time)
-    
-    # Get blocked times from time blocks
-    blocks = TimeBlock.query.filter(TimeBlock.block_date == date).all()
-    for block in blocks:
-        current = datetime.strptime(block.start_time, '%H:%M')
-        end = datetime.strptime(block.end_time, '%H:%M')
-        while current < end:
-            time_str = current.strftime('%H:%M')
-            booked_times.append(time_str)
-            current += timedelta(minutes=30)
-    
-    # Return available times
-    available = [t for t in all_times if t not in booked_times]
-    return available
 
 # ==================== TEMPLATE FILTERS ====================
 @app.template_filter('from_json')
@@ -288,6 +231,7 @@ class GalleryImage(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+# Add this model to effoi_app.py
 class CoffeeCeremony(db.Model):
     __tablename__ = 'coffee_ceremonies'
     id = db.Column(db.Integer, primary_key=True)
@@ -310,6 +254,7 @@ class EventImage(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
+    # Relationship
     event = db.relationship('Event', backref=db.backref('gallery_images', lazy=True, cascade='all, delete-orphan'))
 
 class AboutUsImage(db.Model):
@@ -324,6 +269,7 @@ class AboutUsImage(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
+    # Relationship
     about_us = db.relationship('AboutUs', backref=db.backref('gallery_images_rel', lazy=True, cascade='all, delete-orphan'))
 
 # ==================== ABOUT US MODEL ====================
@@ -332,53 +278,69 @@ class AboutUs(db.Model):
     __tablename__ = 'about_us'
     
     id = db.Column(db.Integer, primary_key=True)
+    # Hero Section
     hero_video_url = db.Column(db.String(500), default='https://player.vimeo.com/external/370468733.sd.mp4?s=90d2b19a3b4d1b3e4d1b3e4d1b3e4d1b3e4d1b3e4&profile_id=139')
     hero_title = db.Column(db.String(200), default='About EFFOI')
     
+    # Card 1 - Our Story
     card1_title = db.Column(db.String(200), default='Our Story')
-    card1_text = db.Column(db.Text, default='Founded in 2024, EFFOI Restaurant brings the authentic taste of Ethiopia to Silver Spring.')
-    card1_color = db.Column(db.String(50), default='danger')
-    card1_icon = db.Column(db.String(50), default='utensils')
+    card1_text = db.Column(db.Text, default='Founded in 2024, EFFOI Restaurant brings the authentic taste of Ethiopia to Silver Spring. Our recipes have been passed down through generations, preserving the rich culinary heritage of Ethiopia.')
+    card1_color = db.Column(db.String(50), default='danger')  # bg-danger, bg-warning, bg-success
+    card1_icon = db.Column(db.String(50), default='utensils')  # Font Awesome icon
     
+    # Card 2 - Our Philosophy
     card2_title = db.Column(db.String(200), default='Our Philosophy')
-    card2_text = db.Column(db.Text, default='We believe in using only the freshest ingredients and traditional cooking methods.')
+    card2_text = db.Column(db.Text, default='We believe in using only the freshest ingredients, traditional cooking methods, and serving with the warm hospitality that Ethiopia is known for.')
     card2_color = db.Column(db.String(50), default='warning')
     card2_icon = db.Column(db.String(50), default='leaf')
     
+    # Card 3 - Our Promise
     card3_title = db.Column(db.String(200), default='Our Promise')
-    card3_text = db.Column(db.Text, default='Every dish is prepared with love and care for an unforgettable experience.')
+    card3_text = db.Column(db.Text, default='Every dish is prepared with love and care, ensuring an unforgettable dining experience that will keep you coming back for more.')
     card3_color = db.Column(db.String(50), default='success')
     card3_icon = db.Column(db.String(50), default='heart')
     
+    # Stats Section
     stats_dishes = db.Column(db.Integer, default=100)
     stats_years = db.Column(db.Integer, default=15)
     stats_customers = db.Column(db.Integer, default=10000)
     stats_awards = db.Column(db.Integer, default=25)
     
-    gallery_images = db.Column(db.Text, default='[]')
+    # Gallery Images (comma-separated URLs or JSON)
+    gallery_images = db.Column(db.Text, default='[]')  # Store as JSON array
+    
+    # SEO
     meta_description = db.Column(db.String(300))
     
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-# ==================== HEALTH CHECK ENDPOINT ====================
-@app.route('/health')
-def health_check():
-    """Health check endpoint for Render monitoring"""
-    try:
-        # Test database connection
-        db.session.execute('SELECT 1')
-        return jsonify({
-            'status': 'healthy',
-            'database': 'connected',
-            'timestamp': datetime.now().isoformat()
-        }), 200
-    except Exception as e:
-        return jsonify({
-            'status': 'unhealthy',
-            'database': 'disconnected',
-            'error': str(e),
-            'timestamp': datetime.now().isoformat()
-        }), 500
+# ==================== HELPER FUNCTIONS ====================
+def get_available_times(date):
+    all_times = []
+    for hour in range(11, 22):
+        for minute in [0, 30]:
+            time_str = f"{hour:02d}:{minute:02d}"
+            all_times.append(time_str)
+    
+    booked_times = []
+    reservations = Reservation.query.filter(
+        Reservation.reservation_date == date,
+        Reservation.status.in_(['pending', 'confirmed'])
+    ).all()
+    for res in reservations:
+        booked_times.append(res.reservation_time)
+    
+    blocks = TimeBlock.query.filter(TimeBlock.block_date == date).all()
+    for block in blocks:
+        current = datetime.strptime(block.start_time, '%H:%M')
+        end = datetime.strptime(block.end_time, '%H:%M')
+        while current < end:
+            time_str = current.strftime('%H:%M')
+            booked_times.append(time_str)
+            current += timedelta(minutes=30)
+    
+    available = [t for t in all_times if t not in booked_times]
+    return available
 
 # ==================== CONTEXT PROCESSORS ====================
 @app.context_processor
@@ -432,8 +394,8 @@ def menu_item_detail(item_id):
 def events():
     upcoming = Event.query.filter_by(is_active=True).filter(Event.event_date >= datetime.now().date()).order_by(Event.event_date).all()
     past = Event.query.filter_by(is_active=True).filter(Event.event_date < datetime.now().date()).order_by(Event.event_date.desc()).limit(6).all()
-    all_events = Event.query.filter_by(is_active=True).order_by(Event.event_date.desc()).all()
-    return render_template('public/events.html', upcoming=upcoming, past=past, events=all_events)
+    all_events = Event.query.filter_by(is_active=True).order_by(Event.event_date.desc()).all()  # Add this line
+    return render_template('public/events.html', upcoming=upcoming, past=past, events=all_events)  # Add events=all_events
 
 @app.route('/blog')
 def blog():
@@ -463,10 +425,13 @@ def submit_blog():
             filename = secure_filename(image_file.filename)
             filename = f"{int(time.time())}_{filename}"
             
-            upload_dir = get_upload_path('blog')
+            project_root = os.path.dirname(os.path.dirname(__file__))
+            upload_dir = os.path.join(project_root, 'frontend', 'static', 'uploads', 'blog')
+            os.makedirs(upload_dir, exist_ok=True)
+            
             file_path = os.path.join(upload_dir, filename)
             image_file.save(file_path)
-            image_url = url_for('static', filename=f'uploads/blog/{filename}', _external=True)
+            image_url = f"/static/uploads/blog/{filename}"
         
         post = BlogPost(
             title=request.form.get('title'),
@@ -503,8 +468,8 @@ def add_comment(post_id):
 @app.route('/reviews')
 def reviews():
     page = request.args.get('page', 1, type=int)
-    reviews_list = Review.query.filter_by(is_approved=True).order_by(Review.created_at.desc()).paginate(page=page, per_page=10)
-    return render_template('public/reviews.html', reviews=reviews_list)
+    reviews = Review.query.filter_by(is_approved=True).order_by(Review.created_at.desc()).paginate(page=page, per_page=10)
+    return render_template('public/reviews.html', reviews=reviews)
 
 @app.route('/reviews/submit', methods=['POST'])
 def submit_review():
@@ -521,8 +486,10 @@ def submit_review():
     flash('Thank you for your review! It will appear after approval.', 'success')
     return redirect(url_for('reviews'))
 
+
 @app.route('/about')
 def about():
+    """About Us page - using custom template with owners, team, and gallery"""
     return render_template('public/about.html')
 
 @app.route('/policy')
@@ -546,23 +513,16 @@ def send_contact():
     message = request.form.get('message')
     
     try:
-        # Only try to send email if mail is configured
-        if app.config['MAIL_USERNAME'] and app.config['MAIL_PASSWORD']:
-            msg = Message(
-                subject=f"Contact Form: {name}",
-                recipients=[os.getenv('ADMIN_EMAIL', 'nigistme1277@gmail.com')],
-                reply_to=email,
-                body=f"Name: {name}\nEmail: {email}\n\nMessage:\n{message}"
-            )
-            mail.send(msg)
-            flash('Your message has been sent. We\'ll get back to you soon!', 'success')
-        else:
-            # Log the message instead
-            print(f"Contact message from {name} ({email}): {message}")
-            flash('Your message has been received. We\'ll get back to you soon!', 'success')
-    except Exception as e:
-        print(f"Email error: {str(e)}")
-        flash('Your message has been received. We\'ll get back to you soon!', 'success')
+        msg = Message(
+            subject=f"Contact Form: {name}",
+            recipients=['nigistme1277@gmail.com'],
+            reply_to=email,
+            body=f"Name: {name}\nEmail: {email}\n\nMessage:\n{message}"
+        )
+        mail.send(msg)
+        flash('Your message has been sent. We\'ll get back to you soon!', 'success')
+    except:
+        flash('Sorry, there was an error sending your message. Please try again.', 'danger')
     
     return redirect(url_for('contact'))
 
@@ -583,54 +543,146 @@ def reserve():
             db.session.add(reservation)
             db.session.commit()
             
-            # Try to send email if configured
-            if app.config['MAIL_USERNAME'] and app.config['MAIL_PASSWORD']:
-                try:
-                    msg = Message(
-                        subject="Reservation Request Received - EFFOI Restaurant",
-                        recipients=[reservation.customer_email],
-                        html=f"""
-                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                            <div style="background-color: #8B1E1E; color: #FFD700; padding: 20px; text-align: center;">
-                                <h1>EFFOI Restaurant</h1>
-                            </div>
-                            <div style="padding: 30px; background-color: #f9f9f9;">
-                                <h2 style="color: #8B1E1E;">Thank You for Your Reservation Request</h2>
-                                <p>Dear <strong>{reservation.customer_name}</strong>,</p>
-                                <p>We have received your reservation request and will confirm it shortly.</p>
-                                
-                                <div style="background-color: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
-                                    <h3 style="color: #8B1E1E; margin-top: 0;">Reservation Details:</h3>
-                                    <p><strong>Date:</strong> {reservation.reservation_date.strftime('%B %d, %Y')}</p>
-                                    <p><strong>Time:</strong> {reservation.reservation_time}</p>
-                                    <p><strong>Party Size:</strong> {reservation.party_size} people</p>
-                                </div>
-                                
-                                <p><strong>Status:</strong> <span style="color: #FFA500; font-weight: bold;">Pending Confirmation</span></p>
-                                <p>We will send you another email once your reservation is confirmed.</p>
-                                
-                                <p>If you need to make any changes, please call us.</p>
-                            </div>
-                            <div style="background-color: #8B1E1E; color: white; padding: 15px; text-align: center; font-size: 12px;">
-                                <p>8233 Fenton St, Silver Spring, MD 20910 | (240) 660-1337</p>
-                            </div>
+            # Send confirmation email to customer
+            try:
+                msg = Message(
+                    subject="Reservation Request Received - EFFOI Restaurant",
+                    recipients=[reservation.customer_email],
+                    html=f"""
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                        <div style="background-color: #8B1E1E; color: #FFD700; padding: 20px; text-align: center;">
+                            <h1>EFFOI Restaurant</h1>
                         </div>
-                        """
-                    )
-                    mail.send(msg)
-                except Exception as e:
-                    print(f"Email send error: {str(e)}")
+                        <div style="padding: 30px; background-color: #f9f9f9;">
+                            <h2 style="color: #8B1E1E;">Thank You for Your Reservation Request</h2>
+                            <p>Dear <strong>{reservation.customer_name}</strong>,</p>
+                            <p>We have received your reservation request and will confirm it shortly.</p>
+                            
+                            <div style="background-color: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                                <h3 style="color: #8B1E1E; margin-top: 0;">Reservation Details:</h3>
+                                <p><strong>Date:</strong> {reservation.reservation_date.strftime('%B %d, %Y')}</p>
+                                <p><strong>Time:</strong> {reservation.reservation_time}</p>
+                                <p><strong>Party Size:</strong> {reservation.party_size} people</p>
+                                {f'<p><strong>Special Requests:</strong> {reservation.special_requests}</p>' if reservation.special_requests else ''}
+                            </div>
+                            
+                            <p><strong>Status:</strong> <span style="color: #FFA500; font-weight: bold;">Pending Confirmation</span></p>
+                            <p>We will send you another email once your reservation is confirmed.</p>
+                            
+                            <p>If you need to make any changes, please call us at <strong>(240) 660-1337</strong>.</p>
+                        </div>
+                        <div style="background-color: #8B1E1E; color: white; padding: 15px; text-align: center; font-size: 12px;">
+                            <p>8233 Fenton St, Silver Spring, MD 20910 | (240) 660-1337</p>
+                        </div>
+                    </div>
+                    """
+                )
+                mail.send(msg)
+                print(f"✅ Confirmation email sent to {reservation.customer_email}")
+            except Exception as e:
+                print(f"❌ Failed to send confirmation email: {str(e)}")
+            
+            # Send notification to admin
+            try:
+                admin_msg = Message(
+                    subject=f"New Reservation: {reservation.customer_name}",
+                    recipients=['nigistme1277@gmail.com'],
+                    html=f"""
+                    <h2>New Reservation Request</h2>
+                    <p><strong>Name:</strong> {reservation.customer_name}</p>
+                    <p><strong>Email:</strong> {reservation.customer_email}</p>
+                    <p><strong>Phone:</strong> {reservation.customer_phone}</p>
+                    <p><strong>Date:</strong> {reservation.reservation_date.strftime('%Y-%m-%d')}</p>
+                    <p><strong>Time:</strong> {reservation.reservation_time}</p>
+                    <p><strong>Party Size:</strong> {reservation.party_size}</p>
+                    {f'<p><strong>Special Requests:</strong> {reservation.special_requests}</p>' if reservation.special_requests else ''}
+                    <p><a href="{url_for('admin_reservations', _external=True)}">View in Admin Panel</a></p>
+                    """
+                )
+                mail.send(admin_msg)
+                print(f"✅ Admin notification sent")
+            except Exception as e:
+                print(f"❌ Failed to send admin notification: {str(e)}")
             
             flash('Your reservation request has been submitted. We\'ll confirm shortly!', 'success')
             
         except Exception as e:
-            print(f"Reservation error: {str(e)}")
+            print(f"❌ Reservation error: {str(e)}")
             flash('There was an error processing your reservation. Please try again.', 'danger')
             db.session.rollback()
         
         return redirect(url_for('index'))
     
     return render_template('public/reserve.html')
+
+@app.route('/admin/reservations/update/<int:reservation_id>', methods=['POST'])
+@admin_required
+def admin_update_reservation(reservation_id):
+    reservation = Reservation.query.get_or_404(reservation_id)
+    new_status = request.form.get('status')
+    
+    if new_status in ['pending', 'confirmed', 'cancelled']:
+        old_status = reservation.status
+        reservation.status = new_status
+        db.session.commit()
+        
+        # Send email notification to customer about status change
+        if new_status != old_status:
+            try:
+                status_colors = {
+                    'confirmed': '#28a745',
+                    'cancelled': '#dc3545',
+                    'pending': '#ffc107'
+                }
+                status_icons = {
+                    'confirmed': '✅',
+                    'cancelled': '❌',
+                    'pending': '⏳'
+                }
+                
+                msg = Message(
+                    subject=f"Reservation {new_status.title()} - EFFOI Restaurant",
+                    recipients=[reservation.customer_email],
+                    html=f"""
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                        <div style="background-color: #8B1E1E; color: #FFD700; padding: 20px; text-align: center;">
+                            <h1>EFFOI Restaurant</h1>
+                        </div>
+                        <div style="padding: 30px; background-color: #f9f9f9;">
+                            <h2 style="color: #8B1E1E;">Reservation Status Update</h2>
+                            <p>Dear <strong>{reservation.customer_name}</strong>,</p>
+                            
+                            <div style="background-color: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                                <h3 style="color: #8B1E1E; margin-top: 0;">Your reservation has been:</h3>
+                                <p style="font-size: 24px; color: {status_colors[new_status]};">
+                                    {status_icons[new_status]} {new_status.title()}
+                                </p>
+                                
+                                <h4 style="margin-top: 20px;">Reservation Details:</h4>
+                                <p><strong>Date:</strong> {reservation.reservation_date.strftime('%B %d, %Y')}</p>
+                                <p><strong>Time:</strong> {reservation.reservation_time}</p>
+                                <p><strong>Party Size:</strong> {reservation.party_size} people</p>
+                            </div>
+                            
+                            {f'<p style="color: #28a745;"><strong>✓ Your table has been confirmed! We look forward to serving you.</strong></p>' if new_status == 'confirmed' else ''}
+                            {f'<p style="color: #dc3545;"><strong>✗ Your reservation has been cancelled. Please contact us if this was a mistake.</strong></p>' if new_status == 'cancelled' else ''}
+                            
+                            <p>If you have any questions, please call us at <strong>(240) 660-1337</strong>.</p>
+                        </div>
+                        <div style="background-color: #8B1E1E; color: white; padding: 15px; text-align: center; font-size: 12px;">
+                            <p>8233 Fenton St, Silver Spring, MD 20910 | (240) 660-1337</p>
+                        </div>
+                    </div>
+                    """
+                )
+                mail.send(msg)
+                print(f"✅ Status update email sent to {reservation.customer_email}")
+            except Exception as e:
+                print(f"❌ Failed to send status update email: {str(e)}")
+        
+        flash(f'Reservation marked as {new_status}', 'success')
+    
+    return redirect(url_for('admin_reservations'))
 
 @app.route('/get-available-times')
 def get_available_times_route():
@@ -704,122 +756,6 @@ def admin_dashboard():
                          recent_reviews=recent_reviews,
                          recent_events=recent_events)
 
-@app.route('/admin/simple-dashboard')
-@admin_required
-def simple_dashboard():
-    total_menu = MenuItem.query.count()
-    categories = Category.query.count()
-    html = f"""
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Admin Dashboard - EFFOI</title>
-    <style>
-        body {{ font-family: Arial; padding: 20px; background: #f5f5f5; }}
-        .container {{ max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; }}
-        h1 {{ color: #8B1E1E; }}
-        .stats {{ background: #eee; padding: 15px; margin: 10px 0; border-radius: 5px; }}
-        .menu-links a {{ display: inline-block; margin: 5px; padding: 8px 15px; background: #8B1E1E; color: white; text-decoration: none; border-radius: 5px; }}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>EFFOI Admin Dashboard</h1>
-        <p>Welcome, {session.get('admin_username')}!</p>
-        <div class="stats">
-            <h3>Statistics</h3>
-            <p>Total Menu Items: <strong>{total_menu}</strong></p>
-            <p>Categories: <strong>{categories}</strong></p>
-        </div>
-        <div class="menu-links">
-            <a href="/admin/menu">Manage Menu</a>
-            <a href="/admin/categories">Manage Categories</a>
-            <a href="/admin/reservations">View Reservations</a>
-            <a href="/admin/logout">Logout</a>
-        </div>
-    </div>
-</body>
-</html>
-"""
-    return html
-
-# ==================== ADMIN RESERVATIONS ====================
-@app.route('/admin/reservations/update/<int:reservation_id>', methods=['POST'])
-@admin_required
-def admin_update_reservation(reservation_id):
-    reservation = Reservation.query.get_or_404(reservation_id)
-    new_status = request.form.get('status')
-    
-    if new_status in ['pending', 'confirmed', 'cancelled']:
-        old_status = reservation.status
-        reservation.status = new_status
-        db.session.commit()
-        
-        # Try to send email if configured and status changed
-        if new_status != old_status and app.config['MAIL_USERNAME'] and app.config['MAIL_PASSWORD']:
-            try:
-                status_colors = {'confirmed': '#28a745', 'cancelled': '#dc3545', 'pending': '#ffc107'}
-                status_icons = {'confirmed': '✅', 'cancelled': '❌', 'pending': '⏳'}
-                
-                msg = Message(
-                    subject=f"Reservation {new_status.title()} - EFFOI Restaurant",
-                    recipients=[reservation.customer_email],
-                    html=f"""
-                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                        <div style="background-color: #8B1E1E; color: #FFD700; padding: 20px; text-align: center;">
-                            <h1>EFFOI Restaurant</h1>
-                        </div>
-                        <div style="padding: 30px; background-color: #f9f9f9;">
-                            <h2 style="color: #8B1E1E;">Reservation Status Update</h2>
-                            <p>Dear <strong>{reservation.customer_name}</strong>,</p>
-                            
-                            <div style="background-color: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
-                                <h3 style="color: #8B1E1E; margin-top: 0;">Your reservation has been:</h3>
-                                <p style="font-size: 24px; color: {status_colors[new_status]};">
-                                    {status_icons[new_status]} {new_status.title()}
-                                </p>
-                                
-                                <h4 style="margin-top: 20px;">Reservation Details:</h4>
-                                <p><strong>Date:</strong> {reservation.reservation_date.strftime('%B %d, %Y')}</p>
-                                <p><strong>Time:</strong> {reservation.reservation_time}</p>
-                                <p><strong>Party Size:</strong> {reservation.party_size} people</p>
-                            </div>
-                            
-                            <p>If you have any questions, please call us.</p>
-                        </div>
-                        <div style="background-color: #8B1E1E; color: white; padding: 15px; text-align: center; font-size: 12px;">
-                            <p>8233 Fenton St, Silver Spring, MD 20910 | (240) 660-1337</p>
-                        </div>
-                    </div>
-                    """
-                )
-                mail.send(msg)
-            except Exception as e:
-                print(f"Email error: {str(e)}")
-        
-        flash(f'Reservation marked as {new_status}', 'success')
-    
-    return redirect(url_for('admin_reservations'))
-
-@app.route('/admin/reservations')
-@admin_required
-def admin_reservations():
-    status = request.args.get('status', 'all')
-    query = Reservation.query
-    if status != 'all':
-        query = query.filter_by(status=status)
-    reservations = query.order_by(Reservation.reservation_date.desc()).all()
-    return render_template('admin/reservations.html', reservations=reservations, status=status)
-
-@app.route('/admin/reservations/delete/<int:reservation_id>', methods=['POST'])
-@admin_required
-def admin_delete_reservation(reservation_id):
-    reservation = Reservation.query.get_or_404(reservation_id)
-    db.session.delete(reservation)
-    db.session.commit()
-    flash('Reservation deleted successfully', 'success')
-    return redirect(url_for('admin_reservations'))
-
 # ==================== ADMIN CATEGORIES ====================
 @app.route('/admin/categories')
 @admin_required
@@ -875,14 +811,16 @@ def admin_menu():
 @admin_required
 def admin_add_menu_item():
     if request.method == 'POST':
+        # Handle image upload
         image_file = request.files.get('image')
         image_url = request.form.get('image_url')
         
         if image_file and image_file.filename:
             filename = secure_filename(f"menu_{int(time.time())}_{image_file.filename}")
-            upload_dir = get_upload_path('menu')
-            file_path = os.path.join(upload_dir, filename)
-            image_file.save(file_path)
+            project_root = os.path.dirname(os.path.dirname(__file__))
+            upload_path = os.path.join(project_root, 'frontend', 'static', 'uploads', 'menu', filename)
+            os.makedirs(os.path.dirname(upload_path), exist_ok=True)
+            image_file.save(upload_path)
             image_url = url_for('static', filename=f'uploads/menu/{filename}', _external=True)
         
         item = MenuItem(
@@ -910,12 +848,14 @@ def admin_edit_menu_item(item_id):
     item = MenuItem.query.get_or_404(item_id)
     
     if request.method == 'POST':
+        # Handle image upload
         image_file = request.files.get('image')
         if image_file and image_file.filename:
             filename = secure_filename(f"menu_{int(time.time())}_{image_file.filename}")
-            upload_dir = get_upload_path('menu')
-            file_path = os.path.join(upload_dir, filename)
-            image_file.save(file_path)
+            project_root = os.path.dirname(os.path.dirname(__file__))
+            upload_path = os.path.join(project_root, 'frontend', 'static', 'uploads', 'menu', filename)
+            os.makedirs(os.path.dirname(upload_path), exist_ok=True)
+            image_file.save(upload_path)
             item.image_url = url_for('static', filename=f'uploads/menu/{filename}', _external=True)
         elif request.form.get('image_url'):
             item.image_url = request.form.get('image_url')
@@ -945,6 +885,116 @@ def admin_delete_menu_item(item_id):
     flash('Menu item deleted successfully', 'success')
     return redirect(url_for('admin_menu'))
 
+# ==================== ADMIN MENU EXPORT/IMPORT ====================
+@app.route('/admin/menu/export')
+@admin_required
+def admin_export_menu():
+    """Export menu as JSON"""
+    categories = Category.query.all()
+    menu_data = []
+    for category in categories:
+        items = []
+        for item in category.menu_items:
+            items.append({
+                'name': item.name,
+                'description': item.description,
+                'price': item.price,
+                'image_url': item.image_url,
+                'is_special': item.is_special,
+                'is_popular': item.is_popular,
+                'is_active': item.is_active,
+                'display_order': item.display_order
+            })
+        menu_data.append({
+            'category': category.name,
+            'display_order': category.display_order,
+            'is_active': category.is_active,
+            'items': items
+        })
+    return jsonify(menu_data)
+
+@app.route('/admin/menu/download-json')
+@admin_required
+def admin_download_menu_json():
+    categories = Category.query.all()
+    menu_data = []
+    
+    for category in categories:
+        items = []
+        for item in category.menu_items:
+            items.append({
+                'name': item.name,
+                'description': item.description,
+                'price': item.price,
+                'image_url': item.image_url,
+                'is_special': item.is_special,
+                'is_popular': item.is_popular,
+                'is_active': item.is_active,
+                'display_order': item.display_order
+            })
+        
+        menu_data.append({
+            'category': category.name,
+            'display_order': category.display_order,
+            'is_active': category.is_active,
+            'items': items
+        })
+    
+    response = jsonify(menu_data)
+    response.headers['Content-Disposition'] = 'attachment; filename=effoi_menu.json'
+    return response
+
+@app.route('/admin/menu/import', methods=['GET', 'POST'])
+@admin_required
+def admin_import_menu():
+    if request.method == 'POST':
+        if 'confirm' not in request.form:
+            flash('Please confirm that you understand this action', 'danger')
+            return redirect(url_for('admin_import_menu'))
+        
+        json_file = request.files.get('menu_json')
+        if not json_file:
+            flash('No file uploaded', 'danger')
+            return redirect(url_for('admin_import_menu'))
+        
+        try:
+            menu_data = json.load(json_file)
+            MenuItem.query.delete()
+            Category.query.delete()
+            
+            for cat_data in menu_data:
+                category = Category(
+                    name=cat_data['category'],
+                    display_order=cat_data.get('display_order', 0),
+                    is_active=cat_data.get('is_active', True)
+                )
+                db.session.add(category)
+                db.session.flush()
+                
+                for item_data in cat_data.get('items', []):
+                    item = MenuItem(
+                        name=item_data['name'],
+                        description=item_data.get('description', ''),
+                        price=item_data['price'],
+                        category_id=category.id,
+                        image_url=item_data.get('image_url', ''),
+                        is_special=item_data.get('is_special', False),
+                        is_popular=item_data.get('is_popular', False),
+                        is_active=item_data.get('is_active', True),
+                        display_order=item_data.get('display_order', 0)
+                    )
+                    db.session.add(item)
+            
+            db.session.commit()
+            flash('Menu imported successfully!', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error importing menu: {str(e)}', 'danger')
+        
+        return redirect(url_for('admin_menu'))
+    
+    return render_template('admin/import_menu.html')
+
 # ==================== ADMIN EVENTS ====================
 @app.route('/admin/events')
 @admin_required
@@ -956,14 +1006,16 @@ def admin_events():
 @admin_required
 def admin_add_event():
     if request.method == 'POST':
+        # Handle image upload
         image_file = request.files.get('image')
         image_url = request.form.get('image_url')
         
         if image_file and image_file.filename:
             filename = secure_filename(f"event_{int(time.time())}_{image_file.filename}")
-            upload_dir = get_upload_path('events')
-            file_path = os.path.join(upload_dir, filename)
-            image_file.save(file_path)
+            project_root = os.path.dirname(os.path.dirname(__file__))
+            upload_path = os.path.join(project_root, 'frontend', 'static', 'uploads', 'events', filename)
+            os.makedirs(os.path.dirname(upload_path), exist_ok=True)
+            image_file.save(upload_path)
             image_url = url_for('static', filename=f'uploads/events/{filename}', _external=True)
         
         event = Event(
@@ -988,12 +1040,14 @@ def admin_edit_event(event_id):
     event = Event.query.get_or_404(event_id)
     
     if request.method == 'POST':
+        # Handle image upload
         image_file = request.files.get('image')
         if image_file and image_file.filename:
             filename = secure_filename(f"event_{int(time.time())}_{image_file.filename}")
-            upload_dir = get_upload_path('events')
-            file_path = os.path.join(upload_dir, filename)
-            image_file.save(file_path)
+            project_root = os.path.dirname(os.path.dirname(__file__))
+            upload_path = os.path.join(project_root, 'frontend', 'static', 'uploads', 'events', filename)
+            os.makedirs(os.path.dirname(upload_path), exist_ok=True)
+            image_file.save(upload_path)
             event.image_url = url_for('static', filename=f'uploads/events/{filename}', _external=True)
         elif request.form.get('image_url'):
             event.image_url = request.form.get('image_url')
@@ -1021,15 +1075,6 @@ def admin_delete_event(event_id):
     flash('Event deleted successfully', 'success')
     return redirect(url_for('admin_events'))
 
-@app.route('/admin/events/toggle/<int:event_id>', methods=['POST'])
-@admin_required
-def admin_toggle_event(event_id):
-    event = Event.query.get_or_404(event_id)
-    event.is_active = not event.is_active
-    db.session.commit()
-    flash(f'Event {"activated" if event.is_active else "deactivated"} successfully', 'success')
-    return redirect(url_for('admin_events'))
-
 # ==================== ADMIN BLOG ====================
 @app.route('/admin/blog')
 @admin_required
@@ -1040,6 +1085,7 @@ def admin_blog():
 @app.route('/admin/blog/edit/<int:post_id>', methods=['GET', 'POST'])
 @admin_required
 def admin_blog_edit(post_id):
+    """Edit/approve blog post"""
     post = BlogPost.query.get_or_404(post_id)
     
     if request.method == 'POST':
@@ -1048,6 +1094,18 @@ def admin_blog_edit(post_id):
         author_name = request.form.get('author_name')
         author_email = request.form.get('author_email')
         status = request.form.get('status')
+        
+        if not title:
+            flash('Title is required', 'danger')
+            return redirect(url_for('admin_blog_edit', post_id=post_id))
+        
+        if not content:
+            flash('Content is required', 'danger')
+            return redirect(url_for('admin_blog_edit', post_id=post_id))
+        
+        if not author_name:
+            flash('Author name is required', 'danger')
+            return redirect(url_for('admin_blog_edit', post_id=post_id))
         
         post.title = title
         post.content = content
@@ -1058,15 +1116,21 @@ def admin_blog_edit(post_id):
         image_file = request.files.get('image')
         if image_file and image_file.filename:
             filename = secure_filename(f"blog_{int(time.time())}_{image_file.filename}")
-            upload_dir = get_upload_path('blog')
-            file_path = os.path.join(upload_dir, filename)
-            image_file.save(file_path)
+            project_root = os.path.dirname(os.path.dirname(__file__))
+            upload_path = os.path.join(project_root, 'frontend', 'static', 'uploads', 'blog', filename)
+            os.makedirs(os.path.dirname(upload_path), exist_ok=True)
+            image_file.save(upload_path)
             post.image_url = url_for('static', filename=f'uploads/blog/{filename}', _external=True)
         elif request.form.get('image_url'):
             post.image_url = request.form.get('image_url')
         
-        db.session.commit()
-        flash('Blog post updated successfully', 'success')
+        try:
+            db.session.commit()
+            flash('Blog post updated successfully', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating blog post: {str(e)}', 'danger')
+        
         return redirect(url_for('admin_blog'))
     
     return render_template('admin/blog_form.html', post=post)
@@ -1118,8 +1182,8 @@ def admin_delete_comment(comment_id):
 @app.route('/admin/reviews')
 @admin_required
 def admin_reviews():
-    reviews_list = Review.query.order_by(Review.created_at.desc()).all()
-    return render_template('admin/reviews.html', reviews=reviews_list)
+    reviews = Review.query.order_by(Review.created_at.desc()).all()
+    return render_template('admin/reviews.html', reviews=reviews)
 
 @app.route('/admin/reviews/approve/<int:review_id>', methods=['POST'])
 @admin_required
@@ -1138,6 +1202,27 @@ def admin_delete_review(review_id):
     db.session.commit()
     flash('Review deleted successfully', 'success')
     return redirect(url_for('admin_reviews'))
+
+# ==================== ADMIN RESERVATIONS ====================
+@app.route('/admin/reservations')
+@admin_required
+def admin_reservations():
+    status = request.args.get('status', 'all')
+    query = Reservation.query
+    if status != 'all':
+        query = query.filter_by(status=status)
+    reservations = query.order_by(Reservation.reservation_date.desc()).all()
+    return render_template('admin/reservations.html', reservations=reservations, status=status)
+
+
+@app.route('/admin/reservations/delete/<int:reservation_id>', methods=['POST'])
+@admin_required
+def admin_delete_reservation(reservation_id):
+    reservation = Reservation.query.get_or_404(reservation_id)
+    db.session.delete(reservation)
+    db.session.commit()
+    flash('Reservation deleted successfully', 'success')
+    return redirect(url_for('admin_reservations'))
 
 # ==================== ADMIN TIME BLOCKS ====================
 @app.route('/admin/time-blocks')
@@ -1243,7 +1328,7 @@ def admin_edit_page(slug):
     
     return render_template('admin/page_form.html', page=page)
 
-# ==================== ADMIN HERO SLIDERS ====================
+# ==================== ADMIN HERO SLIDERS - FIXED ====================
 @app.route('/admin/hero-sliders')
 @admin_required
 def admin_hero_sliders():
@@ -1259,9 +1344,10 @@ def admin_add_slider():
         
         if image_file and image_file.filename:
             filename = secure_filename(f"slider_{int(time.time())}_{image_file.filename}")
-            upload_dir = get_upload_path('sliders')
-            file_path = os.path.join(upload_dir, filename)
-            image_file.save(file_path)
+            project_root = os.path.dirname(os.path.dirname(__file__))
+            upload_path = os.path.join(project_root, 'frontend', 'static', 'uploads', 'sliders', filename)
+            os.makedirs(os.path.dirname(upload_path), exist_ok=True)
+            image_file.save(upload_path)
             image_url = url_for('static', filename=f'uploads/sliders/{filename}', _external=True)
         
         slider = HeroSlider(
@@ -1289,9 +1375,10 @@ def admin_edit_slider(slider_id):
         image_file = request.files.get('image')
         if image_file and image_file.filename:
             filename = secure_filename(f"slider_{int(time.time())}_{image_file.filename}")
-            upload_dir = get_upload_path('sliders')
-            file_path = os.path.join(upload_dir, filename)
-            image_file.save(file_path)
+            project_root = os.path.dirname(os.path.dirname(__file__))
+            upload_path = os.path.join(project_root, 'frontend', 'static', 'uploads', 'sliders', filename)
+            os.makedirs(os.path.dirname(upload_path), exist_ok=True)
+            image_file.save(upload_path)
             slider.image_url = url_for('static', filename=f'uploads/sliders/{filename}', _external=True)
         elif request.form.get('image_url'):
             slider.image_url = request.form.get('image_url')
@@ -1340,9 +1427,10 @@ def admin_upload_gallery():
     image_file = request.files.get('image')
     if image_file and image_file.filename:
         filename = secure_filename(f"gallery_{int(time.time())}_{image_file.filename}")
-        upload_dir = get_upload_path('gallery')
-        file_path = os.path.join(upload_dir, filename)
-        image_file.save(file_path)
+        project_root = os.path.dirname(os.path.dirname(__file__))
+        upload_path = os.path.join(project_root, 'frontend', 'static', 'uploads', 'gallery', filename)
+        os.makedirs(os.path.dirname(upload_path), exist_ok=True)
+        image_file.save(upload_path)
         
         image = GalleryImage(
             title=request.form.get('title'),
@@ -1359,28 +1447,6 @@ def admin_upload_gallery():
     
     return redirect(url_for('admin_gallery'))
 
-@app.route('/admin/gallery/edit/<int:image_id>', methods=['POST'])
-@admin_required
-def admin_edit_gallery(image_id):
-    image = GalleryImage.query.get_or_404(image_id)
-    
-    image.title = request.form.get('title')
-    image.category = request.form.get('category')
-    image.display_order = int(request.form.get('display_order', 0))
-    image.is_active = 'is_active' in request.form
-    
-    image_file = request.files.get('image')
-    if image_file and image_file.filename:
-        filename = secure_filename(f"gallery_{int(time.time())}_{image_file.filename}")
-        upload_dir = get_upload_path('gallery')
-        file_path = os.path.join(upload_dir, filename)
-        image_file.save(file_path)
-        image.image_url = url_for('static', filename=f'uploads/gallery/{filename}', _external=True)
-    
-    db.session.commit()
-    flash('Image updated successfully', 'success')
-    return redirect(url_for('admin_gallery'))
-
 @app.route('/admin/gallery/delete/<int:image_id>', methods=['POST'])
 @admin_required
 def admin_delete_gallery(image_id):
@@ -1390,10 +1456,11 @@ def admin_delete_gallery(image_id):
     flash('Image deleted successfully', 'success')
     return redirect(url_for('admin_gallery'))
 
-# ==================== ADMIN SPECIALS ====================
+# ==================== ADMIN - TOGGLE SPECIALS ====================
 @app.route('/admin/menu/toggle-special/<int:item_id>', methods=['POST'])
 @admin_required
 def admin_toggle_special(item_id):
+    """Toggle menu item special status"""
     item = MenuItem.query.get_or_404(item_id)
     item.is_special = not item.is_special
     db.session.commit()
@@ -1403,6 +1470,7 @@ def admin_toggle_special(item_id):
 @app.route('/admin/menu/toggle-popular/<int:item_id>', methods=['POST'])
 @admin_required
 def admin_toggle_popular(item_id):
+    """Toggle menu item popular status"""
     item = MenuItem.query.get_or_404(item_id)
     item.is_popular = not item.is_popular
     db.session.commit()
@@ -1412,13 +1480,15 @@ def admin_toggle_popular(item_id):
 @app.route('/admin/specials')
 @admin_required
 def admin_specials():
+    """Manage specials"""
     items = MenuItem.query.order_by(MenuItem.category_id, MenuItem.name).all()
     return render_template('admin/specials.html', items=items)
 
-# ==================== ADMIN ABOUT PAGE ====================
+# ==================== ADMIN - ABOUT PAGE MANAGEMENT ====================
 @app.route('/admin/about/edit', methods=['GET', 'POST'])
 @admin_required
 def admin_about_edit():
+    """Edit about page with all components"""
     about = AboutUs.query.first()
     if not about:
         about = AboutUs()
@@ -1426,19 +1496,49 @@ def admin_about_edit():
         db.session.commit()
     
     if request.method == 'POST':
+        print("\n=== ABOUT US SAVE DEBUG ===")
+        
         # Hero Section
         about.hero_title = request.form.get('hero_title', 'About EFFOI')
         
+        # Handle video upload
         video_file = request.files.get('hero_video')
+        print(f"Video file received: {video_file}")
+        
         if video_file and video_file.filename:
-            filename = secure_filename(video_file.filename)
-            filename = f"about_video_{int(time.time())}_{filename}"
-            upload_dir = get_upload_path('about')
-            file_path = os.path.join(upload_dir, filename)
-            video_file.save(file_path)
-            about.hero_video_url = url_for('static', filename=f'uploads/about/{filename}', _external=True)
+            print(f"Video filename: {video_file.filename}")
+            
+            # Check file extension
+            allowed_extensions = {'mp4', 'webm', 'ogg', 'mov', 'avi'}
+            file_ext = video_file.filename.rsplit('.', 1)[1].lower() if '.' in video_file.filename else ''
+            
+            if file_ext in allowed_extensions:
+                # Secure the filename
+                filename = secure_filename(video_file.filename)
+                filename = f"about_video_{int(time.time())}_{filename}"
+                
+                # Get the correct path
+                project_root = os.path.dirname(os.path.dirname(__file__))
+                upload_dir = os.path.join(project_root, 'frontend', 'static', 'uploads', 'about')
+                
+                # Create directory if it doesn't exist
+                os.makedirs(upload_dir, exist_ok=True)
+                print(f"Upload directory: {upload_dir}")
+                
+                # Save the file
+                file_path = os.path.join(upload_dir, filename)
+                video_file.save(file_path)
+                print(f"File saved to: {file_path}")
+                
+                # Create URL
+                about.hero_video_url = url_for('static', filename=f'uploads/about/{filename}')
+                print(f"Video URL: {about.hero_video_url}")
+            else:
+                flash(f'Invalid file type. Allowed: {", ".join(allowed_extensions)}', 'danger')
+                
         elif request.form.get('hero_video_url'):
             about.hero_video_url = request.form.get('hero_video_url')
+            print(f"Using URL from form: {about.hero_video_url}")
         
         # Cards
         about.card1_title = request.form.get('card1_title', 'Our Story')
@@ -1468,22 +1568,30 @@ def admin_about_edit():
         # SEO
         about.meta_description = request.form.get('meta_description')
         
+        # IMPORTANT: Remove the old gallery code - we're not saving gallery_images here anymore
+        # The gallery is now handled by the separate AJAX routes
+        
         try:
             db.session.commit()
             flash('About Us page updated successfully!', 'success')
+            print("=== SAVE SUCCESSFUL ===\n")
         except Exception as e:
             db.session.rollback()
             flash(f'Error saving: {str(e)}', 'danger')
+            print(f"=== SAVE ERROR: {str(e)} ===\n")
         
         return redirect(url_for('admin_about_edit'))
     
+    # Get gallery images from the new model
     gallery_images = AboutUsImage.query.filter_by(about_us_id=about.id, is_active=True).order_by(AboutUsImage.display_order).all()
+    
     return render_template('admin/about_edit.html', about=about, gallery_images=gallery_images)
 
-# ==================== ABOUT US GALLERY ====================
+# ==================== ABOUT US GALLERY MANAGEMENT ====================
 @app.route('/admin/about/gallery/upload', methods=['POST'])
 @admin_required
 def admin_about_gallery_upload():
+    """Upload images for About Us gallery"""
     about = AboutUs.query.first()
     if not about:
         about = AboutUs()
@@ -1495,13 +1603,21 @@ def admin_about_gallery_upload():
     
     for i, file in enumerate(files):
         if file and file.filename:
+            # Get title from form
             title = request.form.get(f'title_{i}', '')
+            
+            # Save file
             filename = secure_filename(file.filename)
             filename = f"about_gallery_{int(time.time())}_{i}_{filename}"
-            upload_dir = get_upload_path('about/gallery')
+            
+            project_root = os.path.dirname(os.path.dirname(__file__))
+            upload_dir = os.path.join(project_root, 'frontend', 'static', 'uploads', 'about', 'gallery')
+            os.makedirs(upload_dir, exist_ok=True)
+            
             file_path = os.path.join(upload_dir, filename)
             file.save(file_path)
             
+            # Create image record
             image = AboutUsImage(
                 about_us_id=about.id,
                 image_url=url_for('static', filename=f'uploads/about/gallery/{filename}', _external=True),
@@ -1518,6 +1634,7 @@ def admin_about_gallery_upload():
 @app.route('/admin/about/gallery/update/<int:image_id>', methods=['POST'])
 @admin_required
 def admin_about_gallery_update(image_id):
+    """Update image title"""
     image = AboutUsImage.query.get_or_404(image_id)
     data = request.get_json()
     
@@ -1531,6 +1648,7 @@ def admin_about_gallery_update(image_id):
 @app.route('/admin/about/gallery/delete/<int:image_id>', methods=['POST'])
 @admin_required
 def admin_about_gallery_delete(image_id):
+    """Delete image"""
     image = AboutUsImage.query.get_or_404(image_id)
     db.session.delete(image)
     db.session.commit()
@@ -1540,6 +1658,7 @@ def admin_about_gallery_delete(image_id):
 @app.route('/admin/event-gallery/<int:event_id>')
 @admin_required
 def admin_event_gallery(event_id):
+    """Manage gallery images for a specific event"""
     event = Event.query.get_or_404(event_id)
     images = EventImage.query.filter_by(event_id=event_id).order_by(EventImage.display_order).all()
     return render_template('admin/event_gallery.html', event=event, images=images)
@@ -1547,20 +1666,29 @@ def admin_event_gallery(event_id):
 @app.route('/admin/event-gallery/upload/<int:event_id>', methods=['POST'])
 @admin_required
 def admin_upload_event_gallery(event_id):
+    """Upload multiple images for an event"""
     event = Event.query.get_or_404(event_id)
     
     files = request.files.getlist('images')
     default_title = request.form.get('default_title', '')
+    
     uploaded_count = 0
     
     for file in files:
         if file and file.filename:
+            # Create filename
             filename = secure_filename(file.filename)
             filename = f"event_{event_id}_{int(time.time())}_{uploaded_count}_{filename}"
-            upload_dir = get_upload_path('events/gallery')
+            
+            # Save file
+            project_root = os.path.dirname(os.path.dirname(__file__))
+            upload_dir = os.path.join(project_root, 'frontend', 'static', 'uploads', 'events', 'gallery')
+            os.makedirs(upload_dir, exist_ok=True)
+            
             file_path = os.path.join(upload_dir, filename)
             file.save(file_path)
             
+            # Create database entry
             image = EventImage(
                 event_id=event_id,
                 image_url=url_for('static', filename=f'uploads/events/gallery/{filename}', _external=True),
@@ -1575,22 +1703,43 @@ def admin_upload_event_gallery(event_id):
     flash(f'Successfully uploaded {uploaded_count} images!', 'success')
     return redirect(url_for('admin_event_gallery', event_id=event_id))
 
+@app.route('/admin/event-gallery/update/<int:image_id>', methods=['POST'])
+@admin_required
+def admin_update_event_gallery(image_id):
+    """Update image details"""
+    image = EventImage.query.get_or_404(image_id)
+    
+    data = request.get_json()
+    if data and 'title' in data:
+        image.title = data['title']
+        db.session.commit()
+        return jsonify({'success': True})
+    
+    return jsonify({'success': False}), 400
+
 @app.route('/admin/event-gallery/edit/<int:image_id>', methods=['POST'])
 @admin_required
 def admin_edit_event_gallery(image_id):
+    """Edit image details with optional replacement"""
     image = EventImage.query.get_or_404(image_id)
     
     image.title = request.form.get('title', image.title)
     image.display_order = int(request.form.get('display_order', image.display_order))
     image.is_active = 'is_active' in request.form
     
+    # Handle image replacement
     new_image = request.files.get('image')
     if new_image and new_image.filename:
         filename = secure_filename(new_image.filename)
         filename = f"event_{image.event_id}_{int(time.time())}_{filename}"
-        upload_dir = get_upload_path('events/gallery')
+        
+        project_root = os.path.dirname(os.path.dirname(__file__))
+        upload_dir = os.path.join(project_root, 'frontend', 'static', 'uploads', 'events', 'gallery')
+        os.makedirs(upload_dir, exist_ok=True)
+        
         file_path = os.path.join(upload_dir, filename)
         new_image.save(file_path)
+        
         image.image_url = url_for('static', filename=f'uploads/events/gallery/{filename}', _external=True)
     
     db.session.commit()
@@ -1600,12 +1749,67 @@ def admin_edit_event_gallery(image_id):
 @app.route('/admin/event-gallery/delete/<int:image_id>', methods=['POST'])
 @admin_required
 def admin_delete_event_gallery(image_id):
+    """Delete image"""
     image = EventImage.query.get_or_404(image_id)
     event_id = image.event_id
+    
     db.session.delete(image)
     db.session.commit()
+    
     flash('Image deleted successfully!', 'success')
     return redirect(url_for('admin_event_gallery', event_id=event_id))
+
+# ==================== ADMIN GALLERY EDIT ====================
+@app.route('/admin/gallery/edit/<int:image_id>', methods=['POST'])
+@admin_required
+def admin_edit_gallery(image_id):
+    """Edit gallery image"""
+    image = GalleryImage.query.get_or_404(image_id)
+    
+    image.title = request.form.get('title')
+    image.category = request.form.get('category')
+    image.display_order = int(request.form.get('display_order', 0))
+    image.is_active = 'is_active' in request.form
+    
+    # Handle image upload
+    image_file = request.files.get('image')
+    if image_file and image_file.filename:
+        filename = secure_filename(f"gallery_{int(time.time())}_{image_file.filename}")
+        project_root = os.path.dirname(os.path.dirname(__file__))
+        upload_path = os.path.join(project_root, 'frontend', 'static', 'uploads', 'gallery', filename)
+        os.makedirs(os.path.dirname(upload_path), exist_ok=True)
+        image_file.save(upload_path)
+        image.image_url = url_for('static', filename=f'uploads/gallery/{filename}', _external=True)
+    
+    db.session.commit()
+    flash('Image updated successfully', 'success')
+    return redirect(url_for('admin_gallery'))
+
+# ==================== API - GET GALLERY IMAGE ====================
+@app.route('/api/gallery-image/<int:image_id>')
+def get_gallery_image(image_id):
+    """Get gallery image details for editing"""
+    image = GalleryImage.query.get_or_404(image_id)
+    return jsonify({
+        'id': image.id,
+        'title': image.title,
+        'category': image.category,
+        'image_url': image.image_url,
+        'display_order': image.display_order,
+        'is_active': image.is_active
+    })
+
+
+# ==================== ADMIN - EVENT TOGGLE ====================
+@app.route('/admin/events/toggle/<int:event_id>', methods=['POST'])
+@admin_required
+def admin_toggle_event(event_id):
+    """Toggle event active status"""
+    event = Event.query.get_or_404(event_id)
+    event.is_active = not event.is_active
+    db.session.commit()
+    flash(f'Event {"activated" if event.is_active else "deactivated"} successfully', 'success')
+    return redirect(url_for('admin_events'))
 
 # ==================== ADMIN SETTINGS ====================
 @app.route('/admin/settings')
@@ -1619,15 +1823,15 @@ def admin_settings():
 @admin_required
 def admin_update_settings():
     restaurant_settings = {
-        'restaurant_name': request.form.get('restaurant_name', 'EFFOI RESTAURANT'),
-        'logo_url': request.form.get('logo_url', 'https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Effoi_logo3.png'),
-        'logo_text': request.form.get('logo_text', 'EFFOI RESTAURANT'),
-        'address': request.form.get('address', '8233 Fenton St, Silver Spring, MD 20910'),
-        'phone': request.form.get('phone', '+1 (240) 660-1337'),
-        'email': request.form.get('email', 'nigistme1277@gmail.com'),
-        'map_icon_color': request.form.get('map_icon_color', '#4285F4'),
-        'hours': request.form.get('hours', 'Mon-Sun: 11:00 AM - 10:00 PM'),
-        'hours_detailed': request.form.get('hours_detailed', 'Monday-Friday:11am-10pm,Saturday:11am-11pm,Sunday:11am-9pm'),
+    'restaurant_name': request.form.get('restaurant_name', 'EFFOI RESTAURANT'),
+    'logo_url': request.form.get('logo_url', 'https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Effoi_logo3.png'),
+    'logo_text': request.form.get('logo_text', 'EFFOI RESTAURANT'),
+    'address': request.form.get('address', '8233 Fenton St, Silver Spring, MD 20910'),
+    'phone': request.form.get('phone', '+1 (240) 660-1337'),
+    'email': request.form.get('email', 'nigistme1277@gmail.com'),
+    'map_icon_color': request.form.get('map_icon_color', '#4285F4'),
+    'hours': request.form.get('hours', 'Mon-Sun: 11:00 AM - 10:00 PM'),
+    'hours_detailed': request.form.get('hours_detailed', 'Monday-Friday:11am-10pm,Saturday:11am-11pm,Sunday:11am-9pm'),
     }
     
     header_settings = {
@@ -1663,7 +1867,7 @@ def admin_update_settings():
     flash('Settings updated successfully', 'success')
     return redirect(url_for('admin_settings'))
 
-# ==================== API ENDPOINTS ====================
+# ==================== API ENDPOINT ====================
 @app.route('/api/blocked-times')
 def get_blocked_times():
     """Get all upcoming blocked time slots"""
@@ -1685,68 +1889,15 @@ def get_blocked_times():
         print(f"API Error: {str(e)}")
         return jsonify([])
 
-@app.route('/api/gallery-image/<int:image_id>')
-def get_gallery_image(image_id):
-    """Get gallery image details for editing"""
-    image = GalleryImage.query.get_or_404(image_id)
-    return jsonify({
-        'id': image.id,
-        'title': image.title,
-        'category': image.category,
-        'image_url': image.image_url,
-        'display_order': image.display_order,
-        'is_active': image.is_active
-    })
-
-# ==================== INITIALIZE DATABASE ====================
-def init_db():
-    """Initialize database and create default admin"""
-    with app.app_context():
-        db.create_all()
-        
-        # Create default admin if not exists
-        if not Admin.query.first():
-            admin = Admin(
-                username='admin',
-                email='admin@effoirestaurant.com',
-                is_super=True
-            )
-            admin_password = os.getenv('ADMIN_PASSWORD', 'EffoiAdmin2024!')
-            admin.set_password(admin_password)
-            db.session.add(admin)
-            db.session.commit()
-            print(f"✅ Default admin created with password: {admin_password}")
-        
-        # Create default settings if not exists
-        default_settings = {
-            'restaurant_name': 'EFFOI RESTAURANT',
-            'address': '8233 Fenton St, Silver Spring, MD 20910',
-            'phone': '+1 (240) 660-1337',
-            'email': 'nigistme1277@gmail.com',
-            'hours': 'Mon-Sun: 11:00 AM - 10:00 PM'
-        }
-        
-        for key, value in default_settings.items():
-            if not SiteSetting.query.filter_by(key=key).first():
-                setting = SiteSetting(key=key, value=value)
-                db.session.add(setting)
-        
-        db.session.commit()
-        print("✅ Database initialized")
-
 # ==================== RUN APPLICATION ====================
 if __name__ == '__main__':
     # Create all upload directories
-    upload_folders = ['blog', 'sliders', 'events', 'events/gallery', 'gallery', 'menu', 'about', 'about/gallery', 'temp']
+    upload_folders = ['blog', 'sliders', 'events', 'gallery', 'menu', 'about', 'temp']
+    project_root = os.path.dirname(os.path.dirname(__file__))
+    
     for folder in upload_folders:
-        get_upload_path(folder)
-        print(f"✅ Created upload folder: {folder}")
+        folder_path = os.path.join(project_root, 'frontend', 'static', 'uploads', folder)
+        os.makedirs(folder_path, exist_ok=True)
+        print(f"✅ Created upload folder: {folder_path}")
     
-    # Initialize database
-    init_db()
-    
-    # Get port from environment (Render sets PORT)
-    port = int(os.environ.get('PORT', 5001))
-    debug = os.environ.get('FLASK_ENV') == 'development'
-    
-    app.run(host='0.0.0.0', port=port, debug=debug)
+    app.run(debug=True, port=5001)
