@@ -7,7 +7,7 @@
 <div class="my-5" id="about-page-content">
     <h1 class="display-3 text-center mb-5" data-aos="fade-up">{{ about.hero_title if about else 'About EFFOI' }}</h1>
     
-    <!-- Hero Video Section -->
+    <!-- Hero Video/GIF Section -->
     <div class="row mb-5">
         <div class="col-12">
             <div class="hero-video-wrapper">
@@ -18,6 +18,13 @@
                                     allowfullscreen 
                                     title="EFFOI Restaurant"
                                     loading="lazy"></iframe>
+                        </div>
+                    {% elif about.hero_video_url.endswith('.gif') %}
+                        <div class="gif-container">
+                            <img src="{{ about.hero_video_url }}" 
+                                 alt="EFFOI Catering Animation" 
+                                 style="width:100%; height:100%; object-fit:cover; border-radius:30px;"
+                                 loading="lazy">
                         </div>
                     {% elif about.hero_video_url.endswith(('.mp4', '.webm', '.ogg')) %}
                         <div class="video-container">
@@ -34,11 +41,11 @@
                         </div>
                     {% endif %}
                 {% else %}
-                    <div class="video-responsive">
-                        <iframe src="https://www.youtube.com/embed/VIDEO_ID" 
-                                allowfullscreen 
-                                title="EFFOI Restaurant"
-                                loading="lazy"></iframe>
+                    <div class="gif-container">
+                        <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Effoi.gif" 
+                             alt="EFFOI Catering Animation" 
+                             style="width:100%; height:100%; object-fit:cover; border-radius:30px;"
+                             loading="lazy">
                     </div>
                 {% endif %}
             </div>
@@ -306,11 +313,6 @@
     </div>
 </div>
 
-<!-- Page Health Monitor -->
-<div id="page-health" style="position: fixed; bottom: 10px; right: 10px; background: #333; color: #0f0; padding: 5px 10px; border-radius: 20px; font-size: 12px; z-index: 9999; display: none;">
-    ✓ Page OK
-</div>
-
 <style>
     .curved-box {
         border-radius: 50px 20px 50px 20px;
@@ -400,6 +402,26 @@
         height: auto;
         margin: 0 auto;
         display: block;
+        border-radius: 15px;
+    }
+    
+    .gif-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #000000;
+        min-height: 500px;
+        padding: 20px;
+    }
+    
+    .gif-container img {
+        max-width: 100%;
+        max-height: 500px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        display: block;
+        margin: 0 auto;
         border-radius: 15px;
     }
     
@@ -772,53 +794,9 @@
     }
 </style>
 
-<!-- Page Health Monitor Script -->
-<script>
-(function() {
-    // Show that JavaScript is working
-    console.log('✅ About page loaded at:', new Date().toISOString());
-    
-    // Monitor page health
-    let healthCheck = setInterval(function() {
-        const content = document.getElementById('about-page-content');
-        if (content && content.children.length > 0) {
-            document.getElementById('page-health').style.display = 'block';
-        } else {
-            console.warn('⚠️ Page content missing, attempting recovery...');
-            document.getElementById('page-health').style.backgroundColor = '#f00';
-            document.getElementById('page-health').innerHTML = '⚠️ Page issue detected';
-        }
-    }, 5000);
-    
-    // Clean up interval on page unload
-    window.addEventListener('beforeunload', function() {
-        clearInterval(healthCheck);
-    });
-    
-    // Add error handlers for images
-    const images = document.querySelectorAll('img');
-    images.forEach(img => {
-        img.addEventListener('error', function() {
-            console.warn('Image failed to load:', this.src);
-            this.style.backgroundColor = '#8B1E1E';
-        });
-    });
-    
-    // Memory leak prevention - clean up AOS if it exists
-    if (typeof AOS !== 'undefined') {
-        AOS.init({
-            duration: 800,
-            once: true,
-            disable: window.innerWidth < 768
-        });
-    }
-})();
-</script>
-
 <script>
 function openImageModal(imageUrl, caption) {
     try {
-        // Create modal if it doesn't exist
         let modal = document.getElementById('imageModal');
         if (!modal) {
             const modalHtml = `
