@@ -704,6 +704,45 @@ def admin_dashboard():
                          recent_reviews=recent_reviews,
                          recent_events=recent_events)
 
+@app.route('/admin/simple-dashboard')
+@admin_required
+def simple_dashboard():
+    total_menu = MenuItem.query.count()
+    categories = Category.query.count()
+    html = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard - EFFOI</title>
+    <style>
+        body {{ font-family: Arial; padding: 20px; background: #f5f5f5; }}
+        .container {{ max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; }}
+        h1 {{ color: #8B1E1E; }}
+        .stats {{ background: #eee; padding: 15px; margin: 10px 0; border-radius: 5px; }}
+        .menu-links a {{ display: inline-block; margin: 5px; padding: 8px 15px; background: #8B1E1E; color: white; text-decoration: none; border-radius: 5px; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>EFFOI Admin Dashboard</h1>
+        <p>Welcome, {session.get('admin_username')}!</p>
+        <div class="stats">
+            <h3>Statistics</h3>
+            <p>Total Menu Items: <strong>{total_menu}</strong></p>
+            <p>Categories: <strong>{categories}</strong></p>
+        </div>
+        <div class="menu-links">
+            <a href="/admin/menu">Manage Menu</a>
+            <a href="/admin/categories">Manage Categories</a>
+            <a href="/admin/reservations">View Reservations</a>
+            <a href="/admin/logout">Logout</a>
+        </div>
+    </div>
+</body>
+</html>
+"""
+    return html
+
 # ==================== ADMIN RESERVATIONS ====================
 @app.route('/admin/reservations/update/<int:reservation_id>', methods=['POST'])
 @admin_required
