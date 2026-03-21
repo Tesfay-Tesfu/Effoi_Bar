@@ -49,3 +49,6 @@ backup_existing_data.py
 *.mov
 *.MP4
 *.mp4
+*.mov
+*.MP4
+*.mp4
