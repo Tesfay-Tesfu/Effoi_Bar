@@ -13,6 +13,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
+from urllib.parse import urlparse
 from dotenv import load_dotenv
 import secrets
 
@@ -21,10 +22,12 @@ load_dotenv()
 
 # Initialize Flask app
 app = Flask(__name__, 
-            template_folder='../frontend/templates',
-            static_folder='../frontend/static')
+            template_folder='frontend/templates',
+            static_folder='frontend/static')
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', secrets.token_hex(32))
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///effoi.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+if not app.config['SQLALCHEMY_DATABASE_URI']:
+    raise RuntimeError('DATABASE_URL environment variable must be set for PostgreSQL.')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 100MB
 
@@ -425,13 +428,22 @@ def submit_blog():
             filename = secure_filename(image_file.filename)
             filename = f"{int(time.time())}_{filename}"
             
-            project_root = os.path.dirname(os.path.dirname(__file__))
-            upload_dir = os.path.join(project_root, 'frontend', 'static', 'uploads', 'blog')
+            upload_dir = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'blog')
             os.makedirs(upload_dir, exist_ok=True)
             
             file_path = os.path.join(upload_dir, filename)
-            image_file.save(file_path)
-            image_url = f"/static/uploads/blog/{filename}"
+            try:
+                image_file.save(file_path)
+                print(f"Saved blog image to {file_path}")
+                if not os.path.exists(file_path):
+                    print(f"Blog image not found after save: {file_path}")
+                    flash('Uploaded file could not be saved. Check server disk/permissions.', 'danger')
+                    return render_template('public/submit_blog.html')
+                image_url = url_for('static', filename=f'uploads/blog/{filename}', _external=True)
+            except Exception as e:
+                print(f"Failed to save blog image: {e}")
+                flash('Failed to save uploaded image. Check server permissions.', 'danger')
+                return render_template('public/submit_blog.html')
         
         post = BlogPost(
             title=request.form.get('title'),
@@ -817,11 +829,17 @@ def admin_add_menu_item():
         
         if image_file and image_file.filename:
             filename = secure_filename(f"menu_{int(time.time())}_{image_file.filename}")
-            project_root = os.path.dirname(os.path.dirname(__file__))
-            upload_path = os.path.join(project_root, 'frontend', 'static', 'uploads', 'menu', filename)
-            os.makedirs(os.path.dirname(upload_path), exist_ok=True)
-            image_file.save(upload_path)
-            image_url = url_for('static', filename=f'uploads/menu/{filename}', _external=True)
+            upload_dir = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'menu')
+            os.makedirs(upload_dir, exist_ok=True)
+            save_path = os.path.join(upload_dir, filename)
+            try:
+                image_file.save(save_path)
+                print(f"Saved menu image to {save_path}")
+                image_url = url_for('static', filename=f'uploads/menu/{filename}', _external=True)
+            except Exception as e:
+                print(f"Failed to save menu image: {e}")
+                flash('Failed to save uploaded image. Check server permissions.', 'danger')
+                return redirect(url_for('admin_menu'))
         
         item = MenuItem(
             name=request.form.get('name'),
@@ -852,11 +870,39 @@ def admin_edit_menu_item(item_id):
         image_file = request.files.get('image')
         if image_file and image_file.filename:
             filename = secure_filename(f"menu_{int(time.time())}_{image_file.filename}")
-            project_root = os.path.dirname(os.path.dirname(__file__))
-            upload_path = os.path.join(project_root, 'frontend', 'static', 'uploads', 'menu', filename)
-            os.makedirs(os.path.dirname(upload_path), exist_ok=True)
-            image_file.save(upload_path)
-            item.image_url = url_for('static', filename=f'uploads/menu/{filename}', _external=True)
+            upload_dir = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'menu')
+            os.makedirs(upload_dir, exist_ok=True)
+            save_path = os.path.join(upload_dir, filename)
+            try:
+                image_file.save(save_path)
+                print(f"Saved menu image to {save_path}")
+                # ensure file was actually written
+                if not os.path.exists(save_path):
+                    print(f"Menu image not found after save: {save_path}")
+                    flash('Uploaded file could not be saved. Check server disk/permissions.', 'danger')
+                    return redirect(url_for('admin_menu'))
+
+                # remove previous image file if it exists and was stored in uploads/menu
+                try:
+                    old_url = item.image_url
+                    if old_url:
+                        parsed = urlparse(old_url)
+                        old_name = os.path.basename(parsed.path)
+                        old_path = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'menu', old_name)
+                        if os.path.exists(old_path) and old_path != save_path:
+                            try:
+                                os.remove(old_path)
+                                print(f"Removed old menu image: {old_path}")
+                            except Exception as e:
+                                print(f"Failed to remove old menu image: {e}")
+                except Exception as e:
+                    print(f"Error while handling old image removal: {e}")
+
+                item.image_url = url_for('static', filename=f'uploads/menu/{filename}', _external=True)
+            except Exception as e:
+                print(f"Failed to save menu image (edit): {e}")
+                flash('Failed to save uploaded image. Check server permissions.', 'danger')
+                return redirect(url_for('admin_menu'))
         elif request.form.get('image_url'):
             item.image_url = request.form.get('image_url')
         
@@ -990,11 +1036,21 @@ def admin_add_event():
         
         if image_file and image_file.filename:
             filename = secure_filename(f"event_{int(time.time())}_{image_file.filename}")
-            project_root = os.path.dirname(os.path.dirname(__file__))
-            upload_path = os.path.join(project_root, 'frontend', 'static', 'uploads', 'events', filename)
-            os.makedirs(os.path.dirname(upload_path), exist_ok=True)
-            image_file.save(upload_path)
-            image_url = url_for('static', filename=f'uploads/events/{filename}', _external=True)
+            upload_dir = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'events')
+            os.makedirs(upload_dir, exist_ok=True)
+            save_path = os.path.join(upload_dir, filename)
+            try:
+                image_file.save(save_path)
+                print(f"Saved event image to {save_path}")
+                if not os.path.exists(save_path):
+                    print(f"Event image not found after save: {save_path}")
+                    flash('Uploaded file could not be saved. Check server disk/permissions.', 'danger')
+                    return redirect(url_for('admin_events'))
+                image_url = url_for('static', filename=f'uploads/events/{filename}', _external=True)
+            except Exception as e:
+                print(f"Failed to save event image: {e}")
+                flash('Failed to save uploaded image. Check server permissions.', 'danger')
+                return redirect(url_for('admin_events'))
         
         event = Event(
             title=request.form.get('title'),
@@ -1022,11 +1078,35 @@ def admin_edit_event(event_id):
         image_file = request.files.get('image')
         if image_file and image_file.filename:
             filename = secure_filename(f"event_{int(time.time())}_{image_file.filename}")
-            project_root = os.path.dirname(os.path.dirname(__file__))
-            upload_path = os.path.join(project_root, 'frontend', 'static', 'uploads', 'events', filename)
-            os.makedirs(os.path.dirname(upload_path), exist_ok=True)
-            image_file.save(upload_path)
-            event.image_url = url_for('static', filename=f'uploads/events/{filename}', _external=True)
+            upload_dir = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'events')
+            os.makedirs(upload_dir, exist_ok=True)
+            save_path = os.path.join(upload_dir, filename)
+            try:
+                image_file.save(save_path)
+                print(f"Saved event image to {save_path}")
+                if not os.path.exists(save_path):
+                    print(f"Event image not found after save: {save_path}")
+                    flash('Uploaded file could not be saved. Check server disk/permissions.', 'danger')
+                    return redirect(url_for('admin_events'))
+                try:
+                    old_url = event.image_url
+                    if old_url:
+                        parsed = urlparse(old_url)
+                        old_name = os.path.basename(parsed.path)
+                        old_path = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'events', old_name)
+                        if os.path.exists(old_path) and old_path != save_path:
+                            try:
+                                os.remove(old_path)
+                                print(f"Removed old event image: {old_path}")
+                            except Exception as e:
+                                print(f"Failed to remove old event image: {e}")
+                except Exception as e:
+                    print(f"Error while handling old image removal: {e}")
+                event.image_url = url_for('static', filename=f'uploads/events/{filename}', _external=True)
+            except Exception as e:
+                print(f"Failed to save event image (edit): {e}")
+                flash('Failed to save uploaded image. Check server permissions.', 'danger')
+                return redirect(url_for('admin_events'))
         elif request.form.get('image_url'):
             event.image_url = request.form.get('image_url')
         
@@ -1094,11 +1174,35 @@ def admin_blog_edit(post_id):
         image_file = request.files.get('image')
         if image_file and image_file.filename:
             filename = secure_filename(f"blog_{int(time.time())}_{image_file.filename}")
-            project_root = os.path.dirname(os.path.dirname(__file__))
-            upload_path = os.path.join(project_root, 'frontend', 'static', 'uploads', 'blog', filename)
-            os.makedirs(os.path.dirname(upload_path), exist_ok=True)
-            image_file.save(upload_path)
-            post.image_url = url_for('static', filename=f'uploads/blog/{filename}', _external=True)
+            upload_dir = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'blog')
+            os.makedirs(upload_dir, exist_ok=True)
+            save_path = os.path.join(upload_dir, filename)
+            try:
+                image_file.save(save_path)
+                print(f"Saved blog image to {save_path}")
+                if not os.path.exists(save_path):
+                    print(f"Blog image not found after save: {save_path}")
+                    flash('Uploaded file could not be saved. Check server disk/permissions.', 'danger')
+                    return redirect(url_for('admin_blog'))
+                try:
+                    old_url = post.image_url
+                    if old_url:
+                        parsed = urlparse(old_url)
+                        old_name = os.path.basename(parsed.path)
+                        old_path = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'blog', old_name)
+                        if os.path.exists(old_path) and old_path != save_path:
+                            try:
+                                os.remove(old_path)
+                                print(f"Removed old blog image: {old_path}")
+                            except Exception as e:
+                                print(f"Failed to remove old blog image: {e}")
+                except Exception as e:
+                    print(f"Error while handling old blog image removal: {e}")
+                post.image_url = url_for('static', filename=f'uploads/blog/{filename}', _external=True)
+            except Exception as e:
+                print(f"Failed to save blog image (edit): {e}")
+                flash('Failed to save uploaded image. Check server permissions.', 'danger')
+                return redirect(url_for('admin_blog'))
         elif request.form.get('image_url'):
             post.image_url = request.form.get('image_url')
         
@@ -1319,14 +1423,25 @@ def admin_add_slider():
     if request.method == 'POST':
         image_file = request.files.get('image')
         image_url = request.form.get('image_url')
-        
         if image_file and image_file.filename:
             filename = secure_filename(f"slider_{int(time.time())}_{image_file.filename}")
-            project_root = os.path.dirname(os.path.dirname(__file__))
-            upload_path = os.path.join(project_root, 'frontend', 'static', 'uploads', 'sliders', filename)
-            os.makedirs(os.path.dirname(upload_path), exist_ok=True)
-            image_file.save(upload_path)
-            image_url = url_for('static', filename=f'uploads/sliders/{filename}', _external=True)
+            # Use app.root_path to build a reliable path to the frontend static folder
+            upload_dir = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'sliders')
+            try:
+                os.makedirs(upload_dir, exist_ok=True)
+            except Exception as e:
+                flash(f'Could not create upload directory: {str(e)}', 'danger')
+                return redirect(url_for('admin_hero_sliders'))
+
+            save_path = os.path.join(upload_dir, filename)
+            try:
+                image_file.save(save_path)
+                # Use the app static URL for saved files
+                image_url = url_for('static', filename=f'uploads/sliders/{filename}', _external=True)
+                print(f"Saved slider image to: {save_path}")
+            except Exception as e:
+                flash(f'Failed to save image: {str(e)}', 'danger')
+                return redirect(url_for('admin_hero_sliders'))
         
         slider = HeroSlider(
             title=request.form.get('title'),
@@ -1353,11 +1468,21 @@ def admin_edit_slider(slider_id):
         image_file = request.files.get('image')
         if image_file and image_file.filename:
             filename = secure_filename(f"slider_{int(time.time())}_{image_file.filename}")
-            project_root = os.path.dirname(os.path.dirname(__file__))
-            upload_path = os.path.join(project_root, 'frontend', 'static', 'uploads', 'sliders', filename)
-            os.makedirs(os.path.dirname(upload_path), exist_ok=True)
-            image_file.save(upload_path)
-            slider.image_url = url_for('static', filename=f'uploads/sliders/{filename}', _external=True)
+            upload_dir = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'sliders')
+            try:
+                os.makedirs(upload_dir, exist_ok=True)
+            except Exception as e:
+                flash(f'Could not create upload directory: {str(e)}', 'danger')
+                return redirect(url_for('admin_hero_sliders'))
+
+            save_path = os.path.join(upload_dir, filename)
+            try:
+                image_file.save(save_path)
+                slider.image_url = url_for('static', filename=f'uploads/sliders/{filename}', _external=True)
+                print(f"Saved edited slider image to: {save_path}")
+            except Exception as e:
+                flash(f'Failed to save image: {str(e)}', 'danger')
+                return redirect(url_for('admin_hero_sliders'))
         elif request.form.get('image_url'):
             slider.image_url = request.form.get('image_url')
         
@@ -1405,11 +1530,20 @@ def admin_upload_gallery():
     image_file = request.files.get('image')
     if image_file and image_file.filename:
         filename = secure_filename(f"gallery_{int(time.time())}_{image_file.filename}")
-        project_root = os.path.dirname(os.path.dirname(__file__))
-        upload_path = os.path.join(project_root, 'frontend', 'static', 'uploads', 'gallery', filename)
-        os.makedirs(os.path.dirname(upload_path), exist_ok=True)
-        image_file.save(upload_path)
-        
+        upload_dir = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'gallery')
+        try:
+            os.makedirs(upload_dir, exist_ok=True)
+        except Exception as e:
+            flash(f'Could not create upload directory: {str(e)}', 'danger')
+            return redirect(url_for('admin_gallery'))
+
+        save_path = os.path.join(upload_dir, filename)
+        try:
+            image_file.save(save_path)
+        except Exception as e:
+            flash(f'Failed to save image: {str(e)}', 'danger')
+            return redirect(url_for('admin_gallery'))
+
         image = GalleryImage(
             title=request.form.get('title'),
             image_url=url_for('static', filename=f'uploads/gallery/{filename}', _external=True),
@@ -1420,6 +1554,7 @@ def admin_upload_gallery():
         db.session.add(image)
         db.session.commit()
         flash('Image uploaded successfully', 'success')
+        print(f"Saved gallery image to: {save_path}")
     else:
         flash('No image file provided', 'danger')
     
@@ -1753,11 +1888,21 @@ def admin_edit_gallery(image_id):
     image_file = request.files.get('image')
     if image_file and image_file.filename:
         filename = secure_filename(f"gallery_{int(time.time())}_{image_file.filename}")
-        project_root = os.path.dirname(os.path.dirname(__file__))
-        upload_path = os.path.join(project_root, 'frontend', 'static', 'uploads', 'gallery', filename)
-        os.makedirs(os.path.dirname(upload_path), exist_ok=True)
-        image_file.save(upload_path)
-        image.image_url = url_for('static', filename=f'uploads/gallery/{filename}', _external=True)
+        upload_dir = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'gallery')
+        try:
+            os.makedirs(upload_dir, exist_ok=True)
+        except Exception as e:
+            flash(f'Could not create upload directory: {str(e)}', 'danger')
+            return redirect(url_for('admin_gallery'))
+
+        save_path = os.path.join(upload_dir, filename)
+        try:
+            image_file.save(save_path)
+            image.image_url = url_for('static', filename=f'uploads/gallery/{filename}', _external=True)
+            print(f"Saved edited gallery image to: {save_path}")
+        except Exception as e:
+            flash(f'Failed to save image: {str(e)}', 'danger')
+            return redirect(url_for('admin_gallery'))
     
     db.session.commit()
     flash('Image updated successfully', 'success')

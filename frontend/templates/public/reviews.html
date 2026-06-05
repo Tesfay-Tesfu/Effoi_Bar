@@ -1,128 +1,908 @@
 {% extends "base.html" %}
 
-{% block title %}Customer Reviews - EFFOI{% endblock %}
+{% block title %}Customer Reviews — EFFOI Restaurant{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ================================================================
+   REVIEWS PAGE — Smart UI/UX
+================================================================ */
+
+/* ── Page wrapper ── */
+.rv-page {
+    background: #faf7f2;
+    min-height: 100vh;
+}
+
+/* ================================================================
+   HERO BANNER
+================================================================ */
+.rv-hero {
+    background: linear-gradient(120deg, #0f0608 0%, #3a0d0d 50%, #1a0808 100%);
+    padding: 5rem 0 3.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.rv-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 70% 50%, rgba(139,30,30,0.35), transparent);
+    pointer-events: none;
+}
+
+.rv-hero-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.rv-hero-left { flex: 1 1 320px; }
+
+.rv-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255,215,0,0.1);
+    border: 1px solid rgba(255,215,0,0.25);
+    color: #FFD700;
+    border-radius: 50px;
+    padding: 0.3rem 1rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 1.1rem;
+}
+
+.rv-hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    color: #fff;
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 0.75rem;
+}
+
+.rv-hero-title span { color: #FFD700; }
+
+.rv-hero-sub {
+    color: rgba(255,255,255,0.55);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.rv-write-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.75rem 1.75rem;
+    background: linear-gradient(135deg, #8B1E1E, #a82525);
+    color: white;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 6px 24px rgba(139,30,30,0.45);
+    transition: all 0.3s ease;
+}
+
+.rv-write-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(139,30,30,0.55);
+    color: white;
+}
+
+/* ── Rating summary card ── */
+.rv-summary-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 22px;
+    padding: 2rem 2.5rem;
+    text-align: center;
+    backdrop-filter: blur(12px);
+    flex-shrink: 0;
+    min-width: 220px;
+}
+
+.rv-big-score {
+    font-family: 'Playfair Display', serif;
+    font-size: 4.5rem;
+    font-weight: 700;
+    color: #FFD700;
+    line-height: 1;
+    margin-bottom: 0.4rem;
+}
+
+.rv-stars-row {
+    display: flex;
+    justify-content: center;
+    gap: 3px;
+    font-size: 1.2rem;
+    margin-bottom: 0.6rem;
+}
+
+.rv-stars-row .fa-star,
+.rv-stars-row .fa-star-half-alt { color: #FFD700; }
+.rv-stars-row .fa-star.empty    { color: rgba(255,215,0,0.25); }
+
+.rv-total-label {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* ── Rating breakdown bars ── */
+.rv-breakdown {
+    margin-top: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    text-align: left;
+}
+
+.rv-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.55);
+}
+
+.rv-bar-track {
+    flex: 1;
+    height: 5px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.rv-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #8B1E1E, #FFD700);
+    border-radius: 3px;
+    transition: width 1s ease;
+}
+
+.rv-bar-count {
+    width: 20px;
+    text-align: right;
+    color: rgba(255,255,255,0.4);
+}
+
+/* ================================================================
+   BODY / FILTERS + GRID
+================================================================ */
+.rv-body {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 2rem 4rem;
+}
+
+/* ── Filter / sort bar ── */
+.rv-filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+}
+
+.rv-filter-pills {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.rv-pill {
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
+    border: 1.5px solid #e0d8ce;
+    background: white;
+    color: #555;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.22s ease;
+}
+
+.rv-pill:hover { border-color: #8B1E1E; color: #8B1E1E; }
+
+.rv-pill.active {
+    background: #8B1E1E;
+    border-color: #8B1E1E;
+    color: white;
+}
+
+.rv-count-label {
+    font-size: 0.82rem;
+    color: #999;
+    white-space: nowrap;
+}
+
+/* ── Review cards grid ── */
+.rv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.25rem;
+}
+
+/* ── Individual review card ── */
+.rv-card {
+    background: white;
+    border-radius: 18px;
+    padding: 1.5rem 1.6rem;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.04);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.rv-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #8B1E1E, #FFD700);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.rv-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 36px rgba(139,30,30,0.1);
+}
+
+.rv-card:hover::before { opacity: 1; }
+
+/* Top row: avatar + name + date */
+.rv-card-top {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+}
+
+.rv-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8B1E1E, #c43535);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    letter-spacing: 0;
+}
+
+.rv-name-group { flex: 1; min-width: 0; }
+
+.rv-name {
+    font-weight: 600;
+    color: #1a1a1a;
+    font-size: 0.92rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rv-date {
+    font-size: 0.72rem;
+    color: #aaa;
+    margin-top: 1px;
+}
+
+/* Stars */
+.rv-card-stars {
+    display: flex;
+    gap: 3px;
+}
+
+.rv-card-stars i {
+    font-size: 0.85rem;
+    color: #FFD700;
+}
+
+.rv-card-stars i.empty { color: #e0d8ce; }
+
+/* Quote mark */
+.rv-quote-mark {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.4rem;
+    font-size: 3rem;
+    line-height: 1;
+    color: rgba(139,30,30,0.06);
+    font-family: 'Playfair Display', serif;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Comment text */
+.rv-comment {
+    font-size: 0.88rem;
+    color: #444;
+    line-height: 1.65;
+    flex: 1;
+}
+
+/* Verified badge */
+.rv-verified {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.7rem;
+    color: #2a7a2a;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.rv-verified i { font-size: 0.7rem; }
+
+/* ── Empty state ── */
+.rv-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 5rem 2rem;
+    color: #aaa;
+}
+
+.rv-empty i { font-size: 3rem; margin-bottom: 1rem; display: block; opacity: 0.3; }
+.rv-empty h3 { color: #999; margin-bottom: 0.5rem; }
+
+/* ================================================================
+   PAGINATION
+================================================================ */
+.rv-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 3rem;
+    flex-wrap: wrap;
+}
+
+.rv-page-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1.5px solid #e0d8ce;
+    background: white;
+    color: #555;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.22s ease;
+    cursor: pointer;
+}
+
+.rv-page-btn:hover { border-color: #8B1E1E; color: #8B1E1E; }
+
+.rv-page-btn.active {
+    background: #8B1E1E;
+    border-color: #8B1E1E;
+    color: white;
+    font-weight: 700;
+    pointer-events: none;
+}
+
+.rv-page-btn.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.rv-page-btn.wide { width: auto; padding: 0 1rem; }
+
+/* ================================================================
+   WRITE A REVIEW MODAL
+================================================================ */
+.rv-modal .modal-content {
+    border: none;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.2);
+}
+
+.rv-modal .modal-header {
+    background: linear-gradient(135deg, #8B1E1E, #6d1515);
+    color: white;
+    padding: 1.5rem 2rem;
+    border: none;
+}
+
+.rv-modal .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.rv-modal .btn-close { filter: invert(1); opacity: 0.8; }
+.rv-modal .btn-close:hover { opacity: 1; }
+
+.rv-modal .modal-body { padding: 2rem; background: #fff; }
+.rv-modal .modal-footer { background: #faf7f2; border-top: 1px solid #f0ebe3; padding: 1rem 2rem; }
+
+/* Form controls */
+.rv-modal .rv-form-group { margin-bottom: 1.25rem; }
+
+.rv-modal label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.4rem;
+    display: block;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.rv-modal .form-control {
+    border: 1.5px solid #e8e1d9;
+    border-radius: 10px;
+    padding: 0.7rem 1rem;
+    font-size: 0.9rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background: #faf7f2;
+}
+
+.rv-modal .form-control:focus {
+    border-color: #8B1E1E;
+    box-shadow: 0 0 0 3px rgba(139,30,30,0.1);
+    background: white;
+    outline: none;
+}
+
+/* ── Interactive star picker ── */
+.rv-star-picker {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.4rem 0;
+}
+
+.rv-star-picker label {
+    font-size: 1.8rem;
+    color: #e0d8ce;
+    cursor: pointer;
+    transition: color 0.15s ease, transform 0.15s ease;
+    text-transform: none;
+    letter-spacing: 0;
+    margin: 0;
+    line-height: 1;
+}
+
+.rv-star-picker input[type="radio"] { display: none; }
+
+.rv-star-picker label:hover,
+.rv-star-picker label.selected,
+.rv-star-picker input[type="radio"]:checked ~ label { color: #FFD700; }
+
+.rv-star-picker label:hover { transform: scale(1.15); }
+
+/* Modal submit btn */
+.rv-submit-btn {
+    background: linear-gradient(135deg, #8B1E1E, #a82525);
+    border: none;
+    color: white;
+    padding: 0.7rem 2rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(139,30,30,0.3);
+    cursor: pointer;
+}
+
+.rv-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(139,30,30,0.45);
+    color: white;
+}
+
+.rv-cancel-btn {
+    background: transparent;
+    border: 1.5px solid #e0d8ce;
+    color: #777;
+    padding: 0.7rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.rv-cancel-btn:hover { border-color: #8B1E1E; color: #8B1E1E; }
+
+/* ================================================================
+   RESPONSIVE
+================================================================ */
+@media (max-width: 768px) {
+    .rv-hero-inner { flex-direction: column; }
+    .rv-summary-card { width: 100%; }
+    .rv-grid { grid-template-columns: 1fr; }
+    .rv-filter-bar { flex-direction: column; align-items: flex-start; }
+    .rv-body { padding: 2rem 1.25rem 3rem; }
+    .rv-hero { padding: 3.5rem 0 2.5rem; }
+    .rv-big-score { font-size: 3.5rem; }
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="my-5">
-    <div class="d-flex justify-content-between align-items-center mb-5">
-        <h1 class="display-4">Customer Reviews</h1>
-        <button class="btn btn-danger rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#reviewModal">
-            <i class="fas fa-star"></i> Write a Review
-        </button>
-    </div>
 
-    <!-- Average Rating -->
-    {% set avg_rating = reviews.items|map(attribute='rating')|sum / reviews.items|length if reviews.items else 0 %}
-    <div class="text-center mb-5">
-        <div class="display-1 fw-bold text-warning">{{ "%.1f"|format(avg_rating) }}</div>
-        <div class="stars fs-3">
-            {% for i in range(5) %}
-                {% if i < avg_rating|int %}
-                    <i class="fas fa-star text-warning"></i>
-                {% elif i < avg_rating|round(0, 'ceil') and avg_rating % 1 >= 0.5 %}
-                    <i class="fas fa-star-half-alt text-warning"></i>
+{# ── Pre-compute stats ── #}
+{% set avg_rating = (reviews.items | map(attribute='rating') | sum / reviews.items | length) if reviews.items else 0 %}
+{% set total = reviews.total %}
+
+{# Per-star counts from current page (best we can do without extra query) #}
+{% set ns = namespace(s5=0, s4=0, s3=0, s2=0, s1=0) %}
+{% for r in reviews.items %}
+    {% if r.rating == 5 %}{% set ns.s5 = ns.s5 + 1 %}
+    {% elif r.rating == 4 %}{% set ns.s4 = ns.s4 + 1 %}
+    {% elif r.rating == 3 %}{% set ns.s3 = ns.s3 + 1 %}
+    {% elif r.rating == 2 %}{% set ns.s2 = ns.s2 + 1 %}
+    {% else %}{% set ns.s1 = ns.s1 + 1 %}{% endif %}
+{% endfor %}
+{% set page_count = reviews.items | length %}
+
+<div class="rv-page">
+
+    <!-- ══════════ HERO BANNER ══════════ -->
+    <div class="rv-hero">
+        <div class="rv-hero-inner">
+
+            <!-- Left: headline + CTA -->
+            <div class="rv-hero-left" data-aos="fade-right">
+                <div class="rv-eyebrow">
+                    <i class="fas fa-star"></i> Guest Experiences
+                </div>
+                <h1 class="rv-hero-title">
+                    What Our <span>Guests</span><br>Are Saying
+                </h1>
+                <p class="rv-hero-sub">
+                    Real stories from real guests who've experienced the warmth,<br>
+                    flavor, and culture of EFFOI Restaurant.
+                </p>
+                <button class="rv-write-btn" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                    <i class="fas fa-pen-nib"></i> Write a Review
+                </button>
+            </div>
+
+            <!-- Right: rating summary -->
+            <div class="rv-summary-card" data-aos="fade-left">
+                <div class="rv-big-score">{{ "%.1f" | format(avg_rating) }}</div>
+
+                <div class="rv-stars-row">
+                    {% for i in range(5) %}
+                        {% if i < avg_rating | int %}
+                            <i class="fas fa-star"></i>
+                        {% elif i < avg_rating | round(0, 'ceil') and avg_rating % 1 >= 0.5 %}
+                            <i class="fas fa-star-half-alt"></i>
+                        {% else %}
+                            <i class="far fa-star empty"></i>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="rv-total-label">{{ total }} verified review{{ 's' if total != 1 }}</div>
+
+                <!-- Breakdown bars -->
+                {% if page_count > 0 %}
+                <div class="rv-breakdown">
+                    {% for star, count in [(5, ns.s5), (4, ns.s4), (3, ns.s3), (2, ns.s2), (1, ns.s1)] %}
+                    <div class="rv-bar-row">
+                        <span>{{ star }}★</span>
+                        <div class="rv-bar-track">
+                            <div class="rv-bar-fill" style="width:{{ ((count / page_count) * 100) | int }}%"></div>
+                        </div>
+                        <span class="rv-bar-count">{{ count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </div><!-- /rv-hero -->
+
+    <!-- ══════════ BODY ══════════ -->
+    <div class="rv-body">
+
+        <!-- Filter / sort bar -->
+        <div class="rv-filter-bar" data-aos="fade-up">
+            <div class="rv-filter-pills" id="filterPills">
+                <button class="rv-pill active" data-filter="all">All</button>
+                <button class="rv-pill" data-filter="5">★★★★★</button>
+                <button class="rv-pill" data-filter="4">★★★★</button>
+                <button class="rv-pill" data-filter="3">★★★</button>
+            </div>
+            <span class="rv-count-label" id="visibleCount">
+                Showing {{ reviews.items | length }} of {{ total }} reviews
+            </span>
+        </div>
+
+        <!-- Reviews grid -->
+        <div class="rv-grid" id="reviewsGrid">
+
+            {% for review in reviews.items %}
+            <div class="rv-card" data-aos="fade-up" data-aos-delay="{{ (loop.index0 % 3) * 80 }}"
+                 data-rating="{{ review.rating }}">
+
+                <!-- Big decorative quote -->
+                <div class="rv-quote-mark" aria-hidden="true">"</div>
+
+                <!-- Top row -->
+                <div class="rv-card-top">
+                    <div class="rv-avatar" aria-hidden="true">
+                        {{ review.customer_name[0] | upper }}
+                    </div>
+                    <div class="rv-name-group">
+                        <div class="rv-name">{{ review.customer_name }}</div>
+                        <div class="rv-date">
+                            <i class="fas fa-calendar-alt" style="font-size:.65rem; margin-right:3px;"></i>
+                            {{ review.created_at.strftime('%B %d, %Y') }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stars -->
+                <div class="rv-card-stars" aria-label="{{ review.rating }} out of 5 stars">
+                    {% for i in range(5) %}
+                        {% if i < review.rating %}
+                            <i class="fas fa-star"></i>
+                        {% else %}
+                            <i class="far fa-star empty"></i>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <!-- Comment -->
+                <p class="rv-comment">{{ review.comment }}</p>
+
+                <!-- Verified diner -->
+                <div class="rv-verified">
+                    <i class="fas fa-circle-check"></i> Verified Diner
+                </div>
+
+            </div>
+            {% else %}
+            <div class="rv-empty">
+                <i class="far fa-comment-dots"></i>
+                <h3>No reviews yet</h3>
+                <p>Be the first to share your experience!</p>
+                <button class="rv-write-btn mt-3" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                    <i class="fas fa-pen-nib"></i> Write a Review
+                </button>
+            </div>
+            {% endfor %}
+
+        </div><!-- /rv-grid -->
+
+        <!-- ── Pagination ── -->
+        {% if reviews.pages > 1 %}
+        <nav class="rv-pagination" aria-label="Reviews pagination">
+
+            {% if reviews.has_prev %}
+            <a href="{{ url_for('reviews', page=reviews.prev_num) }}" class="rv-page-btn wide">
+                <i class="fas fa-chevron-left" style="font-size:.7rem; margin-right:.3rem;"></i> Prev
+            </a>
+            {% else %}
+            <span class="rv-page-btn wide disabled">
+                <i class="fas fa-chevron-left" style="font-size:.7rem; margin-right:.3rem;"></i> Prev
+            </span>
+            {% endif %}
+
+            {% for page_num in reviews.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                {% if page_num %}
+                    <a href="{{ url_for('reviews', page=page_num) }}"
+                       class="rv-page-btn {% if page_num == reviews.page %}active{% endif %}">
+                        {{ page_num }}
+                    </a>
                 {% else %}
-                    <i class="far fa-star text-warning"></i>
+                    <span class="rv-page-btn disabled" style="border:none; color:#ccc; width:auto;">…</span>
                 {% endif %}
             {% endfor %}
-        </div>
-        <p class="text-muted">Based on {{ reviews.total }} reviews</p>
-    </div>
 
-    <!-- Reviews List -->
-    <div class="row g-4">
-        {% for review in reviews.items %}
-        <div class="col-md-6" data-aos="fade-up">
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="stars">
-                            {% for i in range(review.rating) %}
-                                <i class="fas fa-star text-warning"></i>
+            {% if reviews.has_next %}
+            <a href="{{ url_for('reviews', page=reviews.next_num) }}" class="rv-page-btn wide">
+                Next <i class="fas fa-chevron-right" style="font-size:.7rem; margin-left:.3rem;"></i>
+            </a>
+            {% else %}
+            <span class="rv-page-btn wide disabled">
+                Next <i class="fas fa-chevron-right" style="font-size:.7rem; margin-left:.3rem;"></i>
+            </span>
+            {% endif %}
+
+        </nav>
+        {% endif %}
+
+    </div><!-- /rv-body -->
+
+</div><!-- /rv-page -->
+
+<!-- ══════════ WRITE A REVIEW MODAL ══════════ -->
+<div class="modal fade rv-modal" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-modal="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="reviewModalLabel">
+                    <i class="fas fa-pen-nib me-2"></i>Share Your Experience
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form method="POST" action="{{ url_for('submit_review') }}" id="reviewForm" novalidate>
+                <div class="modal-body">
+
+                    <!-- Name -->
+                    <div class="rv-form-group">
+                        <label for="rv_name">Your Name <span style="color:#8B1E1E;">*</span></label>
+                        <input type="text" id="rv_name" name="customer_name"
+                               class="form-control" placeholder="e.g. Marta B."
+                               required minlength="2" maxlength="100" autocomplete="name">
+                    </div>
+
+                    <!-- Email -->
+                    <div class="rv-form-group">
+                        <label for="rv_email">Email <span style="color:#aaa; font-weight:400; text-transform:none; font-size:.75rem;">(optional — never shown)</span></label>
+                        <input type="email" id="rv_email" name="customer_email"
+                               class="form-control" placeholder="your@email.com"
+                               autocomplete="email">
+                    </div>
+
+                    <!-- Star rating picker -->
+                    <div class="rv-form-group">
+                        <label>Your Rating <span style="color:#8B1E1E;">*</span></label>
+                        <div class="rv-star-picker" id="starPicker" role="radiogroup" aria-label="Rating">
+                            {% for v in [1,2,3,4,5] %}
+                            <input type="radio" name="rating" id="star{{ v }}" value="{{ v }}"
+                                   {% if v == 5 %}checked{% endif %}>
+                            <label for="star{{ v }}" title="{{ v }} star{{ 's' if v > 1 }}" data-val="{{ v }}">★</label>
                             {% endfor %}
                         </div>
-                        <small class="text-muted">{{ review.created_at.strftime('%B %d, %Y') }}</small>
+                        <div id="ratingLabel" style="font-size:.78rem; color:#8B1E1E; font-weight:600; margin-top:.3rem; min-height:1rem;">
+                            Excellent
+                        </div>
                     </div>
-                    <p class="mb-3">{{ review.comment }}</p>
-                    <div class="fw-bold">- {{ review.customer_name }}</div>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
 
-    <!-- Pagination -->
-    {% if reviews.pages > 1 %}
-    <nav class="mt-5">
-        <ul class="pagination justify-content-center">
-            {% if reviews.has_prev %}
-            <li class="page-item">
-                <a class="page-link" href="{{ url_for('reviews', page=reviews.prev_num) }}">Previous</a>
-            </li>
-            {% endif %}
-            
-            {% for page_num in reviews.iter_pages() %}
-                {% if page_num %}
-                    <li class="page-item {% if page_num == reviews.page %}active{% endif %}">
-                        <a class="page-link" href="{{ url_for('reviews', page=page_num) }}">{{ page_num }}</a>
-                    </li>
-                {% else %}
-                    <li class="page-item disabled"><span class="page-link">...</span></li>
-                {% endif %}
-            {% endfor %}
-            
-            {% if reviews.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="{{ url_for('reviews', page=reviews.next_num) }}">Next</a>
-            </li>
-            {% endif %}
-        </ul>
-    </nav>
-    {% endif %}
-</div>
+                    <!-- Comment -->
+                    <div class="rv-form-group">
+                        <label for="rv_comment">Your Review <span style="color:#8B1E1E;">*</span></label>
+                        <textarea id="rv_comment" name="comment" class="form-control"
+                                  rows="4" placeholder="Tell us about your dining experience…"
+                                  required minlength="10" maxlength="1000"></textarea>
+                        <div style="font-size:.72rem; color:#aaa; text-align:right; margin-top:.25rem;">
+                            <span id="charCount">0</span>/1000
+                        </div>
+                    </div>
 
-<!-- Review Modal -->
-<div class="modal fade" id="reviewModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Write a Review</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="POST" action="{{ url_for('submit_review') }}">
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Your Name *</label>
-                        <input type="text" class="form-control" name="customer_name" required>
+                    <!-- Honeypot -->
+                    <div style="display:none;" aria-hidden="true">
+                        <input type="text" name="website" tabindex="-1" autocomplete="off">
                     </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Your Email (optional)</label>
-                        <input type="email" class="form-control" name="customer_email">
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Rating *</label>
-                        <select class="form-control" name="rating" required>
-                            <option value="5">5 - Excellent</option>
-                            <option value="4">4 - Very Good</option>
-                            <option value="3">3 - Good</option>
-                            <option value="2">2 - Fair</option>
-                            <option value="1">1 - Poor</option>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Your Review *</label>
-                        <textarea class="form-control" name="comment" rows="4" required></textarea>
-                    </div>
-                </div>
+
+                </div><!-- /modal-body -->
+
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">Submit Review</button>
+                    <button type="button" class="rv-cancel-btn" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="rv-submit-btn" id="submitBtn">
+                        <i class="fas fa-paper-plane me-1"></i> Submit Review
+                    </button>
                 </div>
             </form>
+
         </div>
     </div>
 </div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* ── Star picker interaction ── */
+const ratingLabels = { 1:'Poor', 2:'Fair', 3:'Good', 4:'Very Good', 5:'Excellent' };
+const starLabels   = document.querySelectorAll('.rv-star-picker label');
+const ratingInputs = document.querySelectorAll('.rv-star-picker input[type="radio"]');
+const ratingLbl    = document.getElementById('ratingLabel');
+
+function updateStars(val) {
+    starLabels.forEach((lbl, i) => {
+        lbl.classList.toggle('selected', (i + 1) <= val);
+    });
+    if (ratingLbl) ratingLbl.textContent = ratingLabels[val] || '';
+}
+
+// Init at 5
+updateStars(5);
+
+ratingInputs.forEach(input => {
+    input.addEventListener('change', () => updateStars(parseInt(input.value)));
+});
+
+// Hover preview
+starLabels.forEach(lbl => {
+    lbl.addEventListener('mouseenter', () => {
+        const val = parseInt(lbl.dataset.val);
+        starLabels.forEach((l, i) => l.style.color = (i+1) <= val ? '#FFD700' : '');
+    });
+    lbl.addEventListener('mouseleave', () => {
+        // Reset to checked value
+        const checked = document.querySelector('.rv-star-picker input[type="radio"]:checked');
+        if (checked) updateStars(parseInt(checked.value));
+        starLabels.forEach(l => l.style.color = '');
+    });
+});
+
+/* ── Character counter ── */
+const commentEl  = document.getElementById('rv_comment');
+const charCount  = document.getElementById('charCount');
+if (commentEl && charCount) {
+    commentEl.addEventListener('input', () => {
+        const len = commentEl.value.length;
+        charCount.textContent = len;
+        charCount.style.color = len > 900 ? '#c43535' : '#aaa';
+    });
+}
+
+/* ── Client-side filter by star ── */
+const filterPills = document.querySelectorAll('.rv-pill');
+const cards       = document.querySelectorAll('.rv-card[data-rating]');
+const countLbl    = document.getElementById('visibleCount');
+
+filterPills.forEach(pill => {
+    pill.addEventListener('click', function () {
+        filterPills.forEach(p => p.classList.remove('active'));
+        this.classList.add('active');
+
+        const filter = this.dataset.filter;
+        let shown = 0;
+
+        cards.forEach(card => {
+            const match = filter === 'all' || card.dataset.rating === filter;
+            card.style.display = match ? '' : 'none';
+            if (match) shown++;
+        });
+
+        if (countLbl) {
+            countLbl.textContent = `Showing ${shown} of {{ total }} reviews`;
+        }
+    });
+});
+
+/* ── Form submit guard (honeypot check) ── */
+document.getElementById('reviewForm')?.addEventListener('submit', function (e) {
+    const hp = this.querySelector('input[name="website"]');
+    if (hp && hp.value) { e.preventDefault(); return; }
+
+    const btn = document.getElementById('submitBtn');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Submitting…';
+    }
+});
+</script>
 {% endblock %}

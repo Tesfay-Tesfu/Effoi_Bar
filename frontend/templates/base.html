@@ -47,24 +47,41 @@
         }
 
         /* ===== HEADER ===== */
+
+        /* ---------- Top Bar ---------- */
         .top-bar {
-            background: linear-gradient(135deg, #8B1E1E, #B13E3E);
+            background: linear-gradient(135deg, #6d1515 0%, #8B1E1E 50%, #a82525 100%);
             color: white;
-            padding: 0.5rem 0;
-            font-size: 0.9rem;
+            padding: 0.45rem 0;
+            font-size: 0.82rem;
             position: relative;
-            z-index: 1001;
+            z-index: 1002;
+            border-bottom: 1px solid rgba(255,215,0,0.25);
+            letter-spacing: 0.02em;
         }
 
         .top-bar a {
-            color: white;
+            color: rgba(255,255,255,0.9);
             text-decoration: none;
-            margin-right: 1.5rem;
+            transition: color 0.2s ease;
+            white-space: nowrap;
         }
 
+        .top-bar a:hover { color: #FFD700; }
+
         .top-bar i {
-            margin-right: 0.5rem;
+            margin-right: 0.35rem;
             color: #FFD700;
+            font-size: 0.78rem;
+        }
+
+        .top-bar .tb-divider {
+            width: 1px;
+            height: 14px;
+            background: rgba(255,255,255,0.25);
+            margin: 0 0.75rem;
+            display: inline-block;
+            vertical-align: middle;
         }
 
         .top-bar .header-container {
@@ -76,98 +93,125 @@
             padding: 0 2rem;
         }
 
-        /* Blocked Times Badge */
-        .blocked-times-badge {
-            background: #FFD700;
-            color: #8B1E1E;
-            padding: 0.25rem 1rem;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            display: inline-flex;
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.1rem;
+        }
+
+        .top-bar-right {
+            display: flex;
             align-items: center;
             gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .top-bar-right i.fa-clock { color: #FFD700; }
+
+        /* ---------- Blocked Times Badge ---------- */
+        .blocked-times-badge {
+            background: rgba(255,215,0,0.15);
+            color: #FFD700;
+            padding: 0.2rem 0.75rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.78rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
             cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(139, 30, 30, 0.2);
-            margin-left: 1rem;
+            transition: all 0.25s ease;
+            border: 1px solid rgba(255,215,0,0.35);
             position: relative;
         }
-        
+
+        .blocked-times-badge .badge-dot {
+            width: 7px;
+            height: 7px;
+            background: #FFD700;
+            border-radius: 50%;
+            animation: pulse-dot 1.8s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.4; transform: scale(0.7); }
+        }
+
         .blocked-times-badge:hover {
-            background: #8B1E1E;
-            color: #FFD700;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            background: #FFD700;
+            color: #8B1E1E;
+            border-color: #FFD700;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255,215,0,0.3);
         }
-        
-        .blocked-times-badge:hover i {
-            color: #FFD700;
-        }
-        
-        /* Blocked Times Popup */
+
+        .blocked-times-badge:hover .badge-dot { background: #8B1E1E; }
+
+        /* ---------- Blocked Times Popup ---------- */
         .blocked-times-popup {
             position: absolute;
-            top: 100%;
+            top: calc(100% + 10px);
             right: 0;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            padding: 1rem;
-            min-width: 350px;
-            z-index: 1000;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+            padding: 1.25rem;
+            min-width: 360px;
+            z-index: 2000;
             display: none;
-            margin-top: 0.5rem;
-            border: 1px solid #eee;
+            border: 1px solid #f0f0f0;
+            animation: popup-in 0.2s ease;
         }
-        
-        .blocked-times-popup.show {
-            display: block;
+
+        @keyframes popup-in {
+            from { opacity: 0; transform: translateY(-6px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
-        
+
+        .blocked-times-popup.show { display: block; }
+
         .blocked-times-popup h6 {
             color: #8B1E1E;
             margin-bottom: 0.75rem;
-            padding-bottom: 0.5rem;
+            padding-bottom: 0.6rem;
             border-bottom: 2px solid #FFD700;
-        }
-        
-        .blocked-time-item {
-            padding: 0.75rem;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .blocked-time-item:last-child {
-            border-bottom: none;
-        }
-        
-        .blocked-time-item .date {
-            font-weight: 600;
-            color: #333;
             font-size: 0.9rem;
-        }
-        
-        .blocked-time-item .time {
-            color: #8B1E1E;
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
-        
-        .blocked-time-item .reason {
-            color: #666;
-            font-size: 0.85rem;
-            font-style: italic;
-            margin-top: 0.25rem;
-            padding-left: 1.5rem;
         }
 
+        .blocked-time-item {
+            padding: 0.65rem 0.75rem;
+            border-bottom: 1px solid #f5f5f5;
+            border-radius: 10px;
+            transition: background 0.2s;
+        }
+
+        .blocked-time-item:hover { background: #faf7f2; }
+        .blocked-time-item:last-child { border-bottom: none; }
+
+        .blocked-time-item .date { font-weight: 600; color: #222; font-size: 0.85rem; }
+        .blocked-time-item .time { color: #8B1E1E; font-weight: 500; font-size: 0.85rem; }
+        .blocked-time-item .reason { color: #888; font-size: 0.8rem; font-style: italic; margin-top: 0.2rem; padding-left: 1.25rem; }
+
+        /* ---------- Main Header ---------- */
         .main-header {
-            background: white;
-            padding: 1rem 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            background: rgba(255,255,255,0.97);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 0.75rem 0;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.07);
             position: sticky;
             top: 0;
             z-index: 1000;
+            transition: padding 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+            border-bottom: 1px solid rgba(139,30,30,0.08);
+        }
+
+        .main-header.scrolled {
+            padding: 0.45rem 0;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.12);
+            background: rgba(255,255,255,0.99);
         }
 
         .header-container {
@@ -179,142 +223,163 @@
             align-items: center;
         }
 
+        /* ---------- Logo ---------- */
         .logo-area {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.85rem;
+            text-decoration: none;
+            flex-shrink: 0;
         }
 
         .logo {
-            height: 70px;
+            height: 62px;
             width: auto;
+            transition: transform 0.35s ease, height 0.3s ease;
+            filter: drop-shadow(0 2px 6px rgba(139,30,30,0.15));
         }
+
+        .main-header.scrolled .logo { height: 50px; }
+
+        .logo-area:hover .logo { transform: scale(1.04) rotate(-1deg); }
 
         .logo-text {
             font-family: 'Playfair Display', serif;
-            font-size: 1.8rem;
+            font-size: 1.65rem;
             font-weight: 700;
             color: #8B1E1E;
-            line-height: 1.2;
-            text-align: left;
-        }
-        .logo-text small {
-            font-size: 0.9rem;
-            color: #666;
-            font-family: 'Inter', sans-serif;
-            display: block;
-            font-weight: 400;
-            text-align: left;
-        }
-        .logo-text .bar-text {
-            font-size: 1.2rem;
-            color: #8B1E1E;
-            font-weight: 500;
-            letter-spacing: 1px;
-            margin-top: -5px;
-            display: block;
-            text-align: center;
-            width: 100%;
+            line-height: 1.1;
         }
 
+        .logo-text .logo-sub {
+            font-size: 0.72rem;
+            color: #999;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            display: block;
+        }
+
+        .logo-text .bar-text {
+            font-size: 1rem;
+            color: #8B1E1E;
+            font-weight: 500;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            display: block;
+            margin-top: -2px;
+        }
+
+        /* ---------- Navigation ---------- */
         .main-nav {
             display: flex;
-            gap: 1.5rem;
+            gap: 0.3rem;
             align-items: center;
         }
 
         .main-nav a {
             text-decoration: none;
-            color: #333;
+            color: #444;
             font-weight: 500;
-            transition: color 0.3s ease;
+            font-size: 0.9rem;
+            padding: 0.45rem 0.75rem;
+            border-radius: 8px;
+            transition: color 0.25s ease, background 0.25s ease;
             position: relative;
-            font-size: 0.95rem;
+            letter-spacing: 0.01em;
+            white-space: nowrap;
         }
 
-        .main-nav a:hover,
-        .main-nav a.active {
-            color: #8B1E1E;
-        }
+        .main-nav a:hover { color: #8B1E1E; background: rgba(139,30,30,0.05); }
 
-        .main-nav a::after {
+        .main-nav a.active { color: #8B1E1E; }
+
+        /* Animated underline */
+        .main-nav a:not(.reserve-btn)::after {
             content: '';
             position: absolute;
-            bottom: -4px;
-            left: 0;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
             width: 0;
             height: 2px;
-            background: #8B1E1E;
+            background: linear-gradient(90deg, #8B1E1E, #FFD700);
+            border-radius: 2px;
             transition: width 0.3s ease;
         }
 
-        .main-nav a:hover::after,
+        .main-nav a:not(.reserve-btn):hover::after,
         .main-nav a.active::after {
-            width: 100%;
+            width: calc(100% - 1.5rem);
         }
 
+        /* Reserve Button */
         .reserve-btn {
-            background: #8B1E1E;
+            background: linear-gradient(135deg, #8B1E1E, #a82525) !important;
             color: white !important;
-            padding: 0.4rem 1.2rem;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.9rem;
+            padding: 0.5rem 1.35rem !important;
+            border-radius: 50px !important;
+            font-weight: 600 !important;
+            font-size: 0.88rem !important;
+            letter-spacing: 0.03em;
+            box-shadow: 0 4px 15px rgba(139,30,30,0.3);
+            transition: all 0.3s ease !important;
+            margin-left: 0.5rem;
         }
 
         .reserve-btn:hover {
-            background: #B13E3E;
+            background: linear-gradient(135deg, #a82525, #c43535) !important;
             color: white !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 25px rgba(139,30,30,0.4) !important;
         }
 
-        .reserve-btn::after {
-            display: none !important;
-        }
+        .reserve-btn i { margin-right: 0.4rem; }
 
-        /* Elegant White Hamburger Button */
+        /* ---------- Hamburger Button ---------- */
         .mobile-toggle {
             display: none;
             background: white;
-            border: 1px solid rgba(139, 30, 30, 0.2);
-            font-size: 1.5rem;
+            border: 1.5px solid rgba(139,30,30,0.18);
             color: #8B1E1E;
             cursor: pointer;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            transition: all 0.25s ease;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
-        
+
         .mobile-toggle:hover {
             background: #8B1E1E;
             color: white;
             border-color: #8B1E1E;
-            box-shadow: 0 6px 16px rgba(139, 30, 30, 0.2);
-        }
-        
-        .mobile-toggle i {
-            font-size: 1.3rem;
+            box-shadow: 0 4px 16px rgba(139,30,30,0.25);
+            transform: rotate(5deg);
         }
 
+        .mobile-toggle i { font-size: 1.15rem; transition: transform 0.3s ease; }
+        .mobile-toggle.open i { transform: rotate(90deg); }
+
+        /* ---------- Responsive ---------- */
         @media (max-width: 992px) {
             .top-bar .header-container {
                 flex-direction: column;
-                gap: 0.5rem;
+                gap: 0.4rem;
                 text-align: center;
             }
-            
-            .blocked-times-badge {
-                margin-left: 0;
-                margin-top: 0.5rem;
-            }
-            
-            .mobile-toggle {
-                display: flex;
-            }
-            
+
+            .top-bar-left { justify-content: center; }
+            .top-bar-right { justify-content: center; }
+
+            .blocked-times-badge { margin-left: 0; }
+
+            .mobile-toggle { display: flex; }
+
             .main-nav {
                 display: none;
                 position: absolute;
@@ -323,53 +388,54 @@
                 right: 0;
                 background: white;
                 flex-direction: column;
-                padding: 1.5rem;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-                gap: 0.8rem;
-                border-top: 1px solid rgba(139, 30, 30, 0.1);
-                border-bottom: 2px solid #8B1E1E;
+                padding: 1rem 1.25rem 1.25rem;
+                box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+                gap: 0.3rem;
+                border-top: 2px solid #8B1E1E;
                 z-index: 1000;
+                animation: slide-down 0.25s ease;
             }
-            
-            .main-nav.show {
-                display: flex;
+
+            @keyframes slide-down {
+                from { opacity: 0; transform: translateY(-10px); }
+                to   { opacity: 1; transform: translateY(0); }
             }
-            
+
+            .main-nav.show { display: flex; }
+
             .main-nav a {
                 width: 100%;
-                text-align: left;
-                padding: 0.7rem 1rem;
-                border-radius: 12px;
-                font-size: 1rem;
-                background: #f9f9f9;
-                transition: all 0.3s ease;
+                padding: 0.75rem 1rem;
+                border-radius: 10px;
+                font-size: 0.95rem;
+                background: #faf7f2;
+                color: #333;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                transition: all 0.2s ease;
             }
-            
+
             .main-nav a:hover,
             .main-nav a.active {
                 background: #8B1E1E;
                 color: white;
-                padding-left: 1.5rem;
+                padding-left: 1.4rem;
             }
-            
-            .main-nav a::after {
-                display: none;
-            }
-            
+
+            .main-nav a:not(.reserve-btn)::after { display: none; }
+
             .reserve-btn {
                 text-align: center !important;
-                background: #8B1E1E;
+                justify-content: center;
+                background: linear-gradient(135deg, #8B1E1E, #a82525) !important;
                 color: white !important;
-                margin-top: 0.5rem;
+                margin-left: 0 !important;
+                margin-top: 0.4rem;
+                border-radius: 10px !important;
             }
-            
-            .reserve-btn:hover {
-                background: #B13E3E;
-            }
-            
-            .header-container {
-                flex-wrap: wrap;
-            }
+
+            .header-container { flex-wrap: nowrap; }
         }
 
         /* ===== HERO SECTION ===== */
@@ -656,43 +722,357 @@
             }
         }
 
-        /* Reviews section (displayed above footer) */
-        .reviews-section {
+        /* ===== REVIEWS SECTION (above footer) ===== */
+        .reviews-strip {
+            background: #faf7f2;
+            padding: 4.5rem 0 5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* subtle warm grain */
+        .reviews-strip::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(139,30,30,0.05), transparent);
+            pointer-events: none;
+        }
+
+        .reviews-strip-inner {
             max-width: 1400px;
-            margin: 3rem auto;
+            margin: 0 auto;
             padding: 0 2rem;
+            position: relative;
         }
 
-        .review-card {
-            background: white;
-            border-radius: 30px;
-            padding: 1.5rem;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease;
+        /* ── Section header ── */
+        .rs-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2.75rem;
         }
 
-        .review-card:hover {
-            transform: translateY(-5px);
+        .rs-header-left {}
+
+        .rs-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #8B1E1E;
+            margin-bottom: 0.5rem;
         }
 
-        .stars {
-            color: #FFD700;
-            margin-bottom: 0.8rem;
+        .rs-eyebrow span {
+            width: 28px;
+            height: 2px;
+            background: #8B1E1E;
+            border-radius: 2px;
+            display: inline-block;
         }
 
-        .stars i {
-            margin-right: 2px;
+        .rs-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.6rem, 3vw, 2.2rem);
+            font-weight: 700;
+            color: #1a1a1a;
+            line-height: 1.2;
+            margin: 0;
         }
 
-        .review-author {
+        .rs-title em {
+            font-style: normal;
+            color: #8B1E1E;
+        }
+
+        .rs-all-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.4rem;
+            border: 1.5px solid #8B1E1E;
+            color: #8B1E1E;
+            border-radius: 50px;
+            font-size: 0.83rem;
             font-weight: 600;
-            margin-top: 0.8rem;
-            color: #333;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
-        .review-date {
+        .rs-all-btn:hover {
+            background: #8B1E1E;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139,30,30,0.25);
+        }
+
+        /* ── Horizontal scroll track ── */
+        .rs-track-wrap {
+            position: relative;
+        }
+
+        .rs-track {
+            display: flex;
+            gap: 1.1rem;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 0.5rem;
+            scrollbar-width: none;           /* Firefox */
+        }
+
+        .rs-track::-webkit-scrollbar { display: none; }
+
+        /* ── Individual review card ── */
+        .rs-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.4rem 1.5rem 1.3rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border: 1px solid rgba(0,0,0,0.04);
+            min-width: 280px;
+            max-width: 300px;
+            flex-shrink: 0;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .rs-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #8B1E1E, #FFD700);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .rs-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 14px 40px rgba(139,30,30,0.12);
+        }
+
+        .rs-card:hover::after { opacity: 1; }
+
+        /* Quote decoration */
+        .rs-quote-bg {
+            position: absolute;
+            top: 0.8rem;
+            right: 1rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            line-height: 1;
+            color: rgba(139,30,30,0.06);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        /* Stars row */
+        .rs-stars {
+            display: flex;
+            gap: 3px;
+            font-size: 0.78rem;
+        }
+
+        .rs-stars .fa-star      { color: #FFD700; }
+        .rs-stars .fa-star.off  { color: #e8e1d9; }
+
+        /* Comment */
+        .rs-comment {
+            font-size: 0.87rem;
+            color: #444;
+            line-height: 1.65;
+            flex: 1;
+        }
+
+        /* Author row */
+        .rs-author-row {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            border-top: 1px solid #f5f0ea;
+            padding-top: 0.8rem;
+        }
+
+        .rs-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8B1E1E, #c43535);
+            color: white;
+            font-family: 'Playfair Display', serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .rs-author-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #222;
+            line-height: 1.2;
+        }
+
+        .rs-author-date {
+            font-size: 0.7rem;
+            color: #aaa;
+        }
+
+        /* ── Scroll arrow buttons ── */
+        .rs-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 1.5px solid #e8e1d9;
+            color: #8B1E1E;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            transition: all 0.25s ease;
+            z-index: 2;
+        }
+
+        .rs-arrow:hover {
+            background: #8B1E1E;
+            color: white;
+            border-color: #8B1E1E;
+            box-shadow: 0 6px 20px rgba(139,30,30,0.3);
+        }
+
+        .rs-arrow-left  { left: -18px; }
+        .rs-arrow-right { right: -18px; }
+
+        /* ── Scroll dots ── */
+        .rs-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.4rem;
+            margin-top: 1.5rem;
+        }
+
+        .rs-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #e0d8ce;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .rs-dot.active {
+            background: #8B1E1E;
+            width: 22px;
+            border-radius: 3px;
+        }
+
+        /* ── Empty state ── */
+        .rs-empty {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #aaa;
+            width: 100%;
+        }
+
+        .rs-empty i { font-size: 2.5rem; opacity: 0.25; display: block; margin-bottom: 0.75rem; }
+
+        /* ── Write-review inline CTA card ── */
+        .rs-cta-card {
+            background: linear-gradient(135deg, #8B1E1E 0%, #6d1515 100%);
+            border-radius: 20px;
+            padding: 1.4rem 1.5rem;
+            min-width: 240px;
+            max-width: 260px;
+            flex-shrink: 0;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rs-cta-card::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 140px; height: 140px;
+            background: radial-gradient(circle, rgba(255,215,0,0.18), transparent 65%);
+            pointer-events: none;
+        }
+
+        .rs-cta-card h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: white;
+            line-height: 1.3;
+            margin: 0;
+        }
+
+        .rs-cta-card p {
+            color: rgba(255,255,255,0.65);
             font-size: 0.8rem;
-            color: #999;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .rs-cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.6rem 1.3rem;
+            background: #FFD700;
+            color: #4a0e0e;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+
+        .rs-cta-btn:hover {
+            background: white;
+            color: #8B1E1E;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .rs-arrow { display: none; }
+            .rs-card  { min-width: 260px; }
+            .reviews-strip { padding: 3rem 0 3.5rem; }
+        }
+
+        @media (max-width: 480px) {
+            .rs-card, .rs-cta-card { min-width: 85vw; }
         }
 
         /* Curved box styles */
@@ -771,62 +1151,76 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Top bar with contact -->
+    <!-- Top Bar -->
     <div class="top-bar">
         <div class="header-container">
-            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                <a href="tel:{{ settings.get('phone', '+12406601337') }}"><i class="fas fa-phone"></i> {{ settings.get('phone', '+1 (240) 660-1337') }}</a>
-                <a href="mailto:{{ settings.get('email', 'nigistme1277@gmail.com') }}"><i class="fas fa-envelope"></i> {{ settings.get('email', 'nigistme1277@gmail.com') }}</a>
-                
+            <div class="top-bar-left">
+                <a href="tel:{{ settings.get('phone', '+12406601337') }}">
+                    <i class="fas fa-phone"></i>{{ settings.get('phone', '+1 (240) 660-1337') }}
+                </a>
+                <span class="tb-divider"></span>
+                <a href="mailto:{{ settings.get('email', 'nigistme1277@gmail.com') }}">
+                    <i class="fas fa-envelope"></i>{{ settings.get('email', 'nigistme1277@gmail.com') }}
+                </a>
+                <span class="tb-divider"></span>
+
                 <!-- Blocked Times Badge -->
-                <div class="blocked-times-badge" id="blockedTimesBadge">
-                    <i class="fas fa-clock"></i>
+                <div class="blocked-times-badge" id="blockedTimesBadge" style="position:relative;">
+                    <span class="badge-dot"></span>
                     <span id="blockedCount">0</span> Blocked Slots
-                    <i class="fas fa-chevron-down" style="font-size: 0.7rem;"></i>
-                </div>
-                
-                <!-- Blocked Times Popup -->
-                <div class="blocked-times-popup" id="blockedTimesPopup">
-                    <h6><i class="fas fa-ban me-2"></i>Unavailable Times</h6>
-                    <div id="blockedTimesList">
-                        <div class="text-center text-muted py-3">Loading...</div>
+                    <i class="fas fa-chevron-down" style="font-size:0.65rem; margin-left:2px;"></i>
+
+                    <!-- Blocked Times Popup -->
+                    <div class="blocked-times-popup" id="blockedTimesPopup">
+                        <h6><i class="fas fa-calendar-xmark me-2"></i>Unavailable Times</h6>
+                        <div id="blockedTimesList">
+                            <div class="text-center text-muted py-3" style="font-size:0.85rem;">
+                                <i class="fas fa-spinner fa-spin me-2"></i>Loading…
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div>
-                <i class="fas fa-clock"></i> {{ settings.get('hours', 'Mon-Sun: 11:00 AM - 10:00 PM') }}
+
+            <div class="top-bar-right">
+                <i class="fas fa-clock"></i>
+                <span>{{ settings.get('hours', 'Mon–Sun: 11:00 AM – 10:00 PM') }}</span>
             </div>
         </div>
     </div>
 
-    <!-- Main header -->
-    <div class="main-header">
+    <!-- Main Header -->
+    <div class="main-header" id="mainHeader">
         <div class="header-container">
-            <div class="logo-area">
-                <img src="{{ settings.get('logo_url', 'https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Effoi_logo3.png') }}" 
-                     alt="{{ settings.get('restaurant_name', 'EFFOI') }}" 
+
+            <!-- Logo -->
+            <a href="{{ url_for('index') }}" class="logo-area" style="text-decoration:none;">
+                <img src="{{ settings.get('logo_url', 'https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Effoi_logo3.png') }}"
+                     alt="{{ settings.get('restaurant_name', 'EFFOI') }}"
                      class="logo"
-                     onerror="this.onerror=null; this.src='https://via.placeholder.com/70x70/8B1E1E/ffffff?text=EFFOI';">
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/62x62/8B1E1E/ffffff?text=EFFOI';">
                 <div class="logo-text">
                     {{ settings.get('logo_text', 'EFFOI RESTAURANT') }}
-                    <small class="bar-text">& BAR</small>
+                    <span class="bar-text">& Bar</span>
                 </div>
-            </div>
+            </a>
 
-            <!-- Elegant White Hamburger Button -->
-            <button class="mobile-toggle" id="mobileToggle">
+            <!-- Hamburger (mobile) -->
+            <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation">
                 <i class="fas fa-bars"></i>
             </button>
 
-            <!-- Navigation - FAQ REMOVED from header -->
-            <nav class="main-nav" id="mainNav">
-                <a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">Home</a>
-                <a href="{{ url_for('menu') }}" class="{% if request.endpoint == 'menu' %}active{% endif %}">Menu</a>
-                <a href="{{ url_for('events') }}" class="{% if request.endpoint == 'events' %}active{% endif %}">Club Events</a>
-                <a href="{{ url_for('about') }}" class="{% if request.endpoint == 'about' %}active{% endif %}">About Us</a>
-                <a href="{{ url_for('blog') }}" class="{% if request.endpoint == 'blog' %}active{% endif %}">Blog</a>
-                <a href="{{ url_for('contact') }}" class="{% if request.endpoint == 'contact' %}active{% endif %}">Contact</a>
-                <a href="{{ url_for('reserve') }}" class="reserve-btn">Reserve Table</a>
+            <!-- Nav -->
+            <nav class="main-nav" id="mainNav" role="navigation">
+                <a href="{{ url_for('index') }}"   class="{% if request.endpoint == 'index'  %}active{% endif %}"><i class="fas fa-house"      style="font-size:.75rem;opacity:.6;"></i> Home</a>
+                <a href="{{ url_for('menu') }}"    class="{% if request.endpoint == 'menu'   %}active{% endif %}"><i class="fas fa-utensils"   style="font-size:.75rem;opacity:.6;"></i> Menu</a>
+                <a href="{{ url_for('events') }}"  class="{% if request.endpoint == 'events' %}active{% endif %}"><i class="fas fa-music"      style="font-size:.75rem;opacity:.6;"></i> Events</a>
+                <a href="{{ url_for('about') }}"   class="{% if request.endpoint == 'about'  %}active{% endif %}"><i class="fas fa-users"      style="font-size:.75rem;opacity:.6;"></i> About</a>
+                <a href="{{ url_for('blog') }}"    class="{% if request.endpoint == 'blog'   %}active{% endif %}"><i class="fas fa-pen-nib"    style="font-size:.75rem;opacity:.6;"></i> Blog</a>
+                <a href="{{ url_for('contact') }}" class="{% if request.endpoint == 'contact'%}active{% endif %}"><i class="fas fa-envelope"   style="font-size:.75rem;opacity:.6;"></i> Contact</a>
+                <a href="{{ url_for('reserve') }}" class="reserve-btn">
+                    <i class="fas fa-calendar-check"></i>Reserve a Table
+                </a>
             </nav>
         </div>
     </div>
@@ -848,33 +1242,90 @@
         {% block content %}{% endblock %}
     </div>
 
-    <!-- Reviews Section (displayed above footer) -->
-    <div class="reviews-section">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="h3">What Our Customers Say</h2>
-            <a href="{{ url_for('reviews') }}" class="btn btn-outline-danger">View All Reviews</a>
-        </div>
-        <div class="row g-4">
-            {% for review in recent_reviews %}
-            <div class="col-md-3">
-                <div class="review-card">
-                    <div class="stars">
-                        {% for i in range(review.rating) %}
-                            <i class="fas fa-star"></i>
-                        {% endfor %}
+    <!-- ===== REVIEWS STRIP (above footer) ===== -->
+    <section class="reviews-strip" aria-label="Guest reviews">
+        <div class="reviews-strip-inner">
+
+            <!-- Header -->
+            <div class="rs-header" data-aos="fade-up">
+                <div class="rs-header-left">
+                    <div class="rs-eyebrow">
+                        <span></span> Guest Reviews
                     </div>
-                    <p class="mb-2">"{{ review.comment[:100] }}{% if review.comment|length > 100 %}...{% endif %}"</p>
-                    <div class="review-author">- {{ review.customer_name }}</div>
-                    <div class="review-date">{{ review.created_at.strftime('%B %d, %Y') }}</div>
+                    <h2 class="rs-title">What Our <em>Guests</em> Say</h2>
                 </div>
+                <a href="{{ url_for('reviews') }}" class="rs-all-btn">
+                    All Reviews <i class="fas fa-arrow-right" style="font-size:.75rem;"></i>
+                </a>
             </div>
-            {% else %}
-            <div class="col-12 text-center py-4">
-                <p class="text-muted">No reviews yet. Be the first to review!</p>
-            </div>
-            {% endfor %}
+
+            <!-- Scrollable track -->
+            <div class="rs-track-wrap" data-aos="fade-up" data-aos-delay="80">
+
+                <button class="rs-arrow rs-arrow-left" id="rsArrowLeft" aria-label="Scroll left">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+
+                <div class="rs-track" id="rsTrack">
+
+                    {% for review in recent_reviews %}
+                    <div class="rs-card">
+                        <div class="rs-quote-bg" aria-hidden="true">"</div>
+
+                        <!-- Stars -->
+                        <div class="rs-stars" aria-label="{{ review.rating }} out of 5 stars">
+                            {% for i in range(5) %}
+                                <i class="fas fa-star{% if i >= review.rating %} off{% endif %}"></i>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Comment -->
+                        <p class="rs-comment">
+                            "{{ review.comment[:110] }}{% if review.comment|length > 110 %}…{% endif %}"
+                        </p>
+
+                        <!-- Author -->
+                        <div class="rs-author-row">
+                            <div class="rs-avatar" aria-hidden="true">
+                                {{ review.customer_name[0]|upper }}
+                            </div>
+                            <div>
+                                <div class="rs-author-name">{{ review.customer_name }}</div>
+                                <div class="rs-author-date">{{ review.created_at.strftime('%b %d, %Y') }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="rs-empty">
+                        <i class="far fa-comment-dots"></i>
+                        <p>No reviews yet — be the first!</p>
+                    </div>
+                    {% endfor %}
+
+                    <!-- CTA card always at the end -->
+                    <div class="rs-cta-card">
+                        <div>
+                            <h4>Enjoyed Your Visit?</h4>
+                            <p>Share your experience and help others discover EFFOI.</p>
+                        </div>
+                        <a href="{{ url_for('reviews') }}" class="rs-cta-btn">
+                            <i class="fas fa-pen-nib"></i> Write a Review
+                        </a>
+                    </div>
+
+                </div><!-- /rs-track -->
+
+                <button class="rs-arrow rs-arrow-right" id="rsArrowRight" aria-label="Scroll right">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+
+            </div><!-- /rs-track-wrap -->
+
+            <!-- Scroll dots -->
+            <div class="rs-dots" id="rsDots" aria-hidden="true"></div>
+
         </div>
-    </div>
+    </section>
 
     <!-- Footer - FAQ KEPT HERE in Quick Links -->
     <div class="footer">
@@ -952,104 +1403,155 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     
     <script>
-        AOS.init({
-            duration: 800,
-            once: true
-        });
+        AOS.init({ duration: 800, once: true });
 
-        // Mobile menu toggle
-        document.getElementById('mobileToggle').addEventListener('click', function(e) {
+        /* ── Reviews strip scroll ── */
+        (function () {
+            const track      = document.getElementById('rsTrack');
+            const btnLeft    = document.getElementById('rsArrowLeft');
+            const btnRight   = document.getElementById('rsArrowRight');
+            const dotsWrap   = document.getElementById('rsDots');
+
+            if (!track) return;
+
+            const CARD_W = () => {
+                const c = track.querySelector('.rs-card, .rs-cta-card');
+                return c ? c.offsetWidth + 18 : 300; // card + gap
+            };
+
+            /* ── Build dots ── */
+            const cards = track.querySelectorAll('.rs-card, .rs-cta-card');
+            const visibleCount = () => Math.round(track.offsetWidth / CARD_W()) || 1;
+
+            function buildDots() {
+                if (!dotsWrap || cards.length === 0) return;
+                dotsWrap.innerHTML = '';
+                const pages = Math.ceil(cards.length / visibleCount());
+                for (let i = 0; i < pages; i++) {
+                    const d = document.createElement('button');
+                    d.className = 'rs-dot' + (i === 0 ? ' active' : '');
+                    d.addEventListener('click', () => scrollToPage(i));
+                    dotsWrap.appendChild(d);
+                }
+            }
+
+            function scrollToPage(page) {
+                track.scrollTo({ left: page * visibleCount() * CARD_W(), behavior: 'smooth' });
+            }
+
+            function updateDots() {
+                if (!dotsWrap) return;
+                const dots = dotsWrap.querySelectorAll('.rs-dot');
+                const page = Math.round(track.scrollLeft / (visibleCount() * CARD_W()));
+                dots.forEach((d, i) => d.classList.toggle('active', i === page));
+            }
+
+            buildDots();
+            track.addEventListener('scroll', updateDots, { passive: true });
+
+            btnLeft?.addEventListener('click',  () => track.scrollBy({ left: -CARD_W(), behavior: 'smooth' }));
+            btnRight?.addEventListener('click', () => track.scrollBy({ left:  CARD_W(), behavior: 'smooth' }));
+
+            /* Auto-scroll every 4 s */
+            let autoTimer = setInterval(() => {
+                const maxScroll = track.scrollWidth - track.clientWidth;
+                if (track.scrollLeft >= maxScroll - 10) {
+                    track.scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                    track.scrollBy({ left: CARD_W(), behavior: 'smooth' });
+                }
+            }, 4000);
+
+            /* Pause auto-scroll on hover / touch */
+            track.addEventListener('mouseenter', () => clearInterval(autoTimer));
+            track.addEventListener('touchstart',  () => clearInterval(autoTimer), { passive: true });
+        })();
+
+        
+        const mainHeader = document.getElementById('mainHeader');
+        window.addEventListener('scroll', () => {
+            mainHeader.classList.toggle('scrolled', window.scrollY > 60);
+        }, { passive: true });
+
+        /* ── Mobile menu toggle ── */
+        const mobileToggle = document.getElementById('mobileToggle');
+        const mainNav       = document.getElementById('mainNav');
+
+        mobileToggle.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            document.getElementById('mainNav').classList.toggle('show');
-            
-            // Change icon based on menu state
+            const isOpen = mainNav.classList.toggle('show');
+            this.classList.toggle('open', isOpen);
             const icon = this.querySelector('i');
-            if (document.getElementById('mainNav').classList.contains('show')) {
-                icon.classList.remove('fa-bars');
-                icon.classList.add('fa-times');
-            } else {
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
-            }
+            icon.classList.toggle('fa-bars',  !isOpen);
+            icon.classList.toggle('fa-times',  isOpen);
         });
 
         // Close mobile menu when clicking outside
-        document.addEventListener('click', function(event) {
-            const nav = document.getElementById('mainNav');
-            const toggle = document.getElementById('mobileToggle');
-            
-            if (nav.classList.contains('show') && 
-                !nav.contains(event.target) && 
-                !toggle.contains(event.target)) {
-                nav.classList.remove('show');
-                const icon = toggle.querySelector('i');
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
+        document.addEventListener('click', function (event) {
+            if (mainNav.classList.contains('show') &&
+                !mainNav.contains(event.target) &&
+                !mobileToggle.contains(event.target)) {
+                mainNav.classList.remove('show');
+                mobileToggle.classList.remove('open');
+                const icon = mobileToggle.querySelector('i');
+                icon.classList.replace('fa-times', 'fa-bars');
             }
         });
 
-        // Blocked Times Popup
+        /* ── Blocked Times Popup ── */
         const badge = document.getElementById('blockedTimesBadge');
         const popup = document.getElementById('blockedTimesPopup');
-        
+
         if (badge) {
-            badge.addEventListener('click', function(e) {
+            badge.addEventListener('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
                 popup.classList.toggle('show');
             });
         }
 
-        // Close popup when clicking outside
-        document.addEventListener('click', function(e) {
-            if (badge && popup) {
-                if (!badge.contains(e.target) && !popup.contains(e.target)) {
-                    popup.classList.remove('show');
-                }
+        document.addEventListener('click', function (e) {
+            if (badge && popup && !badge.contains(e.target)) {
+                popup.classList.remove('show');
             }
         });
 
-        // Load blocked times
+        /* ── Load blocked times ── */
         function loadBlockedTimes() {
             fetch('/api/blocked-times')
-                .then(response => response.json())
+                .then(r => r.json())
                 .then(data => {
                     const countSpan = document.getElementById('blockedCount');
-                    const listDiv = document.getElementById('blockedTimesList');
-                    
+                    const listDiv   = document.getElementById('blockedTimesList');
+
                     if (countSpan) countSpan.textContent = data.length;
-                    
+
+                    if (!listDiv) return;
+
                     if (data.length === 0) {
-                        if (listDiv) listDiv.innerHTML = '<div class="text-center text-muted py-3"><i class="fas fa-check-circle me-2"></i>No blocked times</div>';
+                        listDiv.innerHTML = `<div class="text-center text-muted py-3" style="font-size:.85rem;">
+                            <i class="fas fa-check-circle me-2 text-success"></i>No blocked times right now</div>`;
                         return;
                     }
-                    
-                    let html = '';
-                    data.forEach(block => {
-                        html += `
-                            <div class="blocked-time-item">
-                                <div>
-                                    <span class="date"><i class="fas fa-calendar-alt me-2"></i>${block.date}</span>
-                                    <span class="time ms-3"><i class="fas fa-clock me-2"></i>${block.start_time} - ${block.end_time}</span>
-                                </div>
-                                <div class="reason mt-1"><i class="fas fa-info-circle me-2"></i>${block.reason}</div>
+
+                    listDiv.innerHTML = data.map(b => `
+                        <div class="blocked-time-item">
+                            <div>
+                                <span class="date"><i class="fas fa-calendar-alt me-1"></i>${b.date}</span>
+                                <span class="time ms-3"><i class="fas fa-clock me-1"></i>${b.start_time} – ${b.end_time}</span>
                             </div>
-                        `;
-                    });
-                    if (listDiv) listDiv.innerHTML = html;
+                            <div class="reason"><i class="fas fa-info-circle me-1"></i>${b.reason}</div>
+                        </div>`).join('');
                 })
-                .catch(error => {
-                    console.error('Error loading blocked times:', error);
+                .catch(() => {
                     const listDiv = document.getElementById('blockedTimesList');
-                    if (listDiv) listDiv.innerHTML = '<div class="text-center text-danger py-3">Error loading data</div>';
+                    if (listDiv) listDiv.innerHTML = `<div class="text-center text-danger py-3" style="font-size:.85rem;">
+                        <i class="fas fa-triangle-exclamation me-2"></i>Could not load data</div>`;
                 });
         }
 
-        // Load on page load
         loadBlockedTimes();
-        
-        // Refresh every 30 seconds
         setInterval(loadBlockedTimes, 30000);
     </script>
 

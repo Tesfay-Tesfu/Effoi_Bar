@@ -1,98 +1,834 @@
 {% extends "base.html" %}
 
-{% block title %}Our Menu - EFFOI Restaurant{% endblock %}
+{% block title %}Our Menu — EFFOI Restaurant{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ================================================================
+   MENU PAGE — Smart UI/UX
+================================================================ */
+
+/* ── Page background ── */
+.mn-page { background: #faf7f2; min-height: 100vh; }
+
+/* ================================================================
+   HERO BANNER
+================================================================ */
+.mn-hero {
+    background: linear-gradient(120deg, #0f0608 0%, #3a0d0d 55%, #1a0808 100%);
+    padding: 4.5rem 0 3rem;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+
+.mn-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 55% 90% at 50% 100%, rgba(139,30,30,0.3), transparent);
+    pointer-events: none;
+}
+
+/* decorative dots pattern */
+.mn-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255,215,0,0.07) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+}
+
+.mn-hero-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.mn-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255,215,0,0.1);
+    border: 1px solid rgba(255,215,0,0.25);
+    color: #FFD700;
+    border-radius: 50px;
+    padding: 0.3rem 1rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 1.1rem;
+}
+
+.mn-hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    color: #fff;
+    font-weight: 700;
+    line-height: 1.12;
+    margin-bottom: 0.85rem;
+}
+
+.mn-hero-title span { color: #FFD700; }
+
+.mn-hero-sub {
+    color: rgba(255,255,255,0.55);
+    font-size: 1rem;
+    line-height: 1.65;
+    max-width: 560px;
+    margin: 0 auto 1.75rem;
+}
+
+/* search bar */
+.mn-search-wrap {
+    max-width: 440px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.mn-search {
+    width: 100%;
+    padding: 0.8rem 1.1rem 0.8rem 2.75rem;
+    border: 1.5px solid rgba(255,255,255,0.15);
+    border-radius: 50px;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+    color: white;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.25s, background 0.25s;
+}
+
+.mn-search::placeholder { color: rgba(255,255,255,0.4); }
+
+.mn-search:focus {
+    border-color: rgba(255,215,0,0.5);
+    background: rgba(255,255,255,0.12);
+}
+
+.mn-search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.4);
+    font-size: 0.85rem;
+    pointer-events: none;
+}
+
+/* ================================================================
+   STICKY CATEGORY NAV
+================================================================ */
+.mn-nav-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    background: rgba(255,255,255,0.97);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(139,30,30,0.1);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.mn-nav-inner {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.mn-nav-inner::-webkit-scrollbar { display: none; }
+
+.mn-nav-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.85rem 1.2rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #666;
+    text-decoration: none;
+    border-bottom: 2.5px solid transparent;
+    white-space: nowrap;
+    transition: color 0.22s, border-color 0.22s;
+    flex-shrink: 0;
+    cursor: pointer;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+}
+
+.mn-nav-pill:hover { color: #8B1E1E; }
+
+.mn-nav-pill.active {
+    color: #8B1E1E;
+    border-bottom-color: #8B1E1E;
+}
+
+.mn-nav-pill .pill-count {
+    background: #f5ede8;
+    color: #8B1E1E;
+    border-radius: 50px;
+    font-size: 0.65rem;
+    padding: 0.1rem 0.45rem;
+    font-weight: 700;
+    transition: background 0.22s, color 0.22s;
+}
+
+.mn-nav-pill.active .pill-count,
+.mn-nav-pill:hover .pill-count {
+    background: #8B1E1E;
+    color: white;
+}
+
+/* "All" pill */
+.mn-nav-pill.all-pill { padding-right: 1.4rem; }
+
+/* ================================================================
+   MAIN CONTENT
+================================================================ */
+.mn-body {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 3rem 2rem 5rem;
+}
+
+/* ── Search no-results ── */
+.mn-no-results {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #aaa;
+    display: none;
+}
+
+.mn-no-results i { font-size: 2.5rem; opacity: 0.25; display: block; margin-bottom: 0.8rem; }
+
+/* ── Category section ── */
+.mn-category {
+    margin-bottom: 4rem;
+    scroll-margin-top: 120px;   /* offset for sticky nav */
+}
+
+.mn-cat-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+}
+
+.mn-cat-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(139,30,30,0.3), transparent);
+}
+
+.mn-cat-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.mn-cat-count {
+    font-size: 0.72rem;
+    color: #8B1E1E;
+    background: #f5ede8;
+    border-radius: 50px;
+    padding: 0.2rem 0.6rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* ── Items grid ── */
+.mn-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.1rem;
+}
+
+/* ── Menu item card ── */
+.mn-card {
+    background: white;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.04);
+    display: flex;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+}
+
+.mn-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 40px rgba(139,30,30,0.11);
+}
+
+/* Image panel */
+.mn-card-img {
+    width: 110px;
+    min-height: 120px;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+    background: #f0ebe3;
+}
+
+.mn-card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+    cursor: pointer;
+}
+
+.mn-card:hover .mn-card-img img { transform: scale(1.07); }
+
+.mn-card-img-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ccc;
+    font-size: 1.8rem;
+    min-height: 120px;
+}
+
+/* Badges on image */
+.mn-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    padding: 0.2rem 0.55rem;
+    border-radius: 50px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    z-index: 1;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.mn-badge-popular {
+    background: #FFD700;
+    color: #4a0e0e;
+}
+
+.mn-badge-special {
+    background: #8B1E1E;
+    color: white;
+}
+
+/* Body */
+.mn-card-body {
+    padding: 1rem 1.1rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.mn-card-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    line-height: 1.3;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mn-card-desc {
+    font-size: 0.78rem;
+    color: #888;
+    line-height: 1.55;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.mn-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: auto;
+}
+
+.mn-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #8B1E1E;
+    white-space: nowrap;
+}
+
+.mn-detail-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.38rem 0.9rem;
+    border: 1.5px solid #8B1E1E;
+    color: #8B1E1E;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.22s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.mn-detail-btn:hover {
+    background: #8B1E1E;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(139,30,30,0.25);
+}
+
+/* Reserve CTA inside grid */
+.mn-reserve-prompt {
+    background: linear-gradient(135deg, #8B1E1E, #6d1515);
+    border-radius: 18px;
+    padding: 1.5rem 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    grid-column: 1 / -1;
+    margin-top: 0.5rem;
+}
+
+.mn-reserve-prompt::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, rgba(255,215,0,0.2), transparent 65%);
+    pointer-events: none;
+}
+
+.mn-reserve-prompt-icon {
+    font-size: 2rem;
+    opacity: 0.7;
+    flex-shrink: 0;
+}
+
+.mn-reserve-prompt-text { flex: 1; }
+.mn-reserve-prompt-text h4 { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin: 0 0 0.2rem; }
+.mn-reserve-prompt-text p  { font-size: 0.8rem; color: rgba(255,255,255,0.65); margin: 0; }
+
+.mn-reserve-prompt-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1.3rem;
+    background: #FFD700;
+    color: #4a0e0e;
+    border-radius: 50px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.25s ease;
+}
+
+.mn-reserve-prompt-btn:hover {
+    background: white;
+    color: #8B1E1E;
+    transform: translateY(-2px);
+}
+
+/* ── Empty category ── */
+.mn-cat-empty {
+    padding: 2.5rem;
+    text-align: center;
+    color: #ccc;
+    background: white;
+    border-radius: 18px;
+    border: 1px dashed #e8e1d9;
+}
+
+/* ================================================================
+   IMAGE LIGHTBOX MODAL
+================================================================ */
+.mn-modal .modal-content {
+    background: transparent;
+    border: none;
+}
+
+.mn-modal .modal-body {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.mn-modal-img {
+    max-height: 80vh;
+    max-width: 100%;
+    border-radius: 16px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+}
+
+.mn-modal-close {
+    padding: 0.55rem 1.5rem;
+    background: rgba(255,255,255,0.15);
+    border: 1.5px solid rgba(255,255,255,0.3);
+    color: white;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.mn-modal-close:hover { background: rgba(255,255,255,0.25); }
+
+/* ================================================================
+   RESPONSIVE
+================================================================ */
+@media (max-width: 768px) {
+    .mn-body { padding: 2rem 1.25rem 4rem; }
+    .mn-hero { padding: 3rem 0 2.5rem; }
+    .mn-grid { grid-template-columns: 1fr; }
+    .mn-card-img { width: 90px; }
+    .mn-reserve-prompt { flex-direction: column; text-align: center; }
+    .mn-reserve-prompt-btn { width: 100%; justify-content: center; }
+}
+
+@media (max-width: 480px) {
+    .mn-card-img { width: 80px; }
+    .mn-card-name { font-size: 0.92rem; }
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="my-5">
-    <h1 class="display-3 text-center mb-5" data-aos="fade-up">Our Menu</h1>
-    
-    <!-- Category Navigation -->
-    <div class="sticky-top bg-white py-3 mb-4 border-bottom" style="top: 80px; z-index: 900;">
-        <div class="d-flex flex-wrap gap-2 justify-content-center">
-            {% for category in categories %}
-            <a href="#cat-{{ category.id }}" class="btn btn-outline-danger rounded-pill">{{ category.name }}</a>
-            {% endfor %}
+
+{# ── Collect flat item list for search ── #}
+{% set all_items = [] %}
+{% for cat in categories %}
+    {% for item in cat.menu_items %}
+        {% if item.is_active %}{% set _ = all_items.append(item) %}{% endif %}
+    {% endfor %}
+{% endfor %}
+
+<div class="mn-page">
+
+    <!-- ══════════ HERO ══════════ -->
+    <div class="mn-hero">
+        <div class="mn-hero-inner">
+            <div class="mn-eyebrow" data-aos="fade-down">
+                <i class="fas fa-utensils"></i> Authentic Ethiopian Cuisine
+            </div>
+            <h1 class="mn-hero-title" data-aos="fade-up" data-aos-delay="60">
+                Our <span>Menu</span>
+            </h1>
+            <p class="mn-hero-sub" data-aos="fade-up" data-aos-delay="120">
+                From hearty stews and fresh injera to traditional coffee ceremonies —
+                every dish tells a story.
+            </p>
+
+            <!-- Search -->
+            <div class="mn-search-wrap" data-aos="fade-up" data-aos-delay="180">
+                <i class="fas fa-search mn-search-icon"></i>
+                <input type="search" class="mn-search" id="mnSearch"
+                       placeholder="Search dishes, e.g. Doro Wot, Tibs…"
+                       autocomplete="off" spellcheck="false">
+            </div>
         </div>
     </div>
 
-    <!-- Menu Items by Category -->
-    {% for category in categories %}
-    <section id="cat-{{ category.id }}" class="mb-5" data-aos="fade-up">
-        <h2 class="mb-4 pb-2 border-bottom border-2 border-danger d-inline-block">{{ category.name }}</h2>
-        
-        <div class="row g-4">
-            {% for item in category.menu_items %}
-            {% if item.is_active %}
-            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
-                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                    <div class="row g-0 h-100">
-                        <div class="col-4">
-                            {% if item.image_url %}
-                            <img src="{{ item.image_url }}" class="img-fluid h-100 w-100" alt="{{ item.name }}" style="object-fit: cover; cursor: pointer;" onclick="openImageModal('{{ item.image_url }}')">
-                            {% else %}
-                            <div class="bg-secondary h-100 d-flex align-items-center justify-content-center">
-                                <i class="fas fa-utensils fa-2x text-white-50"></i>
-                            </div>
-                            {% endif %}
-                        </div>
-                        <div class="col-8">
-                            <div class="card-body d-flex flex-column h-100">
-                                <div>
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <h6 class="card-title fw-bold">{{ item.name }}</h6>
-                                        {% if item.is_popular %}
-                                        <span class="badge bg-warning text-dark ms-1">🔥 Popular</span>
-                                        {% endif %}
-                                    </div>
-                                    <p class="card-text small text-muted mb-2">{{ item.description }}</p>
-                                </div>
-                                <div class="mt-auto">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="fw-bold text-danger">${{ "%.2f"|format(item.price) }}</span>
-                                        <a href="{{ url_for('menu_item_detail', item_id=item.id) }}" class="btn btn-sm btn-outline-danger rounded-pill px-3">Details</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- ══════════ STICKY CATEGORY NAV ══════════ -->
+    <div class="mn-nav-wrap" id="mnNav">
+        <div class="mn-nav-inner" id="mnNavInner">
+
+            <button class="mn-nav-pill all-pill active" data-cat="all">
+                All
+                <span class="pill-count">{{ all_items | length }}</span>
+            </button>
+
+            {% for category in categories %}
+            {% set active_items = category.menu_items | selectattr('is_active') | list %}
+            {% if active_items %}
+            <button class="mn-nav-pill" data-cat="cat-{{ category.id }}">
+                {{ category.name }}
+                <span class="pill-count">{{ active_items | length }}</span>
+            </button>
             {% endif %}
             {% endfor %}
-        </div>
-    </section>
-    {% endfor %}
-</div>
 
-<!-- Image Modal -->
-<div class="modal fade" id="imageModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content bg-transparent border-0">
-            <div class="modal-body text-center">
-                <img src="" id="modalImage" class="img-fluid rounded-4" style="max-height: 80vh;">
-                <button type="button" class="btn btn-light mt-3 rounded-pill" data-bs-dismiss="modal">Close</button>
+        </div>
+    </div>
+
+    <!-- ══════════ MENU BODY ══════════ -->
+    <div class="mn-body">
+
+        <!-- Search no-results -->
+        <div class="mn-no-results" id="mnNoResults">
+            <i class="fas fa-search"></i>
+            <p>No dishes match "<strong id="mnSearchTerm"></strong>"</p>
+        </div>
+
+        {% for category in categories %}
+        {% set active_items = category.menu_items | selectattr('is_active') | list %}
+        {% if active_items %}
+
+        <section class="mn-category" id="cat-{{ category.id }}" data-aos="fade-up">
+
+            <!-- Category header -->
+            <div class="mn-cat-header">
+                <h2 class="mn-cat-title">{{ category.name }}</h2>
+                <span class="mn-cat-count">{{ active_items | length }} item{{ 's' if active_items | length != 1 }}</span>
+                <div class="mn-cat-line"></div>
+            </div>
+
+            <!-- Items grid -->
+            <div class="mn-grid">
+
+                {% for item in active_items %}
+                <div class="mn-card"
+                     data-name="{{ item.name | lower }}"
+                     data-desc="{{ (item.description or '') | lower }}"
+                     data-cat="cat-{{ category.id }}"
+                     data-aos="fade-up"
+                     data-aos-delay="{{ (loop.index0 % 4) * 60 }}">
+
+                    <!-- Image -->
+                    <div class="mn-card-img">
+                        {% if item.image_url %}
+                        <img src="{{ item.image_url }}"
+                             alt="{{ item.name }}"
+                             loading="lazy"
+                             onclick="mnOpenImage('{{ item.image_url }}', '{{ item.name | replace("'","\\'")|safe }}')">
+                        {% else %}
+                        <div class="mn-card-img-placeholder">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        {% endif %}
+
+                        {% if item.is_popular %}
+                        <span class="mn-badge mn-badge-popular">🔥 Popular</span>
+                        {% elif item.is_special %}
+                        <span class="mn-badge mn-badge-special">✦ Special</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Body -->
+                    <div class="mn-card-body">
+                        <div>
+                            <h3 class="mn-card-name" title="{{ item.name }}">{{ item.name }}</h3>
+                            {% if item.description %}
+                            <p class="mn-card-desc">{{ item.description }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="mn-card-footer">
+                            <span class="mn-price">${{ "%.2f" | format(item.price) }}</span>
+                            <a href="{{ url_for('menu_item_detail', item_id=item.id) }}"
+                               class="mn-detail-btn">
+                                Details <i class="fas fa-arrow-right" style="font-size:.65rem;"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+                {% endfor %}
+
+                {# Reserve prompt every 3rd category #}
+                {% if loop.index % 3 == 0 %}
+                <div class="mn-reserve-prompt">
+                    <div class="mn-reserve-prompt-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="mn-reserve-prompt-text">
+                        <h4>Ready to dine with us?</h4>
+                        <p>Book your table and enjoy the full Ethiopian experience.</p>
+                    </div>
+                    <a href="{{ url_for('reserve') }}" class="mn-reserve-prompt-btn">
+                        <i class="fas fa-calendar-check"></i> Reserve a Table
+                    </a>
+                </div>
+                {% endif %}
+
+            </div>
+        </section>
+
+        {% else %}
+        <section class="mn-category" id="cat-{{ category.id }}">
+            <div class="mn-cat-header">
+                <h2 class="mn-cat-title">{{ category.name }}</h2>
+                <div class="mn-cat-line"></div>
+            </div>
+            <div class="mn-cat-empty">
+                <i class="fas fa-utensils" style="opacity:.2; font-size:1.5rem;"></i>
+                <p class="mt-2 mb-0">Coming soon — check back later!</p>
+            </div>
+        </section>
+        {% endif %}
+        {% endfor %}
+
+    </div><!-- /mn-body -->
+
+</div><!-- /mn-page -->
+
+<!-- ══════════ IMAGE LIGHTBOX ══════════ -->
+<div class="modal fade mn-modal" id="mnImageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <img src="" id="mnModalImg" class="mn-modal-img" alt="">
+                <button type="button" class="mn-modal-close" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Close
+                </button>
             </div>
         </div>
     </div>
 </div>
+
+{% endblock %}
 
 {% block extra_js %}
 <script>
-function openImageModal(imageUrl) {
-    document.getElementById('modalImage').src = imageUrl;
-    new bootstrap.Modal(document.getElementById('imageModal')).show();
+/* ================================================================
+   MENU PAGE — category nav + search + lightbox
+================================================================ */
+
+/* ── Lightbox ── */
+function mnOpenImage(url, name) {
+    const img = document.getElementById('mnModalImg');
+    img.src = url;
+    img.alt = name;
+    new bootstrap.Modal(document.getElementById('mnImageModal')).show();
 }
 
-// Smooth scrolling for category links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+/* ── Category nav: scroll-spy + click ── */
+(function () {
+    const pills    = document.querySelectorAll('.mn-nav-pill');
+    const sections = document.querySelectorAll('.mn-category');
+    const navEl    = document.getElementById('mnNav');
+    const navH     = () => (navEl ? navEl.offsetHeight : 60) + 10;
+
+    /* Click → smooth scroll */
+    pills.forEach(pill => {
+        pill.addEventListener('click', function () {
+            const cat = this.dataset.cat;
+
+            if (cat === 'all') {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                setActive(this);
+                return;
+            }
+
+            const target = document.getElementById(cat);
+            if (target) {
+                const top = target.getBoundingClientRect().top + window.scrollY - navH();
+                window.scrollTo({ top, behavior: 'smooth' });
+            }
+            setActive(this);
+        });
     });
-});
+
+    function setActive(el) {
+        pills.forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+        /* scroll pill into view inside the nav bar */
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+
+    /* Scroll-spy */
+    function onScroll() {
+        let current = null;
+        sections.forEach(sec => {
+            const rect = sec.getBoundingClientRect();
+            if (rect.top <= navH() + 40) current = sec.id;
+        });
+
+        if (!current) {
+            setActiveById('all');
+            return;
+        }
+
+        setActiveById(current);
+    }
+
+    function setActiveById(id) {
+        pills.forEach(p => {
+            const match = id === 'all' ? p.dataset.cat === 'all' : p.dataset.cat === id;
+            p.classList.toggle('active', match);
+        });
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+})();
+
+/* ── Search ── */
+(function () {
+    const input      = document.getElementById('mnSearch');
+    const cards      = document.querySelectorAll('.mn-card');
+    const sections   = document.querySelectorAll('.mn-category');
+    const noResults  = document.getElementById('mnNoResults');
+    const termEl     = document.getElementById('mnSearchTerm');
+
+    if (!input) return;
+
+    input.addEventListener('input', function () {
+        const q = this.value.trim().toLowerCase();
+
+        if (!q) {
+            cards.forEach(c => c.style.display = '');
+            sections.forEach(s => s.style.display = '');
+            if (noResults) noResults.style.display = 'none';
+            return;
+        }
+
+        if (termEl) termEl.textContent = this.value.trim();
+
+        let totalVisible = 0;
+
+        cards.forEach(card => {
+            const name = card.dataset.name || '';
+            const desc = card.dataset.desc || '';
+            const match = name.includes(q) || desc.includes(q);
+            card.style.display = match ? '' : 'none';
+            if (match) totalVisible++;
+        });
+
+        /* Hide empty category sections */
+        sections.forEach(sec => {
+            const visible = [...sec.querySelectorAll('.mn-card')].some(c => c.style.display !== 'none');
+            sec.style.display = visible ? '' : 'none';
+        });
+
+        if (noResults) noResults.style.display = totalVisible === 0 ? 'block' : 'none';
+    });
+
+    /* Clear on Escape */
+    input.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { input.value = ''; input.dispatchEvent(new Event('input')); }
+    });
+})();
 </script>
-{% endblock %}
 {% endblock %}

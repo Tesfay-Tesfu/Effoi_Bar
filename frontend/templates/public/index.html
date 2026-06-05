@@ -3,268 +3,346 @@
 {% block title %}EFFOI RESTAURANT - Authentic Ethiopian Cuisine{% endblock %}
 
 {% block content %}
-<!-- Hero Section - Dynamic from Database -->
-<div class="hero-section">
-    <!-- Left Side - First Slider Image or Video -->
-    <div class="hero-left">
+
+<!-- ===== SMART HERO SECTION ===== -->
+<section class="effoi-hero" id="effoiHero" aria-label="Welcome to EFFOI Restaurant">
+
+    <!-- ── Slide Track ── -->
+    <div class="hero-slides" id="heroSlides">
+
         {% if hero_sliders and hero_sliders|length > 0 %}
-            {% set main_slider = hero_sliders[0] %}
-            {% if main_slider.image_url %}
-            <img src="{{ main_slider.image_url }}" class="hero-video" alt="{{ main_slider.title }}" style="width:100%; height:100%; object-fit:cover;">
-            {% else %}
-            <video class="hero-video" autoplay loop muted playsinline>
-                <source src="https://player.vimeo.com/external/370468733.sd.mp4?s=90d2b19a3b4d1b3e4d1b3e4d1b3e4d1b3e4d1b3e4&profile_id=139" type="video/mp4">
-                <img src="https://images.unsplash.com/photo-1517244683847-7456bb63ff54?q=80&w=2070" alt="EFFOI Restaurant" style="width:100%; height:100%; object-fit:cover;">
-            </video>
-            {% endif %}
-            <div class="hero-overlay" style="transform: translateY(0); background: linear-gradient(transparent, rgba(139,30,30,0.9));">
-                <h2>{{ main_slider.title }}</h2>
-                <p>{{ main_slider.subtitle or 'Experience Authentic Ethiopian Cuisine' }}</p>
-                <a href="{{ main_slider.button_link or '/menu' }}" class="btn btn-danger mt-2">{{ main_slider.button_text or 'View Menu' }}</a>
+            {% for slider in hero_sliders %}
+            <div class="hero-slide {% if loop.first %}active{% endif %}" data-index="{{ loop.index0 }}">
+                {% if slider.image_url %}
+                <div class="hero-slide-bg"
+                     style="background-image:url('{{ slider.image_url }}');"
+                     aria-hidden="true"></div>
+                {% else %}
+                <div class="hero-slide-bg"
+                     style="background-image:url('https://images.unsplash.com/photo-1517244683847-7456bb63ff54?q=80&w=2070');"
+                     aria-hidden="true"></div>
+                {% endif %}
             </div>
+            {% endfor %}
         {% else %}
-            <!-- Default video if no sliders -->
-            <video class="hero-video" autoplay loop muted playsinline>
-                <source src="https://player.vimeo.com/external/370468733.sd.mp4?s=90d2b19a3b4d1b3e4d1b3e4d1b3e4d1b3e4d1b3e4&profile_id=139" type="video/mp4">
-                <img src="https://images.unsplash.com/photo-1517244683847-7456bb63ff54?q=80&w=2070" alt="EFFOI Restaurant" style="width:100%; height:100%; object-fit:cover;">
-            </video>
-            <div class="hero-overlay" style="transform: translateY(0); background: linear-gradient(transparent, rgba(139,30,30,0.9));">
-                <h2>Welcome to EFFOI</h2>
-                <p>Experience Authentic Ethiopian Cuisine</p>
-            </div>
+        <!-- Default slides -->
+        <div class="hero-slide active">
+            <div class="hero-slide-bg" style="background-image:url('https://images.unsplash.com/photo-1517244683847-7456bb63ff54?q=80&w=2070');"></div>
+        </div>
+        <div class="hero-slide">
+            <div class="hero-slide-bg" style="background-image:url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=2070');"></div>
+        </div>
+        <div class="hero-slide">
+            <div class="hero-slide-bg" style="background-image:url('https://images.unsplash.com/photo-1551218808-94e220e084d2?q=80&w=2070');"></div>
+        </div>
         {% endif %}
     </div>
-    
-    <!-- Right Side - Animated Grid (changes every 3 seconds) -->
-    <div class="hero-right">
-        <div class="hero-grid" id="animatedHeroGrid">
-            <!-- Grid items will be populated by JavaScript -->
+
+    <!-- ── Dark overlay ── -->
+    <div class="hero-overlay-dark" aria-hidden="true"></div>
+
+    <!-- ── Floating ambient particles ── -->
+    <div class="hero-particles" aria-hidden="true">
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+    </div>
+
+    <!-- ── Main content ── -->
+    <div class="hero-content">
+
+        <!-- Eyebrow tag -->
+        <div class="hero-eyebrow">
+            <span class="eyebrow-dot"></span>
+            Authentic Ethiopian Cuisine · Silver Spring, MD
+        </div>
+
+        <!-- Headline (updates per slide) -->
+        <h1 class="hero-headline" id="heroHeadline">
+            {% if hero_sliders and hero_sliders|length > 0 %}
+                {{ hero_sliders[0].title }}
+            {% else %}
+                Welcome to <span class="hero-highlight">EFFOI</span>
+            {% endif %}
+        </h1>
+
+        <!-- Subtitle -->
+        <p class="hero-subtitle" id="heroSubtitle">
+            {% if hero_sliders and hero_sliders|length > 0 %}
+                {{ hero_sliders[0].subtitle or 'A journey through the flavors of Ethiopia' }}
+            {% else %}
+                A journey through the flavors &amp; traditions of Ethiopia
+            {% endif %}
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="hero-actions" id="heroActions">
+            <a href="{{ url_for('reserve') }}" class="hero-btn hero-btn-primary">
+                <i class="fas fa-calendar-check"></i> Reserve a Table
+            </a>
+            <a href="{{ url_for('menu') }}" class="hero-btn hero-btn-ghost">
+                <i class="fas fa-utensils"></i> Explore Menu
+            </a>
+        </div>
+
+        <!-- Stats row -->
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <span class="stat-value">15+</span>
+                <span class="stat-label">Years of Tradition</span>
+            </div>
+            <div class="hero-stat-divider"></div>
+            <div class="hero-stat">
+                <span class="stat-value">50+</span>
+                <span class="stat-label">Signature Dishes</span>
+            </div>
+            <div class="hero-stat-divider"></div>
+            <div class="hero-stat">
+                <span class="stat-value">★ 4.9</span>
+                <span class="stat-label">Customer Rating</span>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- ==================== STUNNING EFFOI CATERING SECTION ==================== -->
-<section class="catering-section my-5 py-5">
-    <!-- Animated Background -->
-    <div class="catering-bg">
-        <div class="bg-shape shape-1"></div>
-        <div class="bg-shape shape-2"></div>
-        <div class="bg-shape shape-3"></div>
-        <div class="bg-shape shape-4"></div>
+    <!-- ── Right panel: animated image grid ── -->
+    <div class="hero-panel" aria-hidden="true">
+        <div class="hero-grid-panel" id="animatedHeroGrid">
+            <!-- populated by JS -->
+        </div>
+        <!-- Panel label -->
+        <div class="hero-panel-label">
+            <i class="fas fa-images"></i> Our Flavors
+        </div>
     </div>
-    
-    <div class="container position-relative">
-        <!-- Section Header with Animation -->
-        <div class="text-center mb-5" data-aos="fade-down">
-            <span class="badge-catering">PREMIUM CATERING</span>
-            <h2 class="display-3 fw-bold mb-3">
-                <span class="text-gradient">EFFOI</span> <span class="text-danger">CATERING</span>
+
+    <!-- ── Slide dots ── -->
+    <div class="hero-dots" id="heroDots" role="tablist" aria-label="Hero slides">
+        {% if hero_sliders and hero_sliders|length > 0 %}
+            {% for slider in hero_sliders %}
+            <button class="hero-dot {% if loop.first %}active{% endif %}"
+                    role="tab" aria-label="Slide {{ loop.index }}"
+                    data-index="{{ loop.index0 }}"></button>
+            {% endfor %}
+        {% else %}
+            <button class="hero-dot active" role="tab" data-index="0"></button>
+            <button class="hero-dot" role="tab" data-index="1"></button>
+            <button class="hero-dot" role="tab" data-index="2"></button>
+        {% endif %}
+    </div>
+
+    <!-- ── Scroll cue ── -->
+    <div class="hero-scroll-cue" aria-hidden="true">
+        <span class="scroll-mouse"><span class="scroll-wheel"></span></span>
+        <span class="scroll-text">Scroll to explore</span>
+    </div>
+
+</section>
+
+<!-- ==================== CATERING SECTION ==================== -->
+<section class="ct-section" id="cateringSec">
+
+    <!-- subtle grain texture overlay -->
+    <div class="ct-grain" aria-hidden="true"></div>
+
+    <div class="container-xl position-relative">
+
+        <!-- ── Section header ── -->
+        <div class="ct-header" data-aos="fade-up">
+            <span class="ct-eyebrow">
+                <i class="fas fa-utensils"></i> Premium Catering
+            </span>
+            <h2 class="ct-title">
+                We Bring <span class="ct-gold">Ethiopia</span><br>to Your Event
             </h2>
-            <div class="title-decoration">
-                <i class="fas fa-utensils text-danger"></i>
-                <span class="line"></span>
-                <i class="fas fa-star text-warning"></i>
-                <span class="line"></span>
-                <i class="fas fa-wine-glass-alt text-danger"></i>
-            </div>
-            <p class="lead text-muted mt-4" style="max-width: 700px; margin: 0 auto;">
-                Bringing the authentic taste of Ethiopia to your special events with elegance and style
+            <p class="ct-subtitle">
+                Authentic recipes, elegant presentation, and warm hospitality —<br class="d-none d-md-block">
+                tailored for weddings, corporates, festivals &amp; every celebration in between.
             </p>
         </div>
-        
-        <!-- Two Text Cards with Floating Animation -->
-        <div class="row g-4 mb-5">
-            <div class="col-md-6" data-aos="fade-right" data-aos-duration="1000">
-                <div class="catering-card card-left animate-float">
-                    <div class="card-inner">
-                        <div class="card-icon-wrapper">
-                            <i class="fas fa-crown"></i>
-                        </div>
-                        <h3>Why Choose EFFOI Catering?</h3>
-                        <ul class="catering-list">
-                            <li><i class="fas fa-check-circle"></i> <strong>Authentic Recipes</strong> - Passed down through generations</li>
-                            <li><i class="fas fa-check-circle"></i> <strong>Fresh Ingredients</strong> - Sourced locally daily</li>
-                            <li><i class="fas fa-check-circle"></i> <strong>Professional Staff</strong> - Trained in Ethiopian hospitality</li>
-                            <li><i class="fas fa-check-circle"></i> <strong>Custom Menus</strong> - Tailored to your event theme</li>
-                            <li><i class="fas fa-check-circle"></i> <strong>Coffee Ceremony</strong> - Traditional experience included</li>
-                            <li><i class="fas fa-check-circle"></i> <strong>Live Music</strong> - Cultural performances optional</li>
-                        </ul>
-                        <div class="card-shine"></div>
-                    </div>
-                </div>
+
+        <!-- ── Trust bar ── -->
+        <div class="ct-trust-bar" data-aos="fade-up" data-aos-delay="100">
+            <div class="ct-stat" data-count="500" data-suffix="+">
+                <span class="ct-stat-num">0</span>
+                <span class="ct-stat-lbl">Events Catered</span>
             </div>
-            
-            <div class="col-md-6" data-aos="fade-left" data-aos-duration="1000">
-                <div class="catering-card card-right animate-float-delay">
-                    <div class="card-inner">
-                        <div class="card-icon-wrapper">
-                            <i class="fas fa-gem"></i>
-                        </div>
-                        <h3>Our Catering Packages</h3>
-                        
-                        <div class="package-item">
-                            <div class="package-header">
-                                <span class="package-icon"><i class="fas fa-crown"></i></span>
-                                <h4>Silver Package</h4>
-                                <span class="package-price">$29<span>/person</span></span>
-                            </div>
-                            <p>3 vegetarian dishes, 2 meat dishes, injera, salad - Serves 20-30</p>
-                            <div class="package-features">
-                                <span class="badge bg-light text-dark">Vegetarian Options</span>
-                                <span class="badge bg-light text-dark">Injera Included</span>
-                            </div>
-                        </div>
-                        
-                        <div class="package-item">
-                            <div class="package-header">
-                                <span class="package-icon"><i class="fas fa-crown text-warning"></i></span>
-                                <h4>Gold Package</h4>
-                                <span class="package-price">$49<span>/person</span></span>
-                            </div>
-                            <p>5 vegetarian dishes, 4 meat dishes, injera, salad, dessert - Serves 30-50</p>
-                            <div class="package-features">
-                                <span class="badge bg-light text-dark">Dessert Included</span>
-                                <span class="badge bg-light text-dark">Extended Menu</span>
-                            </div>
-                        </div>
-                        
-                        <div class="package-item">
-                            <div class="package-header">
-                                <span class="package-icon"><i class="fas fa-crown text-danger"></i></span>
-                                <h4>Platinum Package</h4>
-                                <span class="package-price">$79<span>/person</span></span>
-                            </div>
-                            <p>Full buffet with 8+ dishes, coffee ceremony, live music - Serves 50-100+</p>
-                            <div class="package-features">
-                                <span class="badge bg-light text-dark">Coffee Ceremony</span>
-                                <span class="badge bg-light text-dark">Live Music</span>
-                                <span class="badge bg-light text-dark">Full Service</span>
-                            </div>
-                        </div>
-                        
-                        <a href="{{ url_for('contact') }}" class="btn-catering">
-                            <span>Request Quote</span>
-                            <i class="fas fa-arrow-right"></i>
-                        </a>
-                        <div class="card-shine"></div>
-                    </div>
-                </div>
+            <div class="ct-trust-div"></div>
+            <div class="ct-stat" data-count="98" data-suffix="%">
+                <span class="ct-stat-num">0</span>
+                <span class="ct-stat-lbl">Client Satisfaction</span>
+            </div>
+            <div class="ct-trust-div"></div>
+            <div class="ct-stat" data-count="15" data-suffix="+ yrs">
+                <span class="ct-stat-num">0</span>
+                <span class="ct-stat-lbl">Experience</span>
+            </div>
+            <div class="ct-trust-div"></div>
+            <div class="ct-stat" data-count="50" data-suffix="+">
+                <span class="ct-stat-num">0</span>
+                <span class="ct-stat-lbl">Dishes on Menu</span>
             </div>
         </div>
-        
-        <!-- Four BIG Cards with Images/Videos - 2x2 Grid with Hover Effects -->
-        <h3 class="text-center mb-5 display-6" data-aos="zoom-in">
-            <span class="gradient-text">Our Catering in Action</span>
-        </h3>
-        
-        <div class="row g-4">
-            <!-- Wedding Catering Card -->
-            <div class="col-md-6" data-aos="zoom-in" data-aos-delay="100">
-                <div class="catering-media-card">
-                    <div class="media-wrapper">
-                        <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Effoi_cattering1.gif" class="media-image" alt="Wedding Catering">
-                        <div class="media-overlay">
-                            <div class="overlay-content">
-                                <h4>Wedding Catering</h4>
-                                <p>Make your special day unforgettable</p>
-                                <div class="overlay-buttons">
-                                    <a href="{{ url_for('contact') }}" class="btn-overlay">Inquire</a>
-                                    <button class="btn-overlay-icon" onclick="openImageModal('https://images.unsplash.com/photo-1555244162-803834f70033?q=80&w=2070')">
-                                        <i class="fas fa-expand"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="media-badge">Catering</div>
+
+        <!-- ── Bento grid (main content) ── -->
+        <div class="ct-bento" data-aos="fade-up" data-aos-delay="150">
+
+            <!-- Cell A — large photo: wedding -->
+            <div class="ct-cell ct-cell-a">
+                <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Effoi_cattering1.gif"
+                     alt="Wedding Catering" class="ct-cell-img">
+                <div class="ct-cell-overlay">
+                    <span class="ct-cell-badge">Weddings</span>
+                    <div class="ct-cell-body">
+                        <h3>Make It Unforgettable</h3>
+                        <p>Authentic Ethiopian buffet for your special day</p>
+                        <a href="{{ url_for('contact') }}" class="ct-cell-btn">Inquire <i class="fas fa-arrow-right"></i></a>
                     </div>
                 </div>
             </div>
-            
-            <!-- Corporate Events Card -->
-            <div class="col-md-6" data-aos="zoom-in" data-aos-delay="200">
-                <div class="catering-media-card">
-                    <div class="media-wrapper">
-                        <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Mar2.gif" class="media-image" alt="Corporate Events">
-                        <div class="media-overlay">
-                            <div class="overlay-content">
-                                <h4>Corporate Events</h4>
-                                <p>Impress clients and colleagues</p>
-                                <div class="overlay-buttons">
-                                    <a href="{{ url_for('contact') }}" class="btn-overlay">Inquire</a>
-                                    <button class="btn-overlay-icon" onclick="openImageModal('https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?q=80&w=2070')">
-                                        <i class="fas fa-expand"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="media-badge">Catering</div>
+
+            <!-- Cell B — why-us card -->
+            <div class="ct-cell ct-cell-b">
+                <div class="ct-why-card">
+                    <div class="ct-why-icon"><i class="fas fa-crown"></i></div>
+                    <h3>Why Choose EFFOI?</h3>
+                    <ul class="ct-why-list">
+                        <li><i class="fas fa-check"></i><span><strong>Authentic Recipes</strong> passed down through generations</span></li>
+                        <li><i class="fas fa-check"></i><span><strong>Fresh Ingredients</strong> sourced locally every day</span></li>
+                        <li><i class="fas fa-check"></i><span><strong>Custom Menus</strong> tailored to your event theme</span></li>
+                        <li><i class="fas fa-check"></i><span><strong>Coffee Ceremony</strong> traditional experience included</span></li>
+                        <li><i class="fas fa-check"></i><span><strong>Live Music</strong> cultural performances optional</span></li>
+                        <li><i class="fas fa-check"></i><span><strong>Pro Staff</strong> trained in Ethiopian hospitality</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Cell C — tall photo: corporate -->
+            <div class="ct-cell ct-cell-c">
+                <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Mar2.gif"
+                     alt="Corporate Events" class="ct-cell-img">
+                <div class="ct-cell-overlay">
+                    <span class="ct-cell-badge">Corporate</span>
+                    <div class="ct-cell-body">
+                        <h3>Impress Every Guest</h3>
+                        <p>Elevate your next corporate gathering</p>
+                        <a href="{{ url_for('contact') }}" class="ct-cell-btn">Inquire <i class="fas fa-arrow-right"></i></a>
                     </div>
                 </div>
             </div>
-            
-            <!-- Cultural Festivals Card with GIF -->
-            <div class="col-md-6" data-aos="zoom-in" data-aos-delay="300">
-                <div class="catering-media-card">
-                    <div class="media-wrapper">
-                        <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Effoi_cattering2.gif"
-                             class="media-image"
-                             alt="Cultural Festivals - EFFOI Catering"
-                             style="width: 100%; height: 100%; object-fit: cover;">
-                        <div class="media-overlay">
-                            <div class="overlay-content">
-                                <h4>Cultural Festivals</h4>
-                                <p>Traditional Ethiopian celebrations</p>
-                                <div class="overlay-buttons">
-                                    <a href="{{ url_for('events') }}" class="btn-overlay">Learn More</a>
-                                    <button class="btn-overlay-icon" onclick="openImageModal('https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Effoi_cattering2.gif')">
-                                        <i class="fas fa-expand"></i>
-                                    </button>
-                                </div>
+
+            <!-- Cell D — packages card (tabbed) -->
+            <div class="ct-cell ct-cell-d">
+                <div class="ct-pkg-card">
+                    <div class="ct-pkg-header">
+                        <i class="fas fa-gem"></i>
+                        <h3>Catering Packages</h3>
+                    </div>
+
+                    <!-- Tab pills -->
+                    <div class="ct-pkg-tabs" role="tablist">
+                        <button class="ct-tab active" role="tab" data-pkg="silver">Silver</button>
+                        <button class="ct-tab" role="tab" data-pkg="gold">Gold</button>
+                        <button class="ct-tab" role="tab" data-pkg="platinum">Platinum</button>
+                    </div>
+
+                    <!-- Tab panels -->
+                    <div class="ct-pkg-panels">
+                        <div class="ct-panel active" id="pkg-silver">
+                            <div class="ct-pkg-price-row">
+                                <span class="ct-pkg-price">$29</span>
+                                <span class="ct-pkg-per">/person</span>
+                                <span class="ct-pkg-serves">Serves 20–30</span>
+                            </div>
+                            <p class="ct-pkg-desc">3 vegetarian dishes · 2 meat dishes · injera · salad</p>
+                            <div class="ct-pkg-tags">
+                                <span>Vegetarian Options</span>
+                                <span>Injera Included</span>
+                                <span>Setup &amp; Cleanup</span>
                             </div>
                         </div>
-                        <div class="media-badge">Traditional</div>
+                        <div class="ct-panel" id="pkg-gold">
+                            <div class="ct-pkg-price-row">
+                                <span class="ct-pkg-price">$49</span>
+                                <span class="ct-pkg-per">/person</span>
+                                <span class="ct-pkg-serves ct-popular">Most Popular · Serves 30–50</span>
+                            </div>
+                            <p class="ct-pkg-desc">5 vegetarian · 4 meat dishes · injera · salad · dessert</p>
+                            <div class="ct-pkg-tags">
+                                <span>Dessert Included</span>
+                                <span>Extended Menu</span>
+                                <span>Dedicated Server</span>
+                            </div>
+                        </div>
+                        <div class="ct-panel" id="pkg-platinum">
+                            <div class="ct-pkg-price-row">
+                                <span class="ct-pkg-price">$79</span>
+                                <span class="ct-pkg-per">/person</span>
+                                <span class="ct-pkg-serves">Serves 50–100+</span>
+                            </div>
+                            <p class="ct-pkg-desc">Full buffet 8+ dishes · coffee ceremony · live music · full service</p>
+                            <div class="ct-pkg-tags">
+                                <span>Coffee Ceremony</span>
+                                <span>Live Music</span>
+                                <span>Full Service</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="{{ url_for('contact') }}" class="ct-pkg-cta">
+                        Request a Quote <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Cell E — small photo: cultural -->
+            <div class="ct-cell ct-cell-e">
+                <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Effoi_cattering2.gif"
+                     alt="Cultural Festivals" class="ct-cell-img">
+                <div class="ct-cell-overlay">
+                    <span class="ct-cell-badge">Cultural</span>
+                    <div class="ct-cell-body">
+                        <h3>Cultural Festivals</h3>
+                        <p>Traditional Ethiopian celebrations</p>
+                        <a href="{{ url_for('events') }}" class="ct-cell-btn">Learn More <i class="fas fa-arrow-right"></i></a>
                     </div>
                 </div>
             </div>
-            
-            <!-- Private Parties Card -->
-            <div class="col-md-6" data-aos="zoom-in" data-aos-delay="400">
-                <div class="catering-media-card">
-                    <div class="media-wrapper">
-                        <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Mar3.gif" class="media-image" alt="Private Parties">
-                        <div class="media-overlay">
-                            <div class="overlay-content">
-                                <h4>Private Parties</h4>
-                                <p>Birthdays, anniversaries & more</p>
-                                <div class="overlay-buttons">
-                                    <a href="{{ url_for('contact') }}" class="btn-overlay">Inquire</a>
-                                    <button class="btn-overlay-icon" onclick="openImageModal('https://images.unsplash.com/photo-1464349153735-7db50ed83c84?q=80&w=2070')">
-                                        <i class="fas fa-expand"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="media-badge">Catering</div>
+
+            <!-- Cell F — small photo: private parties -->
+            <div class="ct-cell ct-cell-f">
+                <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Mar3.gif"
+                     alt="Private Parties" class="ct-cell-img">
+                <div class="ct-cell-overlay">
+                    <span class="ct-cell-badge">Private</span>
+                    <div class="ct-cell-body">
+                        <h3>Private Parties</h3>
+                        <p>Birthdays, anniversaries &amp; more</p>
+                        <a href="{{ url_for('contact') }}" class="ct-cell-btn">Inquire <i class="fas fa-arrow-right"></i></a>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Call to Action Banner -->
-        <div class="catering-cta mt-5" data-aos="fade-up">
-            <div class="cta-content">
-                <h3>Ready to create an unforgettable experience?</h3>
-                <p>Contact us today for a customized catering quote</p>
-                <a href="{{ url_for('contact') }}" class="btn-cta">
-                    <span>Get Your Quote</span>
-                    <i class="fas fa-calendar-check"></i>
+
+        </div><!-- /ct-bento -->
+
+        <!-- ── CTA Banner ── -->
+        <div class="ct-cta-banner" data-aos="fade-up" data-aos-delay="100">
+            <div class="ct-cta-left">
+                <h3>Ready to create something extraordinary?</h3>
+                <p>Contact us for a fully customized catering quote — no obligation.</p>
+            </div>
+            <div class="ct-cta-right">
+                <a href="{{ url_for('contact') }}" class="ct-cta-btn">
+                    <i class="fas fa-calendar-check"></i> Get Your Quote
+                </a>
+                <a href="tel:{{ settings.get('phone', '+12406601337') }}" class="ct-cta-call">
+                    <i class="fas fa-phone"></i> Call Us
                 </a>
             </div>
-            <div class="cta-particles">
-                <span></span><span></span><span></span><span></span>
-            </div>
+            <!-- decorative orbs -->
+            <span class="ct-orb ct-orb-1" aria-hidden="true"></span>
+            <span class="ct-orb ct-orb-2" aria-hidden="true"></span>
         </div>
-    </div>
+
+    </div><!-- /container -->
 </section>
 
 <!-- ==================== ETHIOPIAN COFFEE CEREMONY SECTION ==================== -->
@@ -960,568 +1038,1060 @@
 </div>
 
 <style>
-/* ==================== CATERING SECTION STYLES ==================== */
-.catering-section {
+/* ==================== SMART HERO STYLES ==================== */
+
+/* ── Container ── */
+.effoi-hero {
     position: relative;
-    background: linear-gradient(135deg, #fff9f9 0%, #ffffff 100%);
+    width: 100vw;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    height: 100vh;
+    min-height: 580px;
+    max-height: 900px;
     overflow: hidden;
-}
-
-/* Animated Background Shapes */
-.catering-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 0;
-    opacity: 0.5;
-}
-
-.bg-shape {
-    position: absolute;
-    background: linear-gradient(45deg, #8B1E1E, #FFD700);
-    border-radius: 50%;
-    filter: blur(60px);
-    animation: float 20s infinite;
-}
-
-.shape-1 {
-    width: 300px;
-    height: 300px;
-    top: -100px;
-    right: -100px;
-    opacity: 0.1;
-    animation-delay: 0s;
-}
-
-.shape-2 {
-    width: 400px;
-    height: 400px;
-    bottom: -150px;
-    left: -150px;
-    opacity: 0.1;
-    animation-delay: -5s;
-}
-
-.shape-3 {
-    width: 200px;
-    height: 200px;
-    top: 50%;
-    left: 30%;
-    opacity: 0.05;
-    animation-delay: -10s;
-}
-
-.shape-4 {
-    width: 250px;
-    height: 250px;
-    bottom: 20%;
-    right: 20%;
-    opacity: 0.05;
-    animation-delay: -15s;
-}
-
-@keyframes float {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    25% { transform: translate(50px, 50px) rotate(90deg); }
-    50% { transform: translate(0, 100px) rotate(180deg); }
-    75% { transform: translate(-50px, 50px) rotate(270deg); }
-}
-
-/* Section Header */
-.badge-catering {
-    display: inline-block;
-    padding: 0.5rem 1.5rem;
-    background: linear-gradient(45deg, #8B1E1E, #B13E3E);
-    color: #FFD700;
-    border-radius: 50px;
-    font-weight: 600;
-    letter-spacing: 2px;
-    margin-bottom: 1rem;
-    box-shadow: 0 5px 15px rgba(139, 30, 30, 0.3);
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
-.text-gradient {
-    background: linear-gradient(45deg, #8B1E1E, #B13E3E);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.title-decoration {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 1rem;
-}
-
-.title-decoration .line {
-    width: 50px;
-    height: 2px;
-    background: linear-gradient(90deg, #8B1E1E, #FFD700, #8B1E1E);
-    animation: lineWidth 3s infinite;
-}
-
-@keyframes lineWidth {
-    0%, 100% { width: 50px; opacity: 0.5; }
-    50% { width: 100px; opacity: 1; }
-}
-
-/* Catering Cards */
-.catering-card {
-    position: relative;
-    height: 100%;
-    border-radius: 30px;
-    overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-}
-
-.card-inner {
-    position: relative;
-    padding: 2.5rem;
-    background: white;
-    height: 100%;
-    z-index: 1;
-    overflow: hidden;
-}
-
-.card-left .card-inner {
-    background: linear-gradient(135deg, #8B1E1E, #B13E3E);
     color: white;
+    margin-top: 0;
 }
 
-.card-right .card-inner {
-    background: linear-gradient(135deg, #fff9e6, #ffffff);
-}
-
-.card-icon-wrapper {
-    width: 80px;
-    height: 80px;
-    background: rgba(255,215,0,0.2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 1.5rem;
-    font-size: 2.5rem;
-    color: #FFD700;
-    animation: rotate 10s linear infinite;
-}
-
-.card-left .card-icon-wrapper {
-    background: rgba(255,255,255,0.2);
-    color: #FFD700;
-}
-
-@keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-/* Floating Animations */
-.animate-float {
-    animation: floatCard 3s ease-in-out infinite;
-}
-
-.animate-float-delay {
-    animation: floatCard 3s ease-in-out 1.5s infinite;
-}
-
-@keyframes floatCard {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
-/* Card Shine Effect */
-.card-shine {
+/* ── Slide track & individual slides ── */
+.hero-slides {
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
+    inset: 0;
+    z-index: 0;
+}
+
+.hero-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+}
+
+.hero-slide.active { opacity: 1; }
+
+/* Ken Burns zoom on active slide */
+.hero-slide-bg {
+    position: absolute;
+    inset: -5%;          /* slightly oversized for zoom headroom */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    animation: none;
+    transition: transform 8s ease;
+    transform: scale(1);
+    will-change: transform;
+}
+
+.hero-slide.active .hero-slide-bg {
+    animation: kenBurns 8s ease forwards;
+}
+
+@keyframes kenBurns {
+    from { transform: scale(1);    }
+    to   { transform: scale(1.08); }
+}
+
+/* ── Overlay ── */
+.hero-overlay-dark {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
     background: linear-gradient(
-        45deg,
-        transparent,
-        rgba(255,255,255,0.1),
-        transparent
+        105deg,
+        rgba(10,4,4,0.72) 0%,
+        rgba(60,10,10,0.55) 45%,
+        rgba(0,0,0,0.15) 100%
     );
-    transform: rotate(45deg);
-    animation: shine 6s infinite;
+}
+
+/* ── Particles ── */
+.hero-particles {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
     pointer-events: none;
 }
 
-@keyframes shine {
-    0% { transform: translateX(-100%) rotate(45deg); }
-    20%, 100% { transform: translateX(100%) rotate(45deg); }
+.hero-particles span {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(255,215,0,0.4);
+    animation: floatParticle 12s infinite ease-in-out;
+}
+.hero-particles span:nth-child(1) { top:15%; left:8%;  animation-duration:11s; animation-delay:0s;  width:4px;  height:4px; }
+.hero-particles span:nth-child(2) { top:60%; left:15%; animation-duration:14s; animation-delay:2s;  width:6px;  height:6px; }
+.hero-particles span:nth-child(3) { top:30%; left:30%; animation-duration:10s; animation-delay:4s;  width:3px;  height:3px; }
+.hero-particles span:nth-child(4) { top:75%; left:45%; animation-duration:13s; animation-delay:1s;  width:5px;  height:5px; }
+.hero-particles span:nth-child(5) { top:20%; left:55%; animation-duration:9s;  animation-delay:3s;  width:4px;  height:4px; }
+.hero-particles span:nth-child(6) { top:50%; left:22%; animation-duration:15s; animation-delay:5s;  width:7px;  height:7px; }
+
+@keyframes floatParticle {
+    0%,100% { transform: translateY(0)   scale(1);   opacity:.4; }
+    33%      { transform: translateY(-25px) scale(1.3); opacity:.7; }
+    66%      { transform: translateY(15px)  scale(.8); opacity:.3; }
 }
 
-/* Catering List */
-.catering-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.catering-list li {
-    margin-bottom: 1rem;
+/* ── Content column ── */
+.hero-content {
+    position: relative;
+    z-index: 3;
+    flex: 1 1 auto;
+    max-width: 680px;
+    padding: 0 3rem 0 clamp(1.5rem, 5vw, 5rem);
     display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* Eyebrow */
+.hero-eyebrow {
+    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    animation: slideIn 0.5s ease-out;
-    animation-fill-mode: both;
-}
-
-.catering-list li:nth-child(1) { animation-delay: 0.1s; }
-.catering-list li:nth-child(2) { animation-delay: 0.2s; }
-.catering-list li:nth-child(3) { animation-delay: 0.3s; }
-.catering-list li:nth-child(4) { animation-delay: 0.4s; }
-.catering-list li:nth-child(5) { animation-delay: 0.5s; }
-.catering-list li:nth-child(6) { animation-delay: 0.6s; }
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-.catering-list i {
+    gap: 0.6rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
     color: #FFD700;
-    font-size: 1.2rem;
+    opacity: 0;
+    animation: slideUp 0.7s 0.2s ease forwards;
 }
 
-/* Package Items */
-.package-item {
-    background: rgba(139, 30, 30, 0.05);
-    border-radius: 15px;
-    padding: 1.2rem;
-    margin-bottom: 1rem;
-    transition: all 0.3s ease;
-    border-left: 3px solid transparent;
+.eyebrow-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #FFD700;
+    animation: pulse-dot 1.8s infinite;
 }
 
-.package-item:hover {
-    transform: translateX(5px);
-    background: rgba(139, 30, 30, 0.1);
-    border-left-color: #8B1E1E;
+@keyframes pulse-dot {
+    0%,100% { opacity:1; transform:scale(1);   }
+    50%      { opacity:.4; transform:scale(.7); }
 }
 
-.package-header {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-    flex-wrap: wrap;
-}
-
-.package-header h4 {
+/* Headline */
+.hero-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 700;
+    line-height: 1.1;
+    color: white;
     margin: 0;
-    flex: 1;
-    font-size: 1.1rem;
+    opacity: 0;
+    animation: slideUp 0.7s 0.4s ease forwards;
+    transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-.package-price {
-    font-weight: bold;
-    color: #8B1E1E;
-    font-size: 1.2rem;
+.hero-headline.transitioning {
+    opacity: 0;
+    transform: translateY(12px);
 }
 
-.package-price span {
-    font-size: 0.8rem;
-    color: #999;
-    font-weight: normal;
+.hero-highlight {
+    color: #FFD700;
+    position: relative;
 }
 
-.package-features {
+/* Subtitle */
+.hero-subtitle {
+    font-size: clamp(0.95rem, 1.8vw, 1.15rem);
+    color: rgba(255,255,255,0.82);
+    line-height: 1.65;
+    margin: 0;
+    max-width: 520px;
+    opacity: 0;
+    animation: slideUp 0.7s 0.6s ease forwards;
+    transition: opacity 0.5s ease;
+}
+
+.hero-subtitle.transitioning { opacity: 0; }
+
+/* CTA Buttons */
+.hero-actions {
     display: flex;
-    gap: 0.5rem;
+    gap: 1rem;
     flex-wrap: wrap;
-    margin-top: 0.5rem;
+    opacity: 0;
+    animation: slideUp 0.7s 0.8s ease forwards;
 }
 
-.package-features .badge {
-    background: #f8f9fa !important;
-    color: #333 !important;
-    padding: 0.3rem 0.8rem;
-    border-radius: 50px;
-    font-weight: normal;
-}
-
-/* Catering Button */
-.btn-catering {
+.hero-btn {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.8rem 2rem;
-    background: linear-gradient(45deg, #8B1E1E, #B13E3E);
-    color: white;
-    text-decoration: none;
+    padding: 0.75rem 1.75rem;
     border-radius: 50px;
     font-weight: 600;
-    margin-top: 1rem;
+    font-size: 0.9rem;
+    text-decoration: none;
     transition: all 0.3s ease;
-    border: 1px solid transparent;
+    white-space: nowrap;
+    letter-spacing: 0.03em;
 }
 
-.btn-catering:hover {
-    background: white;
-    color: #8B1E1E;
-    border-color: #8B1E1E;
-    transform: scale(1.05);
-    box-shadow: 0 10px 20px rgba(139,30,30,0.2);
+.hero-btn-primary {
+    background: linear-gradient(135deg, #8B1E1E, #c43535);
+    color: white;
+    box-shadow: 0 6px 24px rgba(139,30,30,0.45);
+    border: 2px solid transparent;
 }
 
-.btn-catering i {
-    transition: transform 0.3s ease;
+.hero-btn-primary:hover {
+    background: linear-gradient(135deg, #a82525, #d44040);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(139,30,30,0.55);
 }
 
-.btn-catering:hover i {
-    transform: translateX(5px);
+.hero-btn-ghost {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255,255,255,0.55);
+    backdrop-filter: blur(4px);
 }
 
-/* Media Cards */
-.catering-media-card {
+.hero-btn-ghost:hover {
+    background: rgba(255,255,255,0.12);
+    border-color: #FFD700;
+    color: #FFD700;
+    transform: translateY(-3px);
+}
+
+/* Stats row */
+.hero-stats {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    opacity: 0;
+    animation: slideUp 0.7s 1s ease forwards;
+    margin-top: 0.5rem;
+}
+
+.hero-stat { text-align: left; }
+
+.stat-value {
+    display: block;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #FFD700;
+    line-height: 1;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.65);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 0.2rem;
+}
+
+.hero-stat-divider {
+    width: 1px;
+    height: 36px;
+    background: rgba(255,255,255,0.2);
+}
+
+/* ── Right image panel ── */
+.hero-panel {
     position: relative;
+    z-index: 3;
+    flex: 0 0 clamp(260px, 30vw, 420px);
+    height: clamp(280px, 55vh, 500px);
+    margin-right: clamp(1rem, 4vw, 4rem);
     border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-    transition: all 0.3s ease;
-    height: 350px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    opacity: 0;
+    animation: slideIn 0.9s 0.5s ease forwards;
 }
 
-.catering-media-card:hover {
-    transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 25px 50px rgba(139,30,30,0.3);
+@keyframes slideIn {
+    from { opacity:0; transform:translateX(40px); }
+    to   { opacity:1; transform:translateX(0); }
 }
 
-.media-wrapper {
-    position: relative;
+.hero-grid-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
     width: 100%;
     height: 100%;
-    overflow: hidden;
+    gap: 3px;
+    background: #8B1E1E;
 }
 
-.media-image, .media-video {
+/* Panel cell */
+.hgp-cell {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.hgp-cell img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease;
+    transition: transform 0.55s ease;
 }
 
-.catering-media-card:hover .media-image,
-.catering-media-card:hover .media-video {
-    transform: scale(1.1);
-}
+.hgp-cell:hover img { transform: scale(1.1); }
 
-.media-overlay {
+.hgp-cell-overlay {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(to top, rgba(139,30,30,0.9), transparent);
+    inset: 0;
+    background: linear-gradient(transparent 40%, rgba(0,0,0,0.75));
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0.6rem;
     opacity: 0;
     transition: opacity 0.3s ease;
-    display: flex;
-    align-items: flex-end;
-    padding: 2rem;
 }
 
-.catering-media-card:hover .media-overlay {
-    opacity: 1;
-}
+.hgp-cell:hover .hgp-cell-overlay { opacity: 1; }
 
-.overlay-content {
+.hgp-cell-title {
     color: white;
-    transform: translateY(20px);
-    transition: transform 0.3s ease;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.2;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.6);
 }
 
-.catering-media-card:hover .overlay-content {
-    transform: translateY(0);
+.hgp-cell-sub {
+    color: rgba(255,215,0,0.9);
+    font-size: 0.62rem;
+    margin-top: 1px;
 }
 
-.overlay-content h4 {
-    margin-bottom: 0.3rem;
-    font-size: 1.5rem;
+/* Entrance animation for cells */
+@keyframes cellIn {
+    from { opacity:0; transform:scale(0.92); }
+    to   { opacity:1; transform:scale(1); }
 }
 
-.overlay-content p {
-    margin-bottom: 1rem;
-    opacity: 0.9;
-    font-size: 0.9rem;
+.hgp-cell { animation: cellIn 0.45s ease both; }
+.hgp-cell:nth-child(1) { animation-delay: 0.05s; }
+.hgp-cell:nth-child(2) { animation-delay: 0.12s; }
+.hgp-cell:nth-child(3) { animation-delay: 0.19s; }
+.hgp-cell:nth-child(4) { animation-delay: 0.26s; }
+
+/* Panel label */
+.hero-panel-label {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(8px);
+    color: #FFD700;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.7rem;
+    border-radius: 50px;
+    border: 1px solid rgba(255,215,0,0.3);
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
 }
 
-.overlay-buttons {
+/* ── Slide dots ── */
+.hero-dots {
+    position: absolute;
+    bottom: 2.5rem;
+    left: clamp(1.5rem, 5vw, 5rem);
+    z-index: 4;
     display: flex;
     gap: 0.5rem;
     align-items: center;
 }
 
-.btn-overlay {
-    padding: 0.4rem 1rem;
-    background: #FFD700;
-    color: #8B1E1E;
-    text-decoration: none;
-    border-radius: 50px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-}
-
-.btn-overlay:hover {
-    background: white;
-    transform: scale(1.05);
-}
-
-.btn-overlay-icon {
-    width: 35px;
-    height: 35px;
+.hero-dot {
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.2);
-    border: 1px solid white;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: rgba(255,255,255,0.4);
+    border: none;
     cursor: pointer;
     transition: all 0.3s ease;
+    padding: 0;
 }
 
-.btn-overlay-icon:hover {
-    background: white;
-    color: #8B1E1E;
+.hero-dot.active {
+    background: #FFD700;
+    width: 28px;
+    border-radius: 4px;
 }
 
-.media-badge {
+.hero-dot:hover { background: rgba(255,255,255,0.75); }
+
+/* ── Scroll cue ── */
+.hero-scroll-cue {
+    position: absolute;
+    bottom: 2rem;
+    right: clamp(1rem, 4vw, 4rem);
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.scroll-mouse {
+    width: 22px;
+    height: 34px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-radius: 11px;
+    display: flex;
+    justify-content: center;
+    padding-top: 5px;
+}
+
+.scroll-wheel {
+    width: 4px;
+    height: 8px;
+    background: rgba(255,215,0,0.7);
+    border-radius: 2px;
+    animation: scrollWheel 1.8s infinite ease;
+}
+
+@keyframes scrollWheel {
+    0%   { opacity:1; transform:translateY(0); }
+    80%  { opacity:0; transform:translateY(8px); }
+    100% { opacity:0; transform:translateY(8px); }
+}
+
+/* ── Shared slide-up animation ── */
+@keyframes slideUp {
+    from { opacity:0; transform:translateY(22px); }
+    to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── Responsive ── */
+@media (max-width: 992px) {
+    .effoi-hero {
+        flex-direction: column;
+        justify-content: flex-end;
+        height: 90vh;
+        min-height: 520px;
+        max-height: 700px;
+    }
+
+    .hero-content {
+        padding: 0 1.5rem 5rem;
+        max-width: 100%;
+        gap: 1rem;
+    }
+
+    .hero-panel { display: none; }
+
+    .hero-headline { font-size: clamp(1.9rem, 7vw, 3rem); }
+
+    .hero-dots { bottom: 1.5rem; left: 1.5rem; }
+    .hero-scroll-cue { display: none; }
+
+    .hero-stats { gap: 1rem; }
+    .stat-value { font-size: 1.2rem; }
+}
+
+@media (max-width: 576px) {
+    .hero-actions { flex-direction: column; gap: 0.75rem; }
+    .hero-btn { justify-content: center; width: 100%; max-width: 280px; }
+    .hero-stats { display: none; }
+}
+
+/* ==================== CATERING SECTION ==================== */
+
+/* ── Section wrapper ── */
+.ct-section {
+    position: relative;
+    padding: 6rem 0 5rem;
+    background: #0f0608;
+    overflow: hidden;
+}
+
+/* Subtle grain texture */
+.ct-grain {
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    background-size: 200px;
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.ct-section .container-xl { position: relative; z-index: 1; }
+
+/* ── Header ── */
+.ct-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.ct-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255,215,0,0.1);
+    color: #FFD700;
+    border: 1px solid rgba(255,215,0,0.25);
+    border-radius: 50px;
+    padding: 0.35rem 1.1rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 1.25rem;
+}
+
+.ct-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 1rem;
+}
+
+.ct-gold { color: #FFD700; }
+
+.ct-subtitle {
+    color: rgba(255,255,255,0.58);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    max-width: 620px;
+    margin: 0 auto;
+}
+
+/* ── Trust bar ── */
+.ct-trust-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+}
+
+.ct-stat {
+    text-align: center;
+    padding: 0.5rem 2rem;
+    flex: 1 0 120px;
+}
+
+.ct-stat-num {
+    display: block;
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #FFD700;
+    line-height: 1;
+}
+
+.ct-stat-lbl {
+    display: block;
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 0.3rem;
+}
+
+.ct-trust-div {
+    width: 1px;
+    height: 40px;
+    background: rgba(255,255,255,0.12);
+    flex-shrink: 0;
+}
+
+/* ── Bento grid ── */
+.ct-bento {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: 340px 300px 260px;
+    gap: 14px;
+    margin-bottom: 3rem;
+}
+
+/* Cell A — wedding (large, left) */
+.ct-cell-a { grid-column: 1 / 7; grid-row: 1 / 2; }
+/* Cell B — why-us */
+.ct-cell-b { grid-column: 7 / 13; grid-row: 1 / 2; }
+/* Cell C — corporate (tall, left) */
+.ct-cell-c { grid-column: 1 / 5; grid-row: 2 / 4; }
+/* Cell D — packages */
+.ct-cell-d { grid-column: 5 / 13; grid-row: 2 / 3; }
+/* Cell E — cultural */
+.ct-cell-e { grid-column: 5 / 9;  grid-row: 3 / 4; }
+/* Cell F — private */
+.ct-cell-f { grid-column: 9 / 13; grid-row: 3 / 4; }
+
+/* ── Base cell ── */
+.ct-cell {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+}
+
+/* Photo cells */
+.ct-cell-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s ease;
+}
+
+.ct-cell:hover .ct-cell-img { transform: scale(1.06); }
+
+/* Overlay on photo cells */
+.ct-cell-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(10,3,3,0.88) 0%, rgba(0,0,0,0.1) 55%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1.4rem 1.5rem;
+    opacity: 0.85;
+    transition: opacity 0.3s ease;
+}
+
+.ct-cell:hover .ct-cell-overlay { opacity: 1; }
+
+.ct-cell-badge {
     position: absolute;
     top: 1rem;
     left: 1rem;
     background: #FFD700;
-    color: #8B1E1E;
-    padding: 0.3rem 1rem;
+    color: #1a0a0a;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.75rem;
     border-radius: 50px;
-    font-weight: 600;
-    font-size: 0.8rem;
-    z-index: 2;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
 }
 
-.video-indicator {
+.ct-cell-body h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: #fff;
+    margin-bottom: 0.3rem;
+}
+
+.ct-cell-body p {
+    color: rgba(255,255,255,0.75);
+    font-size: 0.85rem;
+    margin-bottom: 0.8rem;
+}
+
+.ct-cell-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #FFD700;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255,215,0,0.4);
+    padding-bottom: 1px;
+    transition: gap 0.2s ease, border-color 0.2s;
+}
+
+.ct-cell-btn:hover { gap: 0.7rem; border-color: #FFD700; color: #FFD700; }
+
+/* ── Why card ── */
+.ct-why-card {
+    height: 100%;
+    padding: 1.75rem 1.75rem 1.5rem;
+    background: linear-gradient(135deg, #8B1E1E 0%, #6d1515 100%);
+    display: flex;
+    flex-direction: column;
+    border-radius: 18px;
+}
+
+.ct-why-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: rgba(255,215,0,0.15);
     display: flex;
     align-items: center;
+    justify-content: center;
+    color: #FFD700;
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    flex-shrink: 0;
+}
+
+.ct-why-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: #fff;
+    margin-bottom: 1.1rem;
+    line-height: 1.25;
+}
+
+.ct-why-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    flex: 1;
+}
+
+.ct-why-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: 0.84rem;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.45;
+}
+
+.ct-why-list li i {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    background: rgba(255,215,0,0.18);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    color: #FFD700;
+    margin-top: 2px;
+}
+
+/* ── Packages card ── */
+.ct-pkg-card {
+    height: 100%;
+    padding: 1.6rem 1.75rem 1.5rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.ct-pkg-header {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.ct-pkg-header i {
+    color: #FFD700;
+    font-size: 1.1rem;
+}
+
+.ct-pkg-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    color: #fff;
+    margin: 0;
+}
+
+/* Tab pills */
+.ct-pkg-tabs {
+    display: flex;
+    gap: 0.4rem;
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px;
+    padding: 4px;
+}
+
+.ct-tab {
+    flex: 1;
+    padding: 0.45rem 0;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    color: rgba(255,255,255,0.45);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.ct-tab.active {
+    background: #8B1E1E;
+    color: #FFD700;
+    box-shadow: 0 2px 10px rgba(139,30,30,0.5);
+}
+
+.ct-tab:hover:not(.active) { color: rgba(255,255,255,0.8); }
+
+/* Panels */
+.ct-pkg-panels { flex: 1; }
+
+.ct-panel { display: none; }
+.ct-panel.active { display: block; animation: panelIn 0.3s ease; }
+
+@keyframes panelIn {
+    from { opacity:0; transform:translateY(8px); }
+    to   { opacity:1; transform:translateY(0); }
+}
+
+.ct-pkg-price-row {
+    display: flex;
+    align-items: baseline;
     gap: 0.3rem;
-    background: rgba(255,255,255,0.2);
-    padding: 0.2rem 0.8rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.65rem;
+}
+
+.ct-pkg-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #FFD700;
+    line-height: 1;
+}
+
+.ct-pkg-per {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.82rem;
+}
+
+.ct-pkg-serves {
+    background: rgba(255,255,255,0.07);
+    color: rgba(255,255,255,0.6);
+    font-size: 0.72rem;
+    padding: 0.2rem 0.6rem;
     border-radius: 50px;
-    font-size: 0.8rem;
+    margin-left: auto;
 }
 
-.video-indicator i {
-    animation: pulse 1.5s infinite;
+.ct-popular {
+    background: rgba(255,215,0,0.15) !important;
+    color: #FFD700 !important;
+    border: 1px solid rgba(255,215,0,0.3);
 }
 
-/* CTA Banner */
-.catering-cta {
-    position: relative;
-    background: linear-gradient(45deg, #8B1E1E, #B13E3E);
-    border-radius: 30px;
-    padding: 3rem;
-    overflow: hidden;
-    box-shadow: 0 20px 40px rgba(139,30,30,0.3);
+.ct-pkg-desc {
+    color: rgba(255,255,255,0.65);
+    font-size: 0.85rem;
+    line-height: 1.55;
+    margin-bottom: 0.75rem;
 }
 
-.cta-content {
-    position: relative;
-    z-index: 2;
-    text-align: center;
+.ct-pkg-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.ct-pkg-tags span {
+    background: rgba(139,30,30,0.25);
+    color: rgba(255,255,255,0.75);
+    border: 1px solid rgba(139,30,30,0.4);
+    font-size: 0.72rem;
+    padding: 0.2rem 0.65rem;
+    border-radius: 50px;
+}
+
+.ct-pkg-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.5rem;
+    background: linear-gradient(135deg, #8B1E1E, #a82525);
+    color: white;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(139,30,30,0.4);
+    align-self: flex-start;
+}
+
+.ct-pkg-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(139,30,30,0.55);
     color: white;
 }
 
-.cta-content h3 {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-    animation: fadeInUp 1s ease;
+/* ── CTA Banner ── */
+.ct-cta-banner {
+    position: relative;
+    background: linear-gradient(120deg, #8B1E1E 0%, #6d1515 60%, #4a0e0e 100%);
+    border-radius: 22px;
+    padding: 2.5rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(139,30,30,0.35);
+    border: 1px solid rgba(255,215,0,0.12);
 }
 
-.cta-content p {
-    font-size: 1.2rem;
-    margin-bottom: 1.5rem;
-    opacity: 0.9;
+.ct-orb {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
 }
 
-.btn-cta {
+.ct-orb-1 {
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(255,215,0,0.12), transparent 70%);
+    top: -80px;
+    right: -60px;
+}
+
+.ct-orb-2 {
+    width: 180px;
+    height: 180px;
+    background: radial-gradient(circle, rgba(255,255,255,0.05), transparent 70%);
+    bottom: -60px;
+    left: 10%;
+}
+
+.ct-cta-left { flex: 1 1 300px; position: relative; z-index: 1; }
+
+.ct-cta-left h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.3rem, 2.5vw, 1.7rem);
+    color: #fff;
+    margin-bottom: 0.4rem;
+    line-height: 1.3;
+}
+
+.ct-cta-left p {
+    color: rgba(255,255,255,0.65);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.ct-cta-right {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.ct-cta-btn {
     display: inline-flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1rem 2.5rem;
+    gap: 0.5rem;
+    padding: 0.75rem 1.75rem;
     background: #FFD700;
-    color: #8B1E1E;
+    color: #4a0e0e;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.9rem;
     text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(255,215,0,0.3);
+}
+
+.ct-cta-btn:hover {
+    background: #fff;
+    color: #8B1E1E;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(255,215,0,0.4);
+}
+
+.ct-cta-call {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    color: rgba(255,255,255,0.85);
+    border: 1.5px solid rgba(255,255,255,0.3);
     border-radius: 50px;
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 0.9rem;
+    text-decoration: none;
     transition: all 0.3s ease;
-    border: 2px solid transparent;
 }
 
-.btn-cta:hover {
-    background: transparent;
-    color: #FFD700;
+.ct-cta-call:hover {
     border-color: #FFD700;
-    transform: scale(1.05);
+    color: #FFD700;
+    transform: translateY(-2px);
 }
 
-.btn-cta i {
-    transition: transform 0.3s ease;
+/* ── Responsive ── */
+@media (max-width: 1100px) {
+    .ct-bento {
+        grid-template-rows: 300px 280px 250px;
+    }
 }
 
-.btn-cta:hover i {
-    transform: rotate(15deg);
+@media (max-width: 900px) {
+    .ct-bento {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 280px auto auto 260px 260px;
+    }
+    .ct-cell-a { grid-column: 1 / 2; grid-row: 1; }
+    .ct-cell-b { grid-column: 2 / 3; grid-row: 1; }
+    .ct-cell-c { grid-column: 1 / 2; grid-row: 2 / 4; }
+    .ct-cell-d { grid-column: 2 / 3; grid-row: 2 / 4; }
+    .ct-cell-e { grid-column: 1 / 2; grid-row: 4; }
+    .ct-cell-f { grid-column: 2 / 3; grid-row: 4; }
 }
 
-.cta-particles span {
-    position: absolute;
-    width: 10px;
-    height: 10px;
+@media (max-width: 640px) {
+    .ct-section { padding: 4rem 0 3rem; }
+    .ct-bento {
+        grid-template-columns: 1fr;
+        grid-template-rows: 260px auto auto 220px 220px 220px;
+        gap: 10px;
+    }
+    .ct-cell-a { grid-column: 1; grid-row: 1; }
+    .ct-cell-b { grid-column: 1; grid-row: 2; }
+    .ct-cell-c { grid-column: 1; grid-row: 3; min-height: 240px; }
+    .ct-cell-d { grid-column: 1; grid-row: 4; min-height: 320px; }
+    .ct-cell-e { grid-column: 1; grid-row: 5; }
+    .ct-cell-f { grid-column: 1; grid-row: 6; }
+    .ct-trust-bar { gap: 0.5rem; padding: 1rem; }
+    .ct-trust-div { display: none; }
+    .ct-cta-banner { padding: 1.75rem 1.5rem; }
+    .ct-cta-right { width: 100%; justify-content: center; }
+}
     background: rgba(255,215,0,0.3);
     border-radius: 50%;
     animation: particles 10s infinite;
 }
 
-.cta-particles span:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
-.cta-particles span:nth-child(2) { top: 70%; left: 20%; animation-delay: 2s; }
-.cta-particles span:nth-child(3) { top: 30%; right: 15%; animation-delay: 4s; }
-.cta-particles span:nth-child(4) { bottom: 20%; right: 25%; animation-delay: 6s; }
-
-@keyframes particles {
-    0%, 100% { transform: translate(0, 0); opacity: 0.3; }
-    25% { transform: translate(20px, -20px); opacity: 0.6; }
-    50% { transform: translate(40px, 0); opacity: 0.3; }
-    75% { transform: translate(20px, 20px); opacity: 0.6; }
-}
-
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 /* Gradient Text */
@@ -1530,12 +2100,6 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    animation: gradientShift 5s infinite;
-}
-
-@keyframes gradientShift {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
 }
 
 /* Hero grid items overlay (keep existing) */
@@ -2410,7 +2974,59 @@
 
 {% block extra_js %}
 <script>
-// Hero grid content from database
+/* ============================================================
+   CATERING — Counter animation + Package tabs
+   ============================================================ */
+
+// ── Animated counters ────────────────────────────────────────
+function animateCounter(el) {
+    const target  = parseInt(el.dataset.count, 10);
+    const suffix  = el.dataset.suffix || '';
+    const numEl   = el.querySelector('.ct-stat-num');
+    const dur     = 1800;
+    const step    = 16;
+    const inc     = target / (dur / step);
+    let   current = 0;
+
+    const timer = setInterval(() => {
+        current = Math.min(current + inc, target);
+        numEl.textContent = Math.round(current) + suffix;
+        if (current >= target) clearInterval(timer);
+    }, step);
+}
+
+// Fire counters when trust bar scrolls into view
+const trustBar = document.querySelector('.ct-trust-bar');
+if (trustBar) {
+    const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                trustBar.querySelectorAll('.ct-stat').forEach(animateCounter);
+                obs.disconnect();
+            }
+        });
+    }, { threshold: 0.4 });
+    obs.observe(trustBar);
+}
+
+// ── Package tabs ─────────────────────────────────────────────
+document.querySelectorAll('.ct-tab').forEach(tab => {
+    tab.addEventListener('click', function () {
+        const pkg = this.dataset.pkg;
+        // update tabs
+        document.querySelectorAll('.ct-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        // update panels
+        document.querySelectorAll('.ct-panel').forEach(p => p.classList.remove('active'));
+        const panel = document.getElementById('pkg-' + pkg);
+        if (panel) panel.classList.add('active');
+    });
+});
+/* ============================================================
+   SMART HERO — Slider + Animated Grid Panel
+   ============================================================ */
+
+// ── Build slider data from Jinja context ──────────────────────
 let heroSliders = [
     {% if hero_sliders and hero_sliders|length > 1 %}
         {% for slider in hero_sliders[1:] %}
@@ -2419,64 +3035,123 @@ let heroSliders = [
             title: "{{ slider.title|replace('"', '\\"')|safe }}",
             subtitle: "{{ slider.subtitle|replace('"', '\\"')|safe if slider.subtitle else '' }}",
             image_url: "{{ slider.image_url|replace('"', '\\"')|safe }}",
-            button_text: "{{ slider.button_text|replace('"', '\\"')|safe }}",
             button_link: "{{ slider.button_link|replace('"', '\\"')|safe }}"
         }{% if not loop.last %},{% endif %}
         {% endfor %}
     {% endif %}
 ];
 
-// If no sliders from database, use default images
+// Fallback gallery when no DB data
 if (heroSliders.length === 0) {
     heroSliders = [
-        { title: 'Doro Wot', subtitle: 'Spicy Chicken Stew', image_url: 'https://images.unsplash.com/photo-1552566624-52f8b3c8b3c9?q=80&w=2070' },
-        { title: 'Kitfo', subtitle: 'Seasoned Raw Beef', image_url: 'https://images.unsplash.com/photo-1544148103-0773bf10d330?q=80&w=2070' },
-        { title: 'Coffee Ceremony', subtitle: 'Traditional Ethiopian Coffee', image_url: 'https://images.unsplash.com/photo-1551218808-94e220e084d2?q=80&w=2070' },
-        { title: 'Live Music', subtitle: 'Cultural Entertainment', image_url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2070' },
-        { title: 'Injera', subtitle: 'Traditional Bread', image_url: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=2070' },
-        { title: 'Restaurant', subtitle: 'Warm Ambiance', image_url: 'https://images.unsplash.com/photo-1517244683847-7456bb63ff54?q=80&w=2070' },
-        { title: 'Tibs', subtitle: 'Sizzling Beef', image_url: 'https://images.unsplash.com/photo-1552566624-52f8b3c8b3c9?q=80&w=2070' }
+        { title: 'Doro Wot',        subtitle: 'Spicy Chicken Stew',         image_url: 'https://images.unsplash.com/photo-1552566624-52f8b3c8b3c9?q=80&w=800',  button_link: '/menu' },
+        { title: 'Kitfo',           subtitle: 'Seasoned Raw Beef',           image_url: 'https://images.unsplash.com/photo-1544148103-0773bf10d330?q=80&w=800',  button_link: '/menu' },
+        { title: 'Coffee Ceremony', subtitle: 'Traditional Ethiopian Coffee',image_url: 'https://images.unsplash.com/photo-1551218808-94e220e084d2?q=80&w=800',  button_link: '/menu' },
+        { title: 'Live Music',      subtitle: 'Cultural Entertainment',      image_url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=800',button_link: '/events' },
+        { title: 'Injera',          subtitle: 'Traditional Fermented Bread', image_url: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=800',button_link: '/menu' },
+        { title: 'Warm Ambiance',   subtitle: 'Authentic Restaurant Space',  image_url: 'https://images.unsplash.com/photo-1517244683847-7456bb63ff54?q=80&w=800',button_link: '/about' },
+        { title: 'Tibs',            subtitle: 'Sizzling Beef or Lamb',       image_url: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?q=80&w=800',  button_link: '/menu' }
     ];
 }
 
-let currentIndex = 0;
-const gridSize = 4; // 4 items in grid (2x2)
+// ── Slide state ───────────────────────────────────────────────
+const slides      = document.querySelectorAll('.hero-slide');
+const dots        = document.querySelectorAll('.hero-dot');
+const headline    = document.getElementById('heroHeadline');
+const subtitle    = document.getElementById('heroSubtitle');
 
-function updateHeroGrid() {
-    const grid = document.getElementById('animatedHeroGrid');
-    if (!grid) return;
-    
-    let html = '';
-    
-    // Get 4 items starting from currentIndex, cycling through the array
-    for (let i = 0; i < gridSize; i++) {
-        const itemIndex = (currentIndex + i) % heroSliders.length;
-        const item = heroSliders[itemIndex];
-        
-        html += `
-            <div class="hero-grid-item" onclick="window.location.href='${item.button_link || '/menu'}'">
-                <img src="${item.image_url}" alt="${item.title}" style="width:100%; height:100%; object-fit:cover;">
-                <div class="item-label">
-                    <strong>${item.title}</strong><br>
-                    <small>${item.subtitle || ''}</small>
-                </div>
-            </div>
-        `;
+// Map DB sliders (index 0 used in HTML for headline) + remaining slides
+const slideTexts = [
+    {% if hero_sliders and hero_sliders|length > 0 %}
+        {% for slider in hero_sliders %}
+        {
+            title: "{{ slider.title|replace('"', '\\"')|safe }}",
+            subtitle: "{{ slider.subtitle|replace('"', '\\"')|safe if slider.subtitle else 'Experience Authentic Ethiopian Cuisine' }}"
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    {% else %}
+    { title: 'Welcome to <span class="hero-highlight">EFFOI</span>',          subtitle: 'A journey through the flavors of Ethiopia' },
+    { title: 'Authentic <span class="hero-highlight">Ethiopian</span> Cuisine',subtitle: 'Traditional recipes passed down through generations' },
+    { title: 'The <span class="hero-highlight">Coffee</span> Ceremony',        subtitle: 'Experience the heart of Ethiopian hospitality' }
+    {% endif %}
+];
+
+let currentSlide = 0;
+let slideTimer;
+
+function goToSlide(index) {
+    slides[currentSlide].classList.remove('active');
+    dots[currentSlide]?.classList.remove('active');
+
+    currentSlide = (index + slides.length) % slides.length;
+
+    slides[currentSlide].classList.add('active');
+    dots[currentSlide]?.classList.add('active');
+
+    // Animate text swap
+    if (headline && slideTexts[currentSlide]) {
+        headline.classList.add('transitioning');
+        if (subtitle) subtitle.classList.add('transitioning');
+        setTimeout(() => {
+            headline.innerHTML = slideTexts[currentSlide].title;
+            if (subtitle) subtitle.textContent = slideTexts[currentSlide].subtitle;
+            headline.classList.remove('transitioning');
+            if (subtitle) subtitle.classList.remove('transitioning');
+        }, 450);
     }
-    
-    grid.innerHTML = html;
-    currentIndex = (currentIndex + 1) % heroSliders.length;
 }
 
-// Initialize grid
-updateHeroGrid();
+function startSlideShow() {
+    slideTimer = setInterval(() => goToSlide(currentSlide + 1), 5500);
+}
 
-// Rotate every 3 seconds
-setInterval(updateHeroGrid, 3000);
+// Dot click
+dots.forEach((dot, i) => {
+    dot.addEventListener('click', () => {
+        clearInterval(slideTimer);
+        goToSlide(i);
+        startSlideShow();
+    });
+});
 
+startSlideShow();
+
+// ── Animated Grid Panel ───────────────────────────────────────
+let gridIndex = 0;
+
+function buildGrid() {
+    const grid = document.getElementById('animatedHeroGrid');
+    if (!grid || heroSliders.length === 0) return;
+
+    // Pick 4 items
+    const cells = Array.from({ length: 4 }, (_, i) =>
+        heroSliders[(gridIndex + i) % heroSliders.length]
+    );
+
+    grid.innerHTML = cells.map((item, i) => `
+        <div class="hgp-cell" style="animation-delay:${i * 0.07}s"
+             onclick="window.location.href='${item.button_link || '/menu'}'">
+            <img src="${item.image_url}" alt="${item.title}" loading="lazy">
+            <div class="hgp-cell-overlay">
+                <div class="hgp-cell-title">${item.title}</div>
+                <div class="hgp-cell-sub">${item.subtitle || ''}</div>
+            </div>
+        </div>
+    `).join('');
+
+    gridIndex = (gridIndex + 1) % heroSliders.length;
+}
+
+buildGrid();
+setInterval(buildGrid, 3200);
+
+// ── Image modal helper ────────────────────────────────────────
 function openImageModal(imageUrl) {
-    document.getElementById('modalImage').src = imageUrl;
-    new bootstrap.Modal(document.getElementById('imageModal')).show();
+    const el = document.getElementById('modalImage');
+    if (el) {
+        el.src = imageUrl;
+        new bootstrap.Modal(document.getElementById('imageModal')).show();
+    }
 }
 </script>
 {% endblock %}
