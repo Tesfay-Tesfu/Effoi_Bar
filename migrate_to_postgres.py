@@ -1,6 +1,6 @@
 import os
 import logging
-from effoi_app import app, db
+from app import app, db
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
