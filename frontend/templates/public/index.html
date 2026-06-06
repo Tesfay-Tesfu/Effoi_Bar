@@ -103,17 +103,6 @@
         </div>
     </div>
 
-    <!-- ── Right panel: animated image grid ── -->
-    <div class="hero-panel" aria-hidden="true">
-        <div class="hero-grid-panel" id="animatedHeroGrid">
-            <!-- populated by JS -->
-        </div>
-        <!-- Panel label -->
-        <div class="hero-panel-label">
-            <i class="fas fa-images"></i> Our Flavors
-        </div>
-    </div>
-
     <!-- ── Slide dots ── -->
     <div class="hero-dots" id="heroDots" role="tablist" aria-label="Hero slides">
         {% if hero_sliders and hero_sliders|length > 0 %}
@@ -3115,34 +3104,6 @@ dots.forEach((dot, i) => {
 });
 
 startSlideShow();
-
-// ── Animated Grid Panel ───────────────────────────────────────
-let gridIndex = 0;
-
-function buildGrid() {
-    const grid = document.getElementById('animatedHeroGrid');
-    if (!grid || heroSliders.length === 0) return;
-
-    // Pick 4 items
-    const cells = Array.from({ length: 4 }, (_, i) =>
-        heroSliders[(gridIndex + i) % heroSliders.length]
-    );
-
-    grid.innerHTML = cells.map((item, i) => `
-        <div class="hgp-cell" style="animation-delay:${i * 0.07}s"
-             onclick="window.location.href='${item.button_link || '/menu'}'">
-            <img src="${item.image_url}" alt="${item.title}" loading="lazy">
-            <div class="hgp-cell-overlay">
-                <div class="hgp-cell-title">${item.title}</div>
-                <div class="hgp-cell-sub">${item.subtitle || ''}</div>
-            </div>
-        </div>
-    `).join('');
-
-    gridIndex = (gridIndex + 1) % heroSliders.length;
-}
-
-buildGrid();
 setInterval(buildGrid, 3200);
 
 // ── Image modal helper ────────────────────────────────────────

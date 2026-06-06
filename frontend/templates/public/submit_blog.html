@@ -3,94 +3,396 @@
 {% block title %}Share Your Experience - EFFOI{% endblock %}
 
 {% block content %}
-<div class="my-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden" data-aos="fade-up">
-                <div class="bg-danger text-white p-4 text-center">
-                    <i class="fas fa-pen-fancy fa-3x mb-3"></i>
-                    <h2>Share Your EFFOI Experience</h2>
-                    <p class="mb-0">Tell us about your visit, favorite dishes, or special moments</p>
-                </div>
-                
-                <div class="card-body p-5">
-                    <form method="POST" action="{{ url_for('submit_blog') }}" enctype="multipart/form-data">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Your Name *</label>
-                                <input type="text" class="form-control form-control-lg rounded-pill" name="author_name" required>
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Your Email</label>
-                                <input type="email" class="form-control form-control-lg rounded-pill" name="author_email">
-                                <small class="text-muted">We'll notify you when your post is published</small>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Post Title *</label>
-                            <input type="text" class="form-control form-control-lg" name="title" required>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Your Story *</label>
-                            <textarea class="form-control" name="content" rows="8" required></textarea>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="form-label">Upload Photo</label>
-                            <input type="file" class="form-control" name="photo" accept="image/*" onchange="previewImage(this)">
-                            <small class="text-muted">Upload a photo from your visit (optional)</small>
-                            <div id="imagePreview" class="mt-2 text-center" style="display: none;">
-                                <img src="" class="img-fluid rounded-4" style="max-height: 200px; border: 2px solid #ddd;">
-                            </div>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="form-label">Or Photo URL</label>
-                            <input type="url" class="form-control" name="image_url" placeholder="https://...">
-                            <small class="text-muted">Paste a direct link to an image (optional)</small>
-                        </div>
-                        
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-danger btn-lg rounded-pill py-3">Submit Post</button>
-                            <a href="{{ url_for('blog') }}" class="btn btn-outline-secondary rounded-pill">Cancel</a>
-                        </div>
-                    </form>
-                </div>
-            </div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  .ef-root { font-family: 'DM Sans', sans-serif; max-width: 680px; margin: 3rem auto; padding: 0 1rem; }
+
+  .ef-card { background: #fff; border: 1px solid #eee; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+
+  .ef-header { display: flex; align-items: flex-start; gap: 1.25rem; padding: 2rem 2rem 1.5rem; border-bottom: 1px solid #f0f0f0; }
+  .ef-icon-badge { width: 52px; height: 52px; min-width: 52px; border-radius: 12px; background: #FCEBEB; display: flex; align-items: center; justify-content: center; }
+  .ef-icon-badge i { font-size: 22px; color: #A32D2D; }
+  .ef-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 500; color: #1a1a1a; margin: 0 0 4px; }
+  .ef-sub { font-size: 13px; color: #777; margin: 0; line-height: 1.5; }
+
+  .ef-body { padding: 2rem; }
+
+  .ef-step-bar { display: flex; gap: 6px; margin-bottom: 2rem; }
+  .ef-step { flex: 1; height: 3px; border-radius: 99px; background: #eee; transition: background 0.3s; }
+  .ef-step.active { background: #A32D2D; }
+
+  .ef-section-label { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #999; margin: 0 0 1rem; }
+
+  .ef-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .ef-field { margin-bottom: 1.25rem; }
+  .ef-label { font-size: 13px; font-weight: 500; color: #555; display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+  .ef-label .req { color: #A32D2D; font-size: 14px; }
+  .ef-label .opt { font-size: 11px; font-weight: 400; color: #bbb; margin-left: 2px; }
+
+  input.ef-input, textarea.ef-input {
+    width: 100%; box-sizing: border-box;
+    background: #fafafa; border: 1.5px solid #eee; border-radius: 10px;
+    padding: 10px 14px; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; color: #1a1a1a; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s; resize: none;
+  }
+  input.ef-input:focus, textarea.ef-input:focus {
+    border-color: #A32D2D; background: #fff;
+    box-shadow: 0 0 0 3px rgba(163,45,45,0.08);
+  }
+  input.ef-input.valid { border-color: #3B6D11; background: #fff; }
+  input.ef-input.invalid, textarea.ef-input.invalid { border-color: #A32D2D; background: #fff; }
+
+  .ef-hint { font-size: 11px; color: #bbb; margin-top: 5px; }
+  .ef-err { font-size: 11px; color: #A32D2D; margin-top: 5px; display: none; }
+
+  .ef-photo-zone { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+  .ef-upload-box {
+    border: 1.5px dashed #ddd; border-radius: 12px; padding: 1.25rem;
+    text-align: center; cursor: pointer;
+    transition: border-color 0.2s, background 0.2s; background: #fafafa;
+  }
+  .ef-upload-box:hover { border-color: #A32D2D; background: #fdf5f5; }
+  .ef-upload-box i { font-size: 24px; color: #bbb; display: block; margin-bottom: 6px; }
+  .ef-upload-box p { font-size: 12px; color: #888; margin: 0; }
+  .ef-upload-box input { display: none; }
+  .ef-or-divider { display: flex; align-items: center; font-size: 11px; color: #bbb; gap: 8px; margin: 10px 0 0; }
+  .ef-or-divider::before, .ef-or-divider::after { content: ''; flex: 1; height: 1px; background: #eee; }
+
+  .ef-preview {
+    position: relative; border-radius: 10px; overflow: hidden;
+    border: 1.5px solid #eee; background: #fafafa;
+    min-height: 130px; display: flex; align-items: center; justify-content: center;
+  }
+  .ef-preview img { width: 100%; height: 150px; object-fit: cover; display: none; }
+  .ef-preview-empty { text-align: center; padding: 1.5rem; }
+  .ef-preview-empty i { font-size: 28px; color: #ddd; display: block; margin-bottom: 6px; }
+  .ef-preview-empty p { font-size: 11px; color: #bbb; margin: 0; }
+  .ef-preview-remove {
+    position: absolute; top: 6px; right: 6px;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: rgba(0,0,0,0.5); border: none; color: #fff;
+    display: none; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 13px;
+  }
+
+  .ef-char-count { font-size: 11px; color: #bbb; text-align: right; margin-top: 4px; transition: color 0.2s; }
+  .ef-char-count.warn { color: #BA7517; }
+  .ef-char-count.over { color: #A32D2D; }
+
+  .ef-actions { display: flex; gap: 10px; margin-top: 1.75rem; align-items: center; }
+  .ef-btn-submit {
+    flex: 1; padding: 12px; background: #A32D2D; color: #fff;
+    border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 500; cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .ef-btn-submit:hover { background: #791F1F; }
+  .ef-btn-submit:active { transform: scale(0.98); }
+  .ef-btn-submit:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+  .ef-btn-cancel {
+    padding: 12px 20px; background: transparent;
+    border: 1.5px solid #ddd; border-radius: 10px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px;
+    color: #888; cursor: pointer; transition: background 0.2s;
+    text-decoration: none; display: inline-flex; align-items: center;
+  }
+  .ef-btn-cancel:hover { background: #f5f5f5; color: #555; }
+
+  .ef-success { display: none; text-align: center; padding: 3rem 2rem; }
+  .ef-success-icon {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: #EAF3DE; display: flex; align-items: center;
+    justify-content: center; margin: 0 auto 1.25rem;
+  }
+  .ef-success-icon i { font-size: 28px; color: #3B6D11; }
+  .ef-success h3 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 500; color: #1a1a1a; margin: 0 0 8px; }
+  .ef-success p { font-size: 14px; color: #777; margin: 0; }
+
+  .ef-progress { display: none; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 600px) {
+    .ef-row, .ef-photo-zone { grid-template-columns: 1fr; }
+    .ef-body { padding: 1.25rem; }
+    .ef-header { padding: 1.25rem; }
+  }
+</style>
+
+<div class="ef-root">
+  <div class="ef-card">
+
+    <div id="ef-form-view">
+      <div class="ef-header">
+        <div class="ef-icon-badge"><i class="ti ti-writing" aria-hidden="true"></i></div>
+        <div>
+          <h2 class="ef-title">Share your EFFOI experience</h2>
+          <p class="ef-sub">Tell us about your visit, favourite dishes, or a special moment worth remembering.</p>
         </div>
+      </div>
+
+      <div class="ef-body">
+        <div class="ef-step-bar" aria-label="Form progress">
+          <div class="ef-step active" id="step1"></div>
+          <div class="ef-step" id="step2"></div>
+          <div class="ef-step" id="step3"></div>
+        </div>
+
+        <form method="POST" action="{{ url_for('submit_blog') }}" enctype="multipart/form-data" id="ef-form" novalidate>
+
+          <p class="ef-section-label">About you</p>
+          <div class="ef-row">
+            <div class="ef-field">
+              <label class="ef-label" for="author_name">Name <span class="req" aria-label="required">*</span></label>
+              <input class="ef-input" id="author_name" type="text" name="author_name" placeholder="Your name" autocomplete="name" required />
+              <div class="ef-err" id="err-name">Please enter your name.</div>
+            </div>
+            <div class="ef-field">
+              <label class="ef-label" for="author_email">Email <span class="opt">optional</span></label>
+              <input class="ef-input" id="author_email" type="email" name="author_email" placeholder="you@example.com" autocomplete="email" />
+              <div class="ef-hint">We'll notify you when your post is published.</div>
+              <div class="ef-err" id="err-email">Please enter a valid email address.</div>
+            </div>
+          </div>
+
+          <p class="ef-section-label" style="margin-top: 0.25rem;">Your story</p>
+          <div class="ef-field">
+            <label class="ef-label" for="post_title">Post title <span class="req" aria-label="required">*</span></label>
+            <input class="ef-input" id="post_title" type="text" name="title" placeholder="Give your story a title…" maxlength="120" required />
+            <div class="ef-err" id="err-title">Please add a title.</div>
+          </div>
+          <div class="ef-field">
+            <label class="ef-label" for="post_content">Your story <span class="req" aria-label="required">*</span></label>
+            <textarea class="ef-input" id="post_content" name="content" rows="6" maxlength="2000" placeholder="Describe your visit, favourite dish, or a special moment…" required></textarea>
+            <div class="ef-char-count" id="char-count">0 / 2000</div>
+            <div class="ef-err" id="err-content">Please write at least 30 characters.</div>
+          </div>
+
+          <p class="ef-section-label" style="margin-top: 0.25rem;">
+            Photo <span style="font-weight:400; text-transform:none; font-size:12px; color:#bbb;">— optional</span>
+          </p>
+          <div class="ef-photo-zone">
+            <div>
+              <div class="ef-upload-box" id="upload-box"
+                   onclick="document.getElementById('photo-input').click()"
+                   role="button" tabindex="0" aria-label="Upload a photo">
+                <i class="ti ti-cloud-upload" aria-hidden="true"></i>
+                <p><strong>Click to upload</strong> or drag &amp; drop</p>
+                <p style="margin-top:4px;">JPG, PNG, WEBP · max 8 MB</p>
+                <input type="file" id="photo-input" name="photo" accept="image/*" />
+              </div>
+              <div class="ef-or-divider">or paste a URL</div>
+              <input class="ef-input" type="url" name="image_url" id="image_url"
+                     placeholder="https://…" style="margin-top: 8px;" />
+            </div>
+            <div class="ef-preview" id="img-preview">
+              <div class="ef-preview-empty" id="preview-empty">
+                <i class="ti ti-photo" aria-hidden="true"></i>
+                <p>Preview will appear here</p>
+              </div>
+              <img id="preview-img" src="" alt="Uploaded preview" />
+              <button class="ef-preview-remove" id="remove-btn"
+                      aria-label="Remove photo" type="button" onclick="removePhoto()">
+                <i class="ti ti-x"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="ef-actions">
+            <a href="{{ url_for('blog') }}" class="ef-btn-cancel">Cancel</a>
+            <button class="ef-btn-submit" id="submit-btn" type="button" onclick="handleSubmit()">
+              <i class="ti ti-send" aria-hidden="true"></i>
+              <span id="btn-label">Submit story</span>
+              <div class="ef-progress" id="spinner"></div>
+            </button>
+          </div>
+
+        </form>
+      </div>
     </div>
+
+    <div class="ef-success" id="ef-success-view">
+      <div class="ef-success-icon"><i class="ti ti-check" aria-hidden="true"></i></div>
+      <h3>Story submitted!</h3>
+      <p>Thanks for sharing. We'll review your post and notify you once it's live.</p>
+    </div>
+
+  </div>
 </div>
 
 <script>
-function previewImage(input) {
-    const preview = document.getElementById('imagePreview');
-    const img = preview.querySelector('img');
-    
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            img.src = e.target.result;
-            preview.style.display = 'block';
-        }
-        reader.readAsDataURL(input.files[0]);
-    } else {
-        preview.style.display = 'none';
-    }
+const nameEl     = document.getElementById('author_name');
+const emailEl    = document.getElementById('author_email');
+const titleEl    = document.getElementById('post_title');
+const contentEl  = document.getElementById('post_content');
+const charCount  = document.getElementById('char-count');
+const photoInput = document.getElementById('photo-input');
+const previewImg = document.getElementById('preview-img');
+const previewEmpty = document.getElementById('preview-empty');
+const removeBtn  = document.getElementById('remove-btn');
+const imageUrlEl = document.getElementById('image_url');
+const steps = [
+  document.getElementById('step1'),
+  document.getElementById('step2'),
+  document.getElementById('step3')
+];
+
+function updateProgress() {
+  const filled = [
+    nameEl.value.trim(),
+    titleEl.value.trim(),
+    contentEl.value.trim().length >= 30
+  ].filter(Boolean).length;
+  steps.forEach((s, i) => s.classList.toggle('active', i < Math.max(1, filled)));
+}
+
+contentEl.addEventListener('input', () => {
+  const len = contentEl.value.length;
+  charCount.textContent = len + ' / 2000';
+  charCount.className = 'ef-char-count' +
+    (len > 1800 ? ' over' : len > 1500 ? ' warn' : '');
+  updateProgress();
+});
+nameEl.addEventListener('input', updateProgress);
+titleEl.addEventListener('input', updateProgress);
+
+function showErr(id, show) {
+  document.getElementById(id).style.display = show ? 'block' : 'none';
+}
+function markField(el, valid) {
+  el.classList.toggle('valid', valid);
+  el.classList.toggle('invalid', !valid);
+}
+
+function setPhoto(src) {
+  previewImg.src = src;
+  previewImg.style.display = 'block';
+  previewEmpty.style.display = 'none';
+  removeBtn.style.display = 'flex';
+}
+function removePhoto() {
+  previewImg.src = '';
+  previewImg.style.display = 'none';
+  previewEmpty.style.display = 'block';
+  removeBtn.style.display = 'none';
+  photoInput.value = '';
+  imageUrlEl.value = '';
+}
+
+photoInput.addEventListener('change', () => {
+  const file = photoInput.files[0];
+  if (!file) return;
+  if (file.size > 8 * 1024 * 1024) {
+    alert('Photo must be under 8 MB.');
+    photoInput.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => setPhoto(e.target.result);
+  reader.readAsDataURL(file);
+  imageUrlEl.value = '';
+});
+
+const uploadBox = document.getElementById('upload-box');
+uploadBox.addEventListener('dragover', e => {
+  e.preventDefault();
+  uploadBox.style.borderColor = '#A32D2D';
+});
+uploadBox.addEventListener('dragleave', () => {
+  uploadBox.style.borderColor = '';
+});
+uploadBox.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadBox.style.borderColor = '';
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = ev => setPhoto(ev.target.result);
+    reader.readAsDataURL(file);
+    imageUrlEl.value = '';
+  }
+});
+uploadBox.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') photoInput.click();
+});
+
+let urlDebounce;
+imageUrlEl.addEventListener('input', () => {
+  clearTimeout(urlDebounce);
+  const val = imageUrlEl.value.trim();
+  if (!val) { removePhoto(); return; }
+  urlDebounce = setTimeout(() => {
+    const test = new Image();
+    test.onload = () => { setPhoto(val); photoInput.value = ''; };
+    test.onerror = () => {};
+    test.src = val;
+  }, 600);
+});
+
+emailEl.addEventListener('blur', () => {
+  if (!emailEl.value) {
+    emailEl.classList.remove('valid', 'invalid');
+    showErr('err-email', false);
+    return;
+  }
+  const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value);
+  markField(emailEl, valid);
+  showErr('err-email', !valid);
+});
+
+function validate() {
+  let ok = true;
+
+  if (!nameEl.value.trim()) {
+    markField(nameEl, false); showErr('err-name', true); ok = false;
+  } else {
+    markField(nameEl, true); showErr('err-name', false);
+  }
+
+  if (!titleEl.value.trim()) {
+    markField(titleEl, false); showErr('err-title', true); ok = false;
+  } else {
+    markField(titleEl, true); showErr('err-title', false);
+  }
+
+  if (contentEl.value.trim().length < 30) {
+    markField(contentEl, false); showErr('err-content', true); ok = false;
+  } else {
+    markField(contentEl, true); showErr('err-content', false);
+  }
+
+  if (emailEl.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value)) {
+    markField(emailEl, false); showErr('err-email', true); ok = false;
+  }
+
+  return ok;
+}
+
+function handleSubmit() {
+  if (!validate()) return;
+
+  const btn     = document.getElementById('submit-btn');
+  const label   = document.getElementById('btn-label');
+  const spinner = document.getElementById('spinner');
+
+  btn.disabled = true;
+  label.style.display = 'none';
+  spinner.style.display = 'block';
+
+  // Submit the real form
+  document.getElementById('ef-form').submit();
+
+  // Show success state (for pages that stay on the same URL after submit)
+  // Remove the setTimeout below if your backend redirects after POST
+  setTimeout(() => {
+    document.getElementById('ef-form-view').style.display = 'none';
+    document.getElementById('ef-success-view').style.display = 'block';
+  }, 1400);
 }
 </script>
 
-<style>
-    .form-control, .form-control-lg {
-        border-radius: 15px;
-        border: 2px solid #eee;
-        padding: 0.75rem 1.5rem;
-    }
-    .form-control:focus {
-        border-color: #8B1E1E;
-        box-shadow: 0 0 0 0.2rem rgba(139, 30, 30, 0.25);
-    }
-</style>
 {% endblock %}

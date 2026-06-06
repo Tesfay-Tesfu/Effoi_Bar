@@ -2,100 +2,634 @@
 
 {% block title %}Contact Us - EFFOI{% endblock %}
 
+{% block extra_css %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
+
+  .cp * { box-sizing: border-box; }
+  .cp { font-family: 'DM Sans', sans-serif; padding: 2.5rem 0; }
+
+  /* ── Layout ── */
+  .cp-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 24px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .cp-left { display: flex; flex-direction: column; gap: 16px; }
+
+  /* ── Dark info card ── */
+  .info-card-dark {
+    background: #1a0808;
+    border-radius: 16px;
+    padding: 1.75rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .info-card-dark::before {
+    content: '';
+    position: absolute;
+    top: -50px; right: -50px;
+    width: 170px; height: 170px;
+    border-radius: 50%;
+    background: rgba(226,75,74,0.14);
+    pointer-events: none;
+  }
+
+  .info-card-dark::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: -40px;
+    width: 130px; height: 130px;
+    border-radius: 50%;
+    background: rgba(226,75,74,0.07);
+    pointer-events: none;
+  }
+
+  .icd-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: #fff;
+    margin: 0 0 1.4rem;
+    line-height: 1.35;
+  }
+
+  .icd-title em { color: #e24b4a; font-style: italic; }
+
+  .icd-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.72);
+    line-height: 1.6;
+    margin-bottom: 0.9rem;
+  }
+
+  .icd-row i { font-size: 15px; color: #e24b4a; margin-top: 2px; flex-shrink: 0; }
+  .icd-row a { color: rgba(255,255,255,0.72); text-decoration: none; }
+  .icd-row a:hover { color: #fff; }
+
+  .icd-divider { height: 0.5px; background: rgba(255,255,255,0.12); margin: 1rem 0; }
+
+  .hours-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 12px;
+    font-size: 12px;
+    margin-top: 4px;
+  }
+
+  .hours-day { color: rgba(255,255,255,0.45); }
+  .hours-time { color: rgba(255,255,255,0.82); font-weight: 500; }
+
+  .social-row { display: flex; gap: 10px; }
+
+  .social-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 0.5px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.7);
+    font-size: 15px;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .social-btn:hover { background: #e24b4a; border-color: #e24b4a; color: #fff; }
+
+  /* ── Map ── */
+  .map-card {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #e8e8e8;
+  }
+
+  .map-card iframe { display: block; width: 100%; height: 160px; border: 0; }
+
+  /* ── Form card ── */
+  .form-card {
+    background: #fff;
+    border: 1px solid #ececec;
+    border-radius: 16px;
+    padding: 1.75rem 2rem;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+  }
+
+  .fc-header { margin-bottom: 1.25rem; }
+
+  .fc-header h4 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    margin: 0 0 4px;
+    color: #1a1a1a;
+  }
+
+  .fc-header p { font-size: 13px; color: #999; margin: 0; }
+
+  /* ── Fields ── */
+  .frow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .frow.full { grid-template-columns: 1fr; }
+
+  .fgroup { display: flex; flex-direction: column; gap: 5px; }
+
+  .fgroup label {
+    font-size: 11px;
+    font-weight: 500;
+    color: #999;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .fgroup input,
+  .fgroup textarea {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 9px 12px;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    background: #fafafa;
+    color: #1a1a1a;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
+
+  .fgroup input:focus,
+  .fgroup textarea:focus {
+    border-color: #e24b4a;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(226,75,74,0.08);
+  }
+
+  .fgroup input.valid   { border-color: #3B6D11; background: #fff; }
+  .fgroup input.error,
+  .fgroup textarea.error { border-color: #e24b4a; background: #fff9f9; }
+
+  .fgroup textarea { resize: none; }
+
+  .err-msg {
+    font-size: 11px;
+    color: #a32d2d;
+    margin-top: 2px;
+    display: none;
+  }
+
+  /* ── Topic pills ── */
+  .topic-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .topic-pill {
+    padding: 5px 13px;
+    border: 1px solid #e8e8e8;
+    border-radius: 20px;
+    background: #fafafa;
+    color: #888;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+
+  .topic-pill:hover { border-color: #e24b4a; color: #1a1a1a; background: #fff5f5; }
+  .topic-pill.active { background: #e24b4a; border-color: #e24b4a; color: #fff; }
+
+  /* ── Char bar ── */
+  .char-bar-wrap {
+    height: 3px;
+    background: #f0f0f0;
+    border-radius: 2px;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+
+  .char-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 2px;
+    background: #e24b4a;
+    transition: width 0.3s, background 0.3s;
+  }
+
+  .char-info {
+    display: flex;
+    justify-content: flex-end;
+    font-size: 11px;
+    margin-top: 4px;
+  }
+
+  .char-count      { font-weight: 500; color: #e24b4a; }
+  .char-count.ok   { color: #3B6D11; }
+
+  /* ── Submit ── */
+  .submit-btn {
+    width: 100%;
+    padding: 13px;
+    background: #e24b4a;
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    margin-top: 0.75rem;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 4px 14px rgba(226,75,74,0.3);
+  }
+
+  .submit-btn:hover   { background: #a32d2d; box-shadow: 0 6px 18px rgba(163,45,45,0.35); }
+  .submit-btn:active  { transform: scale(0.99); }
+  .submit-btn:disabled {
+    background: #e8e8e8;
+    color: #bbb;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+  }
+
+  /* ── Success ── */
+  .success-state {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    gap: 1rem;
+    min-height: 300px;
+  }
+
+  .success-icon {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: #fff0f0;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .success-icon i { font-size: 26px; color: #791F1F; }
+
+  .success-state h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    margin: 0;
+    color: #1a1a1a;
+  }
+
+  .success-state p {
+    font-size: 14px;
+    color: #888;
+    margin: 0;
+    max-width: 240px;
+    line-height: 1.65;
+  }
+
+  .reset-btn {
+    padding: 9px 22px;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    background: #fafafa;
+    color: #555;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.18s, border-color 0.18s;
+  }
+
+  .reset-btn:hover { background: #fff; border-color: #ccc; }
+
+  /* ── Responsive ── */
+  @media (max-width: 680px) {
+    .cp-grid { grid-template-columns: 1fr; }
+    .frow    { grid-template-columns: 1fr; }
+    .form-card { padding: 1.25rem; }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="my-5">
-    <h1 class="display-4 text-center mb-5" data-aos="fade-up">Contact Us</h1>
-    
-    <div class="row g-5">
-        <div class="col-md-5" data-aos="fade-right">
-            <div class="card border-0 shadow-lg rounded-4 p-4">
-                <h3 class="mb-4">Get in Touch</h3>
-                
-                <div class="mb-4">
-                    <h5><i class="fas fa-map-marker-alt text-danger me-2"></i> Address</h5>
-                    <p class="ms-4">
-                        <a href="https://maps.google.com/?q=8233+Fenton+St+Silver+Spring+MD+20910" target="_blank" class="text-decoration-none text-dark">
-                            {{ settings.get('address', '8233 Fenton St, Silver Spring, MD 20910') }}
-                        </a>
-                    </p>
-                </div>
-                
-                <div class="mb-4">
-                    <h5><i class="fas fa-phone text-danger me-2"></i> Phone</h5>
-                    <p class="ms-4">
-                        <a href="tel:{{ settings.get('phone', '+12406601337') }}" class="text-decoration-none text-dark">
-                            {{ settings.get('phone', '+1 (240) 660-1337') }}
-                        </a>
-                    </p>
-                </div>
-                
-                <div class="mb-4">
-                    <h5><i class="fas fa-envelope text-danger me-2"></i> Email</h5>
-                    <p class="ms-4">
-                        <a href="mailto:{{ settings.get('email', 'nigistme1277@gmail.com') }}" class="text-decoration-none text-dark">
-                            {{ settings.get('email', 'nigistme1277@gmail.com') }}
-                        </a>
-                    </p>
-                </div>
-                
-                <div class="mb-4">
-                    <h5><i class="fas fa-clock text-danger me-2"></i> Hours</h5>
-                    <p class="ms-4">{{ settings.get('hours', 'Mon-Sun: 11:00 AM - 10:00 PM') }}</p>
-                </div>
-                
-                <div>
-                    <h5>Follow Us</h5>
-                    <div class="social-icons ms-4">
-                        <a href="{{ settings.get('facebook_url', '#') }}" class="text-danger me-3"><i class="fab fa-facebook-f fa-2x"></i></a>
-                        <a href="{{ settings.get('instagram_url', '#') }}" class="text-danger me-3"><i class="fab fa-instagram fa-2x"></i></a>
-                        <a href="{{ settings.get('twitter_url', '#') }}" class="text-danger me-3"><i class="fab fa-x-twitter fa-2x"></i></a>
-                    </div>
-                </div>
-            </div>
+<div class="cp my-4">
+  <div class="cp-grid">
+
+    <!-- Left: info + map -->
+    <div class="cp-left">
+      <div class="info-card-dark">
+        <h3 class="icd-title">Let's<br><em>get in touch</em></h3>
+
+        <div class="icd-row">
+          <i class="fas fa-map-marker-alt"></i>
+          <a href="https://maps.google.com/?q={{ settings.get('address', '8233 Fenton St Silver Spring MD 20910') | urlencode }}"
+             target="_blank" rel="noopener">
+            {{ settings.get('address', '8233 Fenton St,<br>Silver Spring, MD 20910') | safe }}
+          </a>
         </div>
-        
-        <div class="col-md-7" data-aos="fade-left">
-            <div class="card border-0 shadow-lg rounded-4 p-4">
-                <h3 class="mb-4">Send Us a Message</h3>
-                
-                <form method="POST" action="{{ url_for('send_contact') }}">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Your Name *</label>
-                            <input type="text" class="form-control" name="name" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Your Email *</label>
-                            <input type="email" class="form-control" name="email" required>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Subject</label>
-                        <input type="text" class="form-control" name="subject">
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label class="form-label">Message *</label>
-                        <textarea class="form-control" name="message" rows="6" required></textarea>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-danger w-100 py-3 rounded-pill">Send Message</button>
-                </form>
-            </div>
+
+        <div class="icd-row">
+          <i class="fas fa-phone"></i>
+          <a href="tel:{{ settings.get('phone_raw', '+12406601337') }}">
+            {{ settings.get('phone', '+1 (240) 660-1337') }}
+          </a>
         </div>
-    </div>
-    
-    <!-- Map -->
-    <div class="mt-5" data-aos="zoom-in">
-        <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3101.4177777777776!2d-77.0324!3d38.9904!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89b7c6de12345678%3A0x123456789abcdef!2s8233%20Fenton%20St%2C%20Silver%20Spring%2C%20MD%2020910!5e0!3m2!1sen!2sus!4v1234567890" 
-            width="100%" 
-            height="450" 
-            style="border:0; border-radius: 30px;" 
-            allowfullscreen="" 
-            loading="lazy">
+
+        <div class="icd-row">
+          <i class="fas fa-envelope"></i>
+          <a href="mailto:{{ settings.get('email', 'nigistme1277@gmail.com') }}">
+            {{ settings.get('email', 'nigistme1277@gmail.com') }}
+          </a>
+        </div>
+
+        <div class="icd-divider"></div>
+
+        <div class="icd-row" style="margin-bottom:6px">
+          <i class="fas fa-clock"></i>
+          <span>Hours</span>
+        </div>
+        <div class="hours-grid">
+          <span class="hours-day">Mon – Fri</span>
+          <span class="hours-time">11:00 am – 10:00 pm</span>
+          <span class="hours-day">Sat – Sun</span>
+          <span class="hours-time">11:00 am – 10:00 pm</span>
+        </div>
+
+        <div class="icd-divider"></div>
+
+        <div class="social-row">
+          <a href="{{ settings.get('facebook_url', '#') }}" class="social-btn" aria-label="Facebook">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="{{ settings.get('instagram_url', '#') }}" class="social-btn" aria-label="Instagram">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="{{ settings.get('twitter_url', '#') }}" class="social-btn" aria-label="X / Twitter">
+            <i class="fab fa-x-twitter"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="map-card">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3101.4177777777776!2d-77.0324!3d38.9904!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89b7c6de12345678%3A0x123456789abcdef!2s8233%20Fenton%20St%2C%20Silver%20Spring%2C%20MD%2020910!5e0!3m2!1sen!2sus!4v1234567890"
+          allowfullscreen
+          loading="lazy"
+          title="EFFOI restaurant location">
         </iframe>
+      </div>
     </div>
+
+    <!-- Right: form -->
+    <div class="form-card">
+
+      <!-- Form state -->
+      <div id="formSection">
+        <div class="fc-header">
+          <h4>Send us a message</h4>
+          <p>We typically reply within a few hours</p>
+        </div>
+
+        <form id="contactForm" method="POST" action="{{ url_for('send_contact') }}" novalidate>
+
+          <div class="frow">
+            <div class="fgroup">
+              <label for="cName">Full name *</label>
+              <input type="text" id="cName" name="name" placeholder="Your name" autocomplete="name" required>
+              <span class="err-msg" id="cNameErr">Please enter your name</span>
+            </div>
+            <div class="fgroup">
+              <label for="cEmail">Email *</label>
+              <input type="email" id="cEmail" name="email" placeholder="you@example.com" autocomplete="email" required>
+              <span class="err-msg" id="cEmailErr">Enter a valid email address</span>
+            </div>
+          </div>
+
+          <div class="frow full" style="margin-bottom: 8px;">
+            <div class="fgroup">
+              <label>Topic</label>
+              <div class="topic-pills" id="topicPills">
+                <button type="button" class="topic-pill" data-topic="Reservation inquiry">Reservation inquiry</button>
+                <button type="button" class="topic-pill" data-topic="Private events">Private events</button>
+                <button type="button" class="topic-pill" data-topic="Menu question">Menu question</button>
+                <button type="button" class="topic-pill" data-topic="Feedback">Feedback</button>
+                <button type="button" class="topic-pill" data-topic="Other">Other</button>
+              </div>
+              <input type="text" id="cSubject" name="subject"
+                     placeholder="Or type your own topic…"
+                     style="font-size: 13px;">
+            </div>
+          </div>
+
+          <div class="frow full">
+            <div class="fgroup">
+              <label for="cMessage">
+                Message *
+                <span style="font-weight:400; text-transform:none; letter-spacing:0; color:#bbb;">(min 20 characters)</span>
+              </label>
+              <textarea id="cMessage" name="message" rows="6"
+                        placeholder="Tell us how we can help…" required></textarea>
+              <div class="char-bar-wrap"><div class="char-bar" id="charBar"></div></div>
+              <div class="char-info">
+                <span class="char-count" id="charCount">0 / 20</span>
+              </div>
+              <span class="err-msg" id="cMsgErr">Please write at least 20 characters</span>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitBtn" disabled>
+            <i class="fas fa-paper-plane"></i>
+            Send message
+          </button>
+        </form>
+      </div>
+
+      <!-- Success state -->
+      <div class="success-state" id="successState" tabindex="-1">
+        <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+        <h3>Message sent!</h3>
+        <p>Thanks for reaching out. We'll get back to you at your email within a few hours.</p>
+        <button class="reset-btn" onclick="resetContactForm()">Send another message</button>
+      </div>
+
+    </div>
+  </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var MIN_CHARS = 20;
+  var cName    = document.getElementById('cName');
+  var cEmail   = document.getElementById('cEmail');
+  var cSubject = document.getElementById('cSubject');
+  var cMessage = document.getElementById('cMessage');
+  var charBar  = document.getElementById('charBar');
+  var charCount = document.getElementById('charCount');
+  var submitBtn = document.getElementById('submitBtn');
+
+  /* ── LocalStorage draft restore ── */
+  function restoreLS() {
+    var map = { name: cName, email: cEmail, subject: cSubject, message: cMessage };
+    Object.keys(map).forEach(function (k) {
+      var v = localStorage.getItem('effoi_contact_' + k);
+      if (v) map[k].value = v;
+    });
+    updateChar();
+    checkSubmit();
+    if (cSubject.value) syncPills(cSubject.value);
+  }
+
+  function saveLS(key, val) {
+    try { localStorage.setItem('effoi_contact_' + key, val); } catch (e) {}
+  }
+
+  /* ── Character bar ── */
+  function updateChar() {
+    var len = cMessage.value.trim().length;
+    var pct = Math.min(100, Math.round((len / MIN_CHARS) * 100));
+    charBar.style.width = pct + '%';
+    charBar.style.background = len >= MIN_CHARS ? '#3B6D11' : '#e24b4a';
+    charCount.textContent = len + ' / ' + MIN_CHARS;
+    charCount.className = 'char-count' + (len >= MIN_CHARS ? ' ok' : '');
+  }
+
+  /* ── Submit gate ── */
+  function checkSubmit() {
+    var ok = cName.value.trim() &&
+             /\S+@\S+\.\S+/.test(cEmail.value) &&
+             cMessage.value.trim().length >= MIN_CHARS;
+    submitBtn.disabled = !ok;
+  }
+
+  /* ── Topic pills ── */
+  function syncPills(val) {
+    document.querySelectorAll('.topic-pill').forEach(function (b) {
+      b.classList.toggle('active', b.dataset.topic === val);
+    });
+  }
+
+  document.querySelectorAll('.topic-pill').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      syncPills(this.dataset.topic);
+      cSubject.value = this.dataset.topic;
+      saveLS('subject', cSubject.value);
+    });
+  });
+
+  cSubject.addEventListener('input', function () {
+    syncPills(this.value);
+    saveLS('subject', this.value);
+  });
+
+  /* ── Field listeners ── */
+  cName.addEventListener('input', function () {
+    this.classList.remove('error');
+    document.getElementById('cNameErr').style.display = 'none';
+    saveLS('name', this.value);
+    checkSubmit();
+  });
+
+  cName.addEventListener('blur', function () {
+    if (this.value.trim()) this.classList.add('valid');
+  });
+
+  cEmail.addEventListener('input', function () {
+    this.classList.remove('error');
+    document.getElementById('cEmailErr').style.display = 'none';
+    saveLS('email', this.value);
+    checkSubmit();
+  });
+
+  cEmail.addEventListener('blur', function () {
+    if (this.value && !/\S+@\S+\.\S+/.test(this.value)) {
+      this.classList.add('error');
+      document.getElementById('cEmailErr').style.display = 'block';
+    } else if (this.value) {
+      this.classList.add('valid');
+    }
+  });
+
+  cMessage.addEventListener('input', function () {
+    this.classList.remove('error');
+    document.getElementById('cMsgErr').style.display = 'none';
+    saveLS('message', this.value);
+    updateChar();
+    checkSubmit();
+  });
+
+  /* ── Form submit ──
+     Remove the preventDefault block to let the form POST normally to Flask.
+     Keep it to show the JS success state before your Flask redirect. */
+  document.getElementById('contactForm').addEventListener('submit', function (e) {
+    var valid = true;
+
+    if (!cName.value.trim()) {
+      cName.classList.add('error');
+      document.getElementById('cNameErr').style.display = 'block';
+      valid = false;
+    }
+
+    if (!/\S+@\S+\.\S+/.test(cEmail.value)) {
+      cEmail.classList.add('error');
+      document.getElementById('cEmailErr').style.display = 'block';
+      valid = false;
+    }
+
+    if (cMessage.value.trim().length < MIN_CHARS) {
+      cMessage.classList.add('error');
+      document.getElementById('cMsgErr').style.display = 'block';
+      valid = false;
+    }
+
+    if (!valid) {
+      e.preventDefault();
+      var first = document.querySelector('#contactForm .error');
+      if (first) first.focus();
+      return;
+    }
+
+    /* Comment out these lines to allow real POST to Flask */
+    e.preventDefault();
+    try { localStorage.removeItem('effoi_contact_message'); } catch (err) {}
+    document.getElementById('formSection').style.display = 'none';
+    var ss = document.getElementById('successState');
+    ss.style.display = 'flex';
+    ss.focus();
+    /* ↑ remove above block for real Flask POST ↑ */
+  });
+
+  /* ── Reset ── */
+  window.resetContactForm = function () {
+    document.getElementById('contactForm').reset();
+    document.querySelectorAll('.topic-pill').forEach(function (b) {
+      b.classList.remove('active');
+    });
+    [cName, cEmail, cMessage].forEach(function (el) {
+      el.classList.remove('valid', 'error');
+    });
+    ['cNameErr', 'cEmailErr', 'cMsgErr'].forEach(function (id) {
+      document.getElementById(id).style.display = 'none';
+    });
+    updateChar();
+    checkSubmit();
+    document.getElementById('successState').style.display = 'none';
+    document.getElementById('formSection').style.display = 'block';
+  };
+
+  restoreLS();
+});
+</script>
 {% endblock %}

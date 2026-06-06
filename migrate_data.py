@@ -7,6 +7,9 @@ import os
 import json
 import sqlite3
 from datetime import datetime
+from backend.effoi_app import app, db
+from backend.effoi_app import *
+    
 
 def export_sqlite_to_json(sqlite_db_path='instance/effoi.db', output_file='backup_data.json'):
     """Export all SQLite data to JSON file"""
@@ -45,9 +48,6 @@ def import_json_to_postgres(json_file='backup_data.json'):
     
     with open(json_file, 'r') as f:
         data = json.load(f)
-    
-    from backend.effoi_app import app, db
-    from backend.effoi_app import *
     
     imported_count = 0
     

@@ -1,92 +1,261 @@
 {% extends "base.html" %}
 
-{% block title %}Blog - EFFOI Restaurant{% endblock %}
+{% block title %}Customer Stories - EFFOI Restaurant{% endblock %}
 
 {% block content %}
-<div class="my-5">
-    <div class="d-flex justify-content-between align-items-center mb-5">
-        <h1 class="display-4" data-aos="fade-right">Customer Stories</h1>
-        <a href="{{ url_for('submit_blog') }}" class="btn btn-danger rounded-pill px-4 py-2" data-aos="fade-left">
-            <i class="fas fa-plus-circle me-2"></i>Share Your Story
-        </a>
-    </div>
 
-    {% if posts.items %}
-    <div class="row g-4">
-        {% for post in posts.items %}
-        <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden h-100">
-                <div class="position-relative">
-                    {% if post.image_url %}
-                    <img src="{{ post.image_url }}" class="card-img-top" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
-                    {% else %}
-                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                        <i class="fas fa-image fa-4x text-muted"></i>
-                    </div>
-                    {% endif %}
-                    <span class="position-absolute top-0 start-0 bg-danger text-white px-3 py-2 m-3 rounded-pill small">
-                        <i class="far fa-eye me-1"></i> {{ post.views }}
-                    </span>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h5 class="card-title">{{ post.title }}</h5>
-                    </div>
-                    <p class="card-text text-muted small mb-3">{{ post.content[:120] }}...</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <small class="text-muted">
-                                <i class="far fa-user me-1"></i> {{ post.author_name }}
-                            </small>
-                            <br>
-                            <small class="text-muted">
-                                <i class="far fa-calendar-alt me-1"></i> {{ post.created_at.strftime('%b %d, %Y') }}
-                            </small>
-                        </div>
-                        <a href="{{ url_for('blog_post', post_id=post.id) }}" class="btn btn-outline-danger btn-sm rounded-pill px-3">Read More</a>
-                    </div>
-                </div>
-            </div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  .bl-root { font-family: 'DM Sans', sans-serif; max-width: 1100px; margin: 3rem auto; padding: 0 1.5rem; }
+
+  /* Hero */
+  .bl-hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid #f0f0f0; }
+  .bl-headline { font-family: 'Cormorant Garamond', serif; font-size: clamp(28px, 4vw, 42px); font-weight: 600; color: #1a1a1a; margin: 0; line-height: 1.1; }
+  .bl-headline em { font-style: italic; font-weight: 500; color: #A32D2D; }
+  .bl-hero-sub { font-size: 13px; color: #888; margin: 6px 0 0; }
+  .bl-btn-write {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 10px 20px; background: #A32D2D; color: #fff;
+    border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none;
+    white-space: nowrap; transition: background 0.2s, transform 0.1s;
+  }
+  .bl-btn-write:hover { background: #791F1F; color: #fff; }
+  .bl-btn-write:active { transform: scale(0.97); }
+
+  /* Filter pills */
+  .bl-filters { display: flex; gap: 8px; margin-bottom: 1.75rem; flex-wrap: wrap; }
+  .bl-pill {
+    padding: 6px 16px; border-radius: 99px; border: 1px solid #ddd;
+    background: #fff; font-size: 12px; color: #777; cursor: pointer;
+    transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+  }
+  .bl-pill:hover { border-color: #A32D2D; color: #A32D2D; }
+  .bl-pill.active { background: #A32D2D; border-color: #A32D2D; color: #fff; }
+
+  /* Card grid */
+  .bl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+  .bl-card {
+    background: #fff; border: 1px solid #eee; border-radius: 16px;
+    overflow: hidden; display: flex; flex-direction: column;
+    transition: border-color 0.2s, transform 0.2s;
+    text-decoration: none; color: inherit;
+  }
+  .bl-card:hover { border-color: #A32D2D; transform: translateY(-3px); color: inherit; text-decoration: none; }
+  .bl-card-img { width: 100%; height: 180px; object-fit: cover; display: block; }
+  .bl-card-img-placeholder {
+    height: 180px; background: #f8f8f8;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .bl-card-img-placeholder i { font-size: 32px; color: #ddd; }
+  .bl-card-body { padding: 16px; flex: 1; display: flex; flex-direction: column; }
+  .bl-card-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .bl-views { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: #aaa; }
+  .bl-views i { font-size: 13px; }
+  .bl-date { font-size: 11px; color: #bbb; }
+  .bl-card-title {
+    font-family: 'Cormorant Garamond', serif; font-size: 19px;
+    font-weight: 600; color: #1a1a1a; margin: 0 0 8px; line-height: 1.25;
+  }
+  .bl-card-excerpt { font-size: 13px; color: #777; line-height: 1.65; margin: 0 0 14px; flex: 1; }
+  .bl-card-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: auto; padding-top: 12px; border-top: 1px solid #f0f0f0;
+  }
+  .bl-author { display: flex; align-items: center; gap: 8px; }
+  .bl-avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: #FCEBEB; display: flex; align-items: center;
+    justify-content: center; font-size: 10px; font-weight: 500; color: #A32D2D;
+  }
+  .bl-author-name { font-size: 12px; color: #888; }
+  .bl-read-btn {
+    font-size: 12px; color: #A32D2D; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 3px; font-weight: 500;
+  }
+  .bl-read-btn i { font-size: 14px; transition: transform 0.15s; }
+  .bl-read-btn:hover i { transform: translateX(2px); }
+
+  /* Empty state */
+  .bl-empty { text-align: center; padding: 5rem 1rem; }
+  .bl-empty-icon { width: 72px; height: 72px; border-radius: 50%; background: #FCEBEB; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; }
+  .bl-empty-icon i { font-size: 32px; color: #A32D2D; }
+  .bl-empty h3 { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 600; color: #1a1a1a; margin: 0 0 8px; }
+  .bl-empty p { font-size: 14px; color: #888; margin: 0 0 1.75rem; }
+  .bl-empty-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 28px; background: #A32D2D; color: #fff;
+    border-radius: 10px; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 500; text-decoration: none;
+    transition: background 0.2s;
+  }
+  .bl-empty-btn:hover { background: #791F1F; color: #fff; }
+
+  /* Pagination */
+  .bl-pagination { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 2.5rem; flex-wrap: wrap; }
+  .bl-page-btn {
+    width: 36px; height: 36px; border-radius: 8px; border: 1px solid #ddd;
+    background: #fff; font-size: 13px; color: #666; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Sans', sans-serif; transition: all 0.15s; text-decoration: none;
+  }
+  .bl-page-btn:hover { border-color: #A32D2D; color: #A32D2D; }
+  .bl-page-btn.active { background: #A32D2D; border-color: #A32D2D; color: #fff; }
+  .bl-page-btn.disabled { opacity: 0.3; pointer-events: none; }
+  .bl-page-ellipsis { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #bbb; }
+
+  @media (max-width: 600px) {
+    .bl-hero { flex-direction: column; align-items: flex-start; }
+    .bl-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="bl-root">
+
+  <!-- Hero header -->
+  <div class="bl-hero">
+    <div>
+      <h1 class="bl-headline">Customer <em>Stories</em></h1>
+      <p class="bl-hero-sub">Real experiences from our guests</p>
+    </div>
+    <a href="{{ url_for('submit_blog') }}" class="bl-btn-write">
+      <i class="ti ti-plus" aria-hidden="true" style="font-size:15px;"></i>
+      Share your story
+    </a>
+  </div>
+
+  {% if posts.items %}
+
+  <!-- Sort / filter pills (client-side) -->
+  <div class="bl-filters" role="group" aria-label="Sort posts">
+    <button class="bl-pill active" onclick="sortPosts('default', this)">All stories</button>
+    <button class="bl-pill" onclick="sortPosts('popular', this)">Most viewed</button>
+    <button class="bl-pill" onclick="sortPosts('recent', this)">Most recent</button>
+  </div>
+
+  <!-- Post grid -->
+  <div class="bl-grid" id="blog-grid">
+    {% for post in posts.items %}
+    <a href="{{ url_for('blog_post', post_id=post.id) }}" class="bl-card"
+       data-views="{{ post.views }}"
+       data-date="{{ post.created_at.strftime('%Y-%m-%d') }}"
+       data-index="{{ loop.index }}">
+
+      {% if post.image_url %}
+      <img class="bl-card-img" src="{{ post.image_url }}" alt="{{ post.title }}" loading="lazy">
+      {% else %}
+      <div class="bl-card-img-placeholder">
+        <i class="ti ti-photo" aria-hidden="true"></i>
+      </div>
+      {% endif %}
+
+      <div class="bl-card-body">
+        <div class="bl-card-meta">
+          <span class="bl-views">
+            <i class="ti ti-eye" aria-hidden="true"></i>
+            {{ post.views }}
+          </span>
+          <span class="bl-date">{{ post.created_at.strftime('%b %d, %Y') }}</span>
         </div>
-        {% endfor %}
-    </div>
 
-    <!-- Pagination -->
-    {% if posts.pages > 1 %}
-    <nav class="mt-5">
-        <ul class="pagination justify-content-center">
-            {% if posts.has_prev %}
-            <li class="page-item">
-                <a class="page-link rounded-pill" href="{{ url_for('blog', page=posts.prev_num) }}">Previous</a>
-            </li>
-            {% endif %}
-            
-            {% for page_num in posts.iter_pages() %}
-                {% if page_num %}
-                    <li class="page-item {% if page_num == posts.page %}active{% endif %}">
-                        <a class="page-link rounded-pill" href="{{ url_for('blog', page=page_num) }}">{{ page_num }}</a>
-                    </li>
-                {% else %}
-                    <li class="page-item disabled"><span class="page-link">...</span></li>
-                {% endif %}
-            {% endfor %}
-            
-            {% if posts.has_next %}
-            <li class="page-item">
-                <a class="page-link rounded-pill" href="{{ url_for('blog', page=posts.next_num) }}">Next</a>
-            </li>
-            {% endif %}
-        </ul>
-    </nav>
-    {% endif %}
-    
+        <h2 class="bl-card-title">{{ post.title }}</h2>
+        <p class="bl-card-excerpt">
+          {{ post.content[:130] }}{% if post.content|length > 130 %}…{% endif %}
+        </p>
+
+        <div class="bl-card-footer">
+          <div class="bl-author">
+            <div class="bl-avatar" aria-hidden="true">
+              {{ post.author_name[:2]|upper }}
+            </div>
+            <span class="bl-author-name">{{ post.author_name }}</span>
+          </div>
+          <span class="bl-read-btn">
+            Read <i class="ti ti-arrow-right" aria-hidden="true"></i>
+          </span>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  {% if posts.pages > 1 %}
+  <nav class="bl-pagination" aria-label="Page navigation">
+    {% if posts.has_prev %}
+    <a class="bl-page-btn" href="{{ url_for('blog', page=posts.prev_num) }}" aria-label="Previous page">
+      <i class="ti ti-chevron-left" style="font-size:16px;"></i>
+    </a>
     {% else %}
-    <div class="text-center py-5" data-aos="fade-up">
-        <i class="fas fa-blog fa-5x text-muted mb-4"></i>
-        <h3>No Blog Posts Yet</h3>
-        <p class="lead text-muted mb-4">Be the first to share your EFFOI experience!</p>
-        <a href="{{ url_for('submit_blog') }}" class="btn btn-danger btn-lg rounded-pill px-5">Write a Post</a>
-    </div>
+    <span class="bl-page-btn disabled" aria-hidden="true">
+      <i class="ti ti-chevron-left" style="font-size:16px;"></i>
+    </span>
     {% endif %}
+
+    {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+      {% if page_num %}
+        <a class="bl-page-btn {% if page_num == posts.page %}active{% endif %}"
+           href="{{ url_for('blog', page=page_num) }}"
+           aria-label="Page {{ page_num }}"
+           {% if page_num == posts.page %}aria-current="page"{% endif %}>
+          {{ page_num }}
+        </a>
+      {% else %}
+        <span class="bl-page-ellipsis" aria-hidden="true">…</span>
+      {% endif %}
+    {% endfor %}
+
+    {% if posts.has_next %}
+    <a class="bl-page-btn" href="{{ url_for('blog', page=posts.next_num) }}" aria-label="Next page">
+      <i class="ti ti-chevron-right" style="font-size:16px;"></i>
+    </a>
+    {% else %}
+    <span class="bl-page-btn disabled" aria-hidden="true">
+      <i class="ti ti-chevron-right" style="font-size:16px;"></i>
+    </span>
+    {% endif %}
+  </nav>
+  {% endif %}
+
+  {% else %}
+
+  <!-- Empty state -->
+  <div class="bl-empty">
+    <div class="bl-empty-icon">
+      <i class="ti ti-writing" aria-hidden="true"></i>
+    </div>
+    <h3>No stories yet</h3>
+    <p>Be the first to share your EFFOI experience with the world.</p>
+    <a href="{{ url_for('submit_blog') }}" class="bl-empty-btn">
+      <i class="ti ti-plus" aria-hidden="true" style="font-size:16px;"></i>
+      Write the first story
+    </a>
+  </div>
+
+  {% endif %}
 </div>
+
+<script>
+function sortPosts(type, btn) {
+  document.querySelectorAll('.bl-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+
+  const grid = document.getElementById('blog-grid');
+  if (!grid) return;
+  const cards = Array.from(grid.querySelectorAll('.bl-card'));
+
+  let sorted;
+  if (type === 'popular') {
+    sorted = cards.sort((a, b) => parseInt(b.dataset.views) - parseInt(a.dataset.views));
+  } else if (type === 'recent') {
+    sorted = cards.sort((a, b) => new Date(b.dataset.date) - new Date(a.dataset.date));
+  } else {
+    sorted = cards.sort((a, b) => parseInt(a.dataset.index) - parseInt(b.dataset.index));
+  }
+  sorted.forEach(c => grid.appendChild(c));
+}
+</script>
+
 {% endblock %}

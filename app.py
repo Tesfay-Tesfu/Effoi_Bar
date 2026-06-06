@@ -167,7 +167,7 @@ class Reservation(db.Model):
     customer_email = db.Column(db.String(100), nullable=False)
     customer_phone = db.Column(db.String(20))
     reservation_date = db.Column(db.Date, nullable=False)
-    reservation_time = db.Column(db.String(5), nullable=False)
+    reservation_time = db.Column(db.String(10), nullable=False)
     party_size = db.Column(db.Integer, nullable=False)
     special_requests = db.Column(db.Text)
     status = db.Column(db.String(20), default='pending')

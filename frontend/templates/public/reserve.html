@@ -2,96 +2,656 @@
 
 {% block title %}Make a Reservation - EFFOI{% endblock %}
 
+{% block extra_css %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
+
+  .rform * { box-sizing: border-box; }
+  .rform { font-family: 'DM Sans', sans-serif; padding: 2.5rem 0; }
+
+  .rform-shell {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    background: #fff;
+    border-radius: 18px;
+    overflow: hidden;
+    max-width: 780px;
+    margin: 0 auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+  }
+
+  /* ── Sidebar ── */
+  .rform-sidebar {
+    background: #1a0808;
+    padding: 2.25rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .rform-sidebar::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(226,75,74,0.15);
+    pointer-events: none;
+  }
+
+  .rform-sidebar::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: -40px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(226,75,74,0.08);
+    pointer-events: none;
+  }
+
+  .sidebar-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    color: #fff;
+    margin: 0 0 1.75rem;
+    line-height: 1.3;
+  }
+
+  .sidebar-title em { color: #e24b4a; font-style: italic; }
+
+  .sidebar-divider {
+    height: 0.5px;
+    background: rgba(255,255,255,0.12);
+    margin: 1.25rem 0;
+  }
+
+  .sidebar-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    flex: 1;
+  }
+
+  .info-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.72);
+    line-height: 1.55;
+  }
+
+  .info-row i {
+    font-size: 15px;
+    color: #e24b4a;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+
+  .sidebar-note {
+    margin-top: auto;
+    padding: 0.75rem 1rem;
+    background: rgba(226,75,74,0.12);
+    border-left: 2px solid #e24b4a;
+    border-radius: 0 6px 6px 0;
+    font-size: 12px;
+    color: rgba(255,255,255,0.58);
+    line-height: 1.55;
+  }
+
+  /* ── Form body ── */
+  .rform-body { padding: 2rem 2rem; }
+
+  .form-header { margin-bottom: 1rem; }
+
+  .form-header h4 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    margin: 0 0 4px;
+    color: #1a1a1a;
+  }
+
+  .form-header p { font-size: 13px; color: #888; margin: 0; }
+
+  /* Progress */
+  .progress-bar {
+    height: 3px;
+    background: #f0f0f0;
+    border-radius: 2px;
+    margin: 1rem 0 0.75rem;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: #e24b4a;
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .step-tracker {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 1.25rem;
+    align-items: center;
+  }
+
+  .step-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    transition: all 0.3s;
+  }
+
+  .step-dot.active { background: #e24b4a; width: 18px; border-radius: 3px; }
+  .step-dot.done   { background: #a32d2d; }
+
+  /* Field groups */
+  .frow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .frow.full { grid-template-columns: 1fr; }
+
+  .fgroup { display: flex; flex-direction: column; gap: 5px; }
+
+  .fgroup label {
+    font-size: 11px;
+    font-weight: 500;
+    color: #999;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .fgroup input,
+  .fgroup select,
+  .fgroup textarea {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 9px 12px;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    background: #fafafa;
+    color: #1a1a1a;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    width: 100%;
+  }
+
+  .fgroup input:focus,
+  .fgroup select:focus,
+  .fgroup textarea:focus {
+    border-color: #e24b4a;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(226,75,74,0.08);
+  }
+
+  .fgroup input.filled { border-color: #a32d2d; background: #fff; }
+  .fgroup textarea { resize: none; }
+
+  .field-hint { font-size: 11px; color: #aaa; margin-top: 2px; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: #999;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin: 14px 0 7px;
+  }
+
+  /* Party picker */
+  .party-picker {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 6px;
+  }
+
+  .party-btn {
+    aspect-ratio: 1;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    background: #fafafa;
+    color: #888;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0;
+  }
+
+  .party-btn:hover { border-color: #e24b4a; color: #1a1a1a; background: #fff5f5; }
+  .party-btn.selected { background: #e24b4a; border-color: #e24b4a; color: #fff; }
+
+  /* Time grid */
+  .time-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    max-height: 130px;
+    overflow-y: auto;
+  }
+
+  .time-btn {
+    padding: 7px 4px;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    background: #fafafa;
+    color: #888;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.18s;
+    text-align: center;
+  }
+
+  .time-btn:hover   { border-color: #e24b4a; color: #1a1a1a; background: #fff5f5; }
+  .time-btn.selected { background: #e24b4a; border-color: #e24b4a; color: #fff; }
+  .time-btn.unavailable { opacity: 0.32; cursor: not-allowed; pointer-events: none; }
+
+  .time-placeholder {
+    grid-column: 1/-1;
+    text-align: center;
+    font-size: 13px;
+    color: #bbb;
+    padding: 1rem 0;
+  }
+
+  /* Submit */
+  .submit-btn {
+    width: 100%;
+    padding: 13px;
+    background: #e24b4a;
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    margin-top: 0.75rem;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 4px 14px rgba(226,75,74,0.35);
+  }
+
+  .submit-btn:hover   { background: #a32d2d; box-shadow: 0 6px 18px rgba(163,45,45,0.4); }
+  .submit-btn:active  { transform: scale(0.99); }
+  .submit-btn:disabled {
+    background: #e0e0e0;
+    color: #aaa;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+  }
+
+  /* Success panel */
+  .success-panel {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    gap: 1rem;
+    min-height: 320px;
+  }
+
+  .success-icon {
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    background: #fff0f0;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .success-icon i { font-size: 28px; color: #a32d2d; }
+
+  .success-panel h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    margin: 0;
+    color: #1a1a1a;
+  }
+
+  .success-panel p {
+    font-size: 14px;
+    color: #888;
+    margin: 0;
+    max-width: 260px;
+    line-height: 1.6;
+  }
+
+  .booking-chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .booking-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: #fafafa;
+    border: 1px solid #e8e8e8;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #555;
+  }
+
+  .booking-chip i { font-size: 14px; color: #e24b4a; }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .rform-shell { grid-template-columns: 1fr; }
+    .rform-sidebar { padding: 1.5rem; }
+    .sidebar-title { font-size: 20px; margin-bottom: 1rem; }
+    .rform-body { padding: 1.5rem; }
+    .frow { grid-template-columns: 1fr; }
+    .party-picker { grid-template-columns: repeat(8, 1fr); }
+    .time-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="my-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                <div class="row g-0">
-                    <div class="col-md-5 bg-danger text-white p-5 d-flex flex-column justify-content-center">
-                        <h3 class="mb-4">Reserve Your Table</h3>
-                        <p><i class="fas fa-phone me-2"></i> {{ settings.get('phone', '+1 (240) 660-1337') }}</p>
-                        <p><i class="fas fa-envelope me-2"></i> {{ settings.get('email', 'nigistme1277@gmail.com') }}</p>
-                        <p><i class="fas fa-clock me-2"></i> {{ settings.get('hours', 'Mon-Sun: 11am-10pm') }}</p>
-                        <hr class="bg-white">
-                        <p class="small">For parties larger than 8, please call us directly.</p>
-                    </div>
-                    <div class="col-md-7 p-5">
-                        <h4 class="mb-4">Make a Reservation</h4>
-                        <form method="POST" action="{{ url_for('reserve') }}" id="reservationForm">
-                            <div class="mb-3">
-                                <label class="form-label">Your Name *</label>
-                                <input type="text" class="form-control" name="name" required>
-                            </div>
-                            
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Email *</label>
-                                    <input type="email" class="form-control" name="email" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Phone *</label>
-                                    <input type="tel" class="form-control" name="phone" required>
-                                </div>
-                            </div>
-                            
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Date *</label>
-                                    <input type="date" class="form-control" name="date" id="resDate" min="{{ now().strftime('%Y-%m-%d') }}" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Time *</label>
-                                    <select class="form-control" name="time" id="resTime" required>
-                                        <option value="">Select date first</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label class="form-label">Party Size *</label>
-                                <select class="form-control" name="party_size" required>
-                                    <option value="1">1 person</option>
-                                    <option value="2">2 people</option>
-                                    <option value="3">3 people</option>
-                                    <option value="4">4 people</option>
-                                    <option value="5">5 people</option>
-                                    <option value="6">6 people</option>
-                                    <option value="7">7 people</option>
-                                    <option value="8">8 people</option>
-                                </select>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label class="form-label">Special Requests (optional)</label>
-                                <textarea class="form-control" name="special_requests" rows="3"></textarea>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-danger w-100 py-3 rounded-pill">Confirm Reservation</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+<div class="rform my-4">
+  <div class="rform-shell">
+
+    <!-- Sidebar -->
+    <div class="rform-sidebar">
+      <h3 class="sidebar-title">Reserve your<br><em>table tonight</em></h3>
+
+      <div class="sidebar-info">
+        <div class="info-row">
+          <i class="fas fa-phone"></i>
+          <span>{{ settings.get('phone', '+1 (240) 660-1337') }}</span>
         </div>
+        <div class="info-row">
+          <i class="fas fa-envelope"></i>
+          <span>{{ settings.get('email', 'nigistme1277@gmail.com') }}</span>
+        </div>
+        <div class="info-row">
+          <i class="fas fa-clock"></i>
+          <span>{{ settings.get('hours', 'Mon – Sun') }}<br>11:00 am – 10:00 pm</span>
+        </div>
+        <div class="info-row">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>Walk-ins welcome,<br>reservations preferred</span>
+        </div>
+      </div>
+
+      <div class="sidebar-divider"></div>
+
+      <div class="sidebar-note">
+        <i class="fas fa-users" style="margin-right:6px; color:#e24b4a; font-size:12px;"></i>
+        For parties larger than 8, please call us directly.
+      </div>
     </div>
+
+    <!-- Form body -->
+    <div class="rform-body">
+      <!-- Form section -->
+      <div id="formSection">
+        <div class="form-header">
+          <h4>Your details</h4>
+          <p>All fields marked * are required</p>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+        <div class="step-tracker">
+          <div class="step-dot active" id="dot1"></div>
+          <div class="step-dot" id="dot2"></div>
+          <div class="step-dot" id="dot3"></div>
+          <div class="step-dot" id="dot4"></div>
+        </div>
+
+        <form method="POST" action="{{ url_for('reserve') }}" id="resForm" novalidate>
+
+          <div class="frow">
+            <div class="fgroup">
+              <label for="rName">Full name *</label>
+              <input type="text" id="rName" name="name" placeholder="Your name" autocomplete="name" required>
+            </div>
+            <div class="fgroup">
+              <label for="rPhone">Phone *</label>
+              <input type="tel" id="rPhone" name="phone" placeholder="+1 (000) 000-0000" autocomplete="tel" required>
+            </div>
+          </div>
+
+          <div class="frow full">
+            <div class="fgroup">
+              <label for="rEmail">Email *</label>
+              <input type="email" id="rEmail" name="email" placeholder="you@example.com" autocomplete="email" required>
+              <span class="field-hint">Confirmation will be sent here</span>
+            </div>
+          </div>
+
+          <div class="section-label">When would you like to visit?</div>
+
+          <div class="frow">
+            <div class="fgroup">
+              <label for="rDate">Date *</label>
+              <input type="date" id="rDate" name="date" min="{{ now().strftime('%Y-%m-%d') }}" required>
+            </div>
+            <div class="fgroup">
+              <label>Time *</label>
+              <div class="time-grid" id="timeGrid">
+                <div class="time-placeholder">Pick a date first</div>
+              </div>
+              <input type="hidden" id="rTime" name="time" required>
+            </div>
+          </div>
+
+          <div class="section-label">Party size *</div>
+          <div class="party-picker">
+            <button type="button" class="party-btn" data-size="1">1</button>
+            <button type="button" class="party-btn" data-size="2">2</button>
+            <button type="button" class="party-btn" data-size="3">3</button>
+            <button type="button" class="party-btn" data-size="4">4</button>
+            <button type="button" class="party-btn" data-size="5">5</button>
+            <button type="button" class="party-btn" data-size="6">6</button>
+            <button type="button" class="party-btn" data-size="7">7</button>
+            <button type="button" class="party-btn" data-size="8">8</button>
+          </div>
+          <input type="hidden" id="rParty" name="party_size" required>
+
+          <div class="frow full" style="margin-top: 14px;">
+            <div class="fgroup">
+              <label for="rRequests">Special requests</label>
+              <textarea id="rRequests" name="special_requests" rows="2"
+                placeholder="Dietary needs, celebrations, accessibility…"></textarea>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitBtn" disabled>
+            <i class="fas fa-calendar-check"></i>
+            Confirm reservation
+          </button>
+        </form>
+      </div>
+
+      <!-- Success panel (shown after JS submit preview; real POST bypasses this) -->
+      <div class="success-panel" id="successPanel">
+        <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+        <h3>You're all set!</h3>
+        <p>We've received your reservation and will send a confirmation to your email shortly.</p>
+        <div class="booking-chips">
+          <span class="booking-chip" id="chipDate"><i class="fas fa-calendar"></i> —</span>
+          <span class="booking-chip" id="chipTime"><i class="fas fa-clock"></i> —</span>
+          <span class="booking-chip" id="chipParty"><i class="fas fa-users"></i> —</span>
+        </div>
+        <button type="button" class="submit-btn" style="max-width:200px; margin-top: 0.25rem;" onclick="resetForm()">
+          <i class="fas fa-plus"></i> New reservation
+        </button>
+      </div>
+
+    </div><!-- /.rform-body -->
+  </div><!-- /.rform-shell -->
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-$(document).ready(function() {
-    $('#resDate').change(function() {
-        var date = $(this).val();
-        $('#resTime').html('<option value="">Loading...</option>');
-        
-        $.get('{{ url_for("get_available_times_route") }}', {date: date}, function(data) {
-            var options = '<option value="">Select time</option>';
-            data.times.forEach(function(time) {
-                options += '<option value="' + time + '">' + time + '</option>';
-            });
-            $('#resTime').html(options);
-        });
+$(document).ready(function () {
+
+  /* ── Time slots ── */
+  var ALL_TIMES = [
+    "11:00 AM","11:30 AM","12:00 PM","12:30 PM",
+    "1:00 PM","1:30 PM","2:00 PM","2:30 PM",
+    "3:00 PM","3:30 PM","4:00 PM","4:30 PM",
+    "5:00 PM","5:30 PM","6:00 PM","6:30 PM",
+    "7:00 PM","7:30 PM","8:00 PM","8:30 PM",
+    "9:00 PM","9:30 PM"
+  ];
+
+  /* ── Progress & step dots ── */
+  function updateProgress() {
+    var fields = [
+      $('#rName').val().trim(),
+      $('#rEmail').val().trim(),
+      $('#rPhone').val().trim(),
+      $('#rDate').val(),
+      $('#rTime').val(),
+      $('#rParty').val()
+    ];
+    var filled = fields.filter(Boolean).length;
+    var pct = Math.round((filled / fields.length) * 100);
+    $('#progressFill').css('width', pct + '%');
+
+    var stages = [
+      fields[0] && fields[1] && fields[2],   // contact info
+      !!fields[3],                            // date
+      !!fields[4],                            // time
+      !!fields[5]                             // party
+    ];
+
+    $.each(['#dot1','#dot2','#dot3','#dot4'], function (i, sel) {
+      var $d = $(sel).removeClass('active done');
+      var prevDone = stages.slice(0, i).every(Boolean);
+      if (i === 0 || prevDone) {
+        if (stages[i]) $d.addClass('done');
+        else $d.addClass('active');
+      }
     });
+
+    $('#submitBtn').prop('disabled', !fields.every(Boolean));
+  }
+
+  /* ── Contact field listeners ── */
+  $('#rName, #rEmail, #rPhone').on('input', function () {
+    $(this).toggleClass('filled', !!$(this).val().trim());
+    updateProgress();
+  });
+
+  /* ── Date → time grid ── */
+  $('#rDate').on('change', function () {
+    var dateVal = $(this).val();
+    if (!dateVal) return;
+    $(this).addClass('filled');
+    $('#rTime').val('');
+
+    var grid = $('#timeGrid').empty();
+    var now = new Date();
+    var selected = new Date(dateVal + 'T00:00:00');
+    var isToday = selected.toDateString() === now.toDateString();
+
+    /* Optionally call your Flask endpoint for real availability:
+       $.get('{{ url_for("get_available_times_route") }}', {date: dateVal}, function(data) { ... });
+       For now we render all slots and grey-out past times on today. */
+
+    $.each(ALL_TIMES, function (_, t) {
+      var past = false;
+      if (isToday) {
+        var parts = t.split(' ');
+        var hm    = parts[0].split(':');
+        var hour  = parseInt(hm[0]);
+        var min   = parseInt(hm[1]);
+        if (parts[1] === 'PM' && hour !== 12) hour += 12;
+        if (parts[1] === 'AM' && hour === 12) hour = 0;
+        past = (hour < now.getHours()) ||
+               (hour === now.getHours() && min <= now.getMinutes());
+      }
+
+      var $btn = $('<button type="button" class="time-btn">')
+        .text(t)
+        .attr('data-time', t);
+
+      if (past) {
+        $btn.addClass('unavailable').prop('disabled', true);
+      } else {
+        $btn.on('click', function () {
+          $('.time-btn').removeClass('selected');
+          $(this).addClass('selected');
+          $('#rTime').val($(this).data('time'));
+          updateProgress();
+        });
+      }
+
+      grid.append($btn);
+    });
+
+    updateProgress();
+  });
+
+  /* ── Party size buttons ── */
+  $(document).on('click', '.party-btn', function () {
+    $('.party-btn').removeClass('selected');
+    $(this).addClass('selected');
+    $('#rParty').val($(this).data('size'));
+    updateProgress();
+  });
+
+  /* ── Form submit ──
+     Remove the preventDefault block below if you want a real POST.
+     Keep it to show the success state in JS before your Flask redirect. */
+  $('#resForm').on('submit', function (e) {
+    // Allow the form to submit normally so Flask can process and save the reservation.
+    // Keep client-side progress UI; server will handle redirect/confirmation.
+    return true;
+  });
+
+  function showSuccess() {
+    var date  = $('#rDate').val();
+    var time  = $('#rTime').val();
+    var party = $('#rParty').val();
+    var dateStr = date
+      ? new Date(date + 'T00:00:00').toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'})
+      : '';
+    $('#chipDate').html('<i class="fas fa-calendar"></i> ' + dateStr);
+    $('#chipTime').html('<i class="fas fa-clock"></i> ' + time);
+    $('#chipParty').html('<i class="fas fa-users"></i> ' + party + ' guest' + (party > 1 ? 's' : ''));
+    $('#formSection').hide();
+    $('#successPanel').css('display', 'flex');
+  }
+
+  /* ── Reset ── */
+  window.resetForm = function () {
+    $('#resForm')[0].reset();
+    $('.party-btn, .time-btn').removeClass('selected');
+    $('#rTime, #rParty').val('');
+    $('#timeGrid').html('<div class="time-placeholder">Pick a date first</div>');
+    $('#progressFill').css('width', '0%');
+    $.each(['#dot1','#dot2','#dot3','#dot4'], function (i, sel) {
+      $(sel).removeClass('active done').toggleClass('active', i === 0);
+    });
+    $('#submitBtn').prop('disabled', true);
+    $('#successPanel').hide();
+    $('#formSection').show();
+    $('#rName, #rEmail, #rPhone, #rDate').removeClass('filled');
+  };
+
+  /* ── Init ── */
+  updateProgress();
 });
 </script>
 {% endblock %}

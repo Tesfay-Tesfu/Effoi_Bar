@@ -4,827 +4,394 @@
 
 {% block content %}
 {% set about = about_us %}
-<div class="my-5" id="about-page-content">
-    <h1 class="display-3 text-center mb-5" data-aos="fade-up">{{ about.hero_title if about else 'About EFFOI' }}</h1>
-    
-    <!-- Hero Video/GIF Section -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="hero-video-wrapper">
-                {% if about and about.hero_video_url %}
-                    {% if 'youtube' in about.hero_video_url or 'vimeo' in about.hero_video_url %}
-                        <div class="video-responsive">
-                            <iframe src="{{ about.hero_video_url }}" 
-                                    allowfullscreen 
-                                    title="EFFOI Restaurant"
-                                    loading="lazy"></iframe>
-                        </div>
-                    {% elif about.hero_video_url.endswith('.gif') %}
-                        <div class="gif-container">
-                            <img src="{{ about.hero_video_url }}" 
-                                 alt="EFFOI Catering Animation" 
-                                 style="width:100%; height:100%; object-fit:cover; border-radius:30px;"
-                                 loading="lazy">
-                        </div>
-                    {% elif about.hero_video_url.endswith(('.mp4', '.webm', '.ogg')) %}
-                        <div class="video-container">
-                            <video controls autoplay loop muted playsinline preload="metadata">
-                                <source src="{{ about.hero_video_url }}" type="video/mp4">
-                                <source src="{{ about.hero_video_url }}" type="video/webm">
-                                <source src="{{ about.hero_video_url }}" type="video/ogg">
-                                Your browser does not support the video tag.
-                            </video>
-                        </div>
-                    {% else %}
-                        <div class="image-container">
-                            <img src="{{ about.hero_video_url }}" alt="Hero Image" loading="lazy">
-                        </div>
-                    {% endif %}
-                {% else %}
-                    <div class="gif-container">
-                        <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Effoi.gif" 
-                             alt="EFFOI Catering Animation" 
-                             style="width:100%; height:100%; object-fit:cover; border-radius:30px;"
-                             loading="lazy">
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-    
-    <!-- MEET THE OWNERS SECTION -->
-    <div class="row mb-5">
-        <div class="col-12 text-center mb-4" data-aos="fade-down">
-            <h2 class="display-5 fw-bold">Meet The Owners</h2>
-            <div class="title-decoration">
-                <i class="fas fa-star text-danger"></i>
-                <span class="line"></span>
-                <i class="fas fa-heart text-danger"></i>
-                <span class="line"></span>
-                <i class="fas fa-star text-danger"></i>
-            </div>
-            <p class="lead text-muted mt-3">The passionate women behind EFFOI Restaurant & Bar</p>
-        </div>
-        
-        <div class="col-lg-6 mb-4" data-aos="fade-right">
-            <div class="owner-card">
-                <div class="owner-image-wrapper">
-                    <div class="owner-image-frame">
-                        <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Marye_Profile.png" 
-                             alt="Owner 1 - Marye Effoi" 
-                             class="owner-image"
-                             loading="lazy"
-                             onerror="this.src='https://via.placeholder.com/400x400/8B1E1E/ffffff?text=Tigist'">
-                        <div class="owner-image-overlay">
-                            <span class="owner-initials">ME</span>
-                        </div>
-                    </div>
-                    <div class="owner-badge">
-                        <i class="fas fa-crown"></i>
-                        <span>Co-Founder</span>
-                    </div>
-                </div>
-                <div class="owner-content">
-                    <h3 class="owner-name">Marye Effoi</h3>
-                    <p class="owner-title">Co-Founder & Executive Chef</p>
-                    <div class="owner-divider"></div>
-                    <p class="owner-bio">
-                        With over 20 years of culinary experience, Marye brings the authentic flavors of Ethiopia to every dish. 
-                        Trained by her grandmother in the traditional cooking methods of Addis Ababa, she ensures that every recipe 
-                        maintains its cultural integrity while delighting modern palates.
-                    </p>
-                    <div class="owner-quote">
-                        <i class="fas fa-quote-left"></i>
-                        <em>"Cooking is my love language. Every dish tells a story of our heritage."</em>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-6 mb-4" data-aos="fade-left">
-            <div class="owner-card">
-                <div class="owner-image-wrapper">
-                    <div class="owner-image-frame">
-                        <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Nigist_Profile.png" 
-                             alt="Owner 2 - Nigist Effoi" 
-                             class="owner-image"
-                             loading="lazy"
-                             onerror="this.src='https://via.placeholder.com/400x400/8B1E1E/ffffff?text=Nigist'">
-                        <div class="owner-image-overlay">
-                            <span class="owner-initials">NE</span>
-                        </div>
-                    </div>
-                    <div class="owner-badge">
-                        <i class="fas fa-wine-glass-alt"></i>
-                        <span>Co-Founder</span>
-                    </div>
-                </div>
-                <div class="owner-content">
-                    <h3 class="owner-name">Nigist Effoi</h3>
-                    <p class="owner-title">Co-Founder & Hospitality Director</p>
-                    <div class="owner-divider"></div>
-                    <p class="owner-bio">
-                        Nigist's journey in hospitality began in her family's traditional coffee ceremony in Ethiopia. 
-                        Her warm smile and genuine care for guests create the unforgettable atmosphere that EFFOI is known for. 
-                        She ensures that every visitor feels like family from the moment they walk through the door.
-                    </p>
-                    <div class="owner-quote">
-                        <i class="fas fa-quote-left"></i>
-                        <em>"Hospitality is not a service, it's a tradition passed down through generations."</em>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Joint Statement -->
-        <div class="col-12 mt-3" data-aos="fade-up">
-            <div class="owners-joint-statement">
-                <p class="mb-0">
-                    <i class="fas fa-quote-left text-danger me-2"></i>
-                    Together, we built EFFOI to share the rich culinary heritage of Ethiopia with our community. 
-                    Every dish, every smile, every moment is a reflection of our love for our culture and our guests.
-                    <i class="fas fa-quote-right text-danger ms-2"></i>
-                </p>
-                <div class="joint-signature">
-                    <span>M.E.</span>
-                    <span>&</span>
-                    <span>N.E.</span>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- ===== ELEGANT HORIZONTAL TEAM CARD ===== -->
-    <div class="row mb-5">
-        <div class="col-12" data-aos="fade-up">
-            <div class="team-section-title text-center mb-4">
-                <h2 class="display-5 fw-bold">The EFFOI Family</h2>
-                <div class="title-decoration">
-                    <i class="fas fa-users text-danger"></i>
-                    <span class="line"></span>
-                    <i class="fas fa-heart text-danger"></i>
-                    <span class="line"></span>
-                    <i class="fas fa-users text-danger"></i>
-                </div>
-                <p class="lead text-muted mt-3">The dedicated team behind your unforgettable dining experience</p>
-            </div>
-            
-            <!-- HORIZONTAL TEAM CARD - Clean & Professional -->
-            <div class="horizontal-team-card">
-                <div class="horizontal-card-inner">
-                    <!-- Left Side - Image -->
-                    <div class="horizontal-card-image">
-                        <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/nigist1.jpg" 
-                             alt="EFFOI Team" 
-                             class="team-group-photo"
-                             loading="lazy"
-                             onerror="this.src='https://via.placeholder.com/800x600/8B1E1E/ffffff?text=EFFOI+Team'">
-                    </div>
-                    
-                    <!-- Right Side - Text Content (inside the card) -->
-                    <div class="horizontal-card-content">
-                        <div class="content-inner">
-                            <h3 class="team-card-title">One Team, One Family</h3>
-                            
-                            <p class="team-card-text">
-                                At EFFOI, our team is the heartbeat of everything we do. From our culinary artists 
-                                who craft each dish with precision, to our service staff who greet you with genuine smiles – 
-                                every member of our family is dedicated to creating unforgettable moments for our guests.
-                            </p>
-                            
-                            <p class="team-card-text">
-                                What makes us special isn't just our skills, but our spirit. We celebrate together, 
-                                support each other, and grow as one. This family atmosphere radiates from our kitchen 
-                                to every table, ensuring that when you dine with us, you're truly dining with family.
-                            </p>
-                            
-                            <div class="team-signature">
-                                <span>The EFFOI Team</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Three Cards -->
-    <div class="row g-5 align-items-center mb-5">
-        <div class="col-lg-6" data-aos="fade-right">
-            <div class="pe-lg-4">
-                <!-- Card 1 -->
-                <div class="curved-box bg-{{ about.card1_color if about else 'danger' }} text-white p-5 mb-4">
-                    <h3 class="mb-3"><i class="fas fa-{{ about.card1_icon if about else 'utensils' }} me-3"></i> {{ about.card1_title if about else 'Our Story' }}</h3>
-                    <p class="lead mb-0">{{ about.card1_text if about else 'Founded in 2024, EFFOI Restaurant brings the authentic taste of Ethiopia to Silver Spring. Our recipes have been passed down through generations, preserving the rich culinary heritage of Ethiopia.' }}</p>
-                </div>
-                
-                <!-- Card 2 -->
-                <div class="curved-box bg-{{ about.card2_color if about else 'warning' }} text-dark p-5 mb-4">
-                    <h3 class="mb-3"><i class="fas fa-{{ about.card2_icon if about else 'leaf' }} me-3"></i> {{ about.card2_title if about else 'Our Philosophy' }}</h3>
-                    <p class="lead mb-0">{{ about.card2_text if about else 'We believe in using only the freshest ingredients, traditional cooking methods, and serving with the warm hospitality that Ethiopia is known for.' }}</p>
-                </div>
-                
-                <!-- Card 3 -->
-                <div class="curved-box bg-{{ about.card3_color if about else 'success' }} text-white p-5">
-                    <h3 class="mb-3"><i class="fas fa-{{ about.card3_icon if about else 'heart' }} me-3"></i> {{ about.card3_title if about else 'Our Promise' }}</h3>
-                    <p class="lead mb-0">{{ about.card3_text if about else 'Every dish is prepared with love and care, ensuring an unforgettable dining experience that will keep you coming back for more.' }}</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Gallery Images -->
-        <div class="col-lg-6" data-aos="fade-left">
-            <div class="row g-4" id="aboutGallery">
-                {% if about and about.gallery_images_rel %}
-                    {% for image in about.gallery_images_rel if image.is_active %}
-                    <div class="col-md-6">
-                        <div class="image-frame" style="height: 250px; cursor: pointer;" onclick="openImageModal('{{ image.image_url }}', '{{ image.title }}')">
-                            <img src="{{ image.image_url }}" class="w-100 h-100" alt="{{ image.title }}" style="object-fit: cover;" loading="lazy">
-                            {% if image.title %}
-                            <div class="image-overlay">
-                                <h6>{{ image.title }}</h6>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <!-- Default gallery images -->
-                    <div class="col-md-6">
-                        <div class="image-frame" style="height: 250px;">
-                            <img src="https://images.unsplash.com/photo-1517244683847-7456bb63ff54?q=80&w=2070" class="w-100 h-100" alt="Restaurant Interior" style="object-fit: cover;" loading="lazy">
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="image-frame" style="height: 250px;">
-                            <img src="https://images.unsplash.com/photo-1552566624-52f8b3c8b3c9?q=80&w=2070" class="w-100 h-100" alt="Ethiopian Food" style="object-fit: cover;" loading="lazy">
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="image-frame" style="height: 150px;">
-                            <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=2070" class="w-100 h-100" alt="Dining Experience" style="object-fit: cover;" loading="lazy">
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="image-frame" style="height: 150px;">
-                            <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?q=80&w=2070" class="w-100 h-100" alt="Ethiopian Coffee" style="object-fit: cover;" loading="lazy">
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="image-frame" style="height: 150px;">
-                            <img src="https://images.unsplash.com/photo-1544148103-0773bf10d330?q=80&w=2070" class="w-100 h-100" alt="Chef Preparing Food" style="object-fit: cover;" loading="lazy">
-                        </div>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-    
-    <!-- Stats Section -->
-    <div class="row text-center g-4 mt-5" data-aos="fade-up">
-        <div class="col-md-3">
-            <div class="curved-box-stat py-4">
-                <i class="fas fa-utensils fa-3x text-danger mb-3"></i>
-                <h3 class="fw-bold">{{ about.stats_dishes if about else '100' }}+</h3>
-                <p class="text-muted">Authentic Dishes</p>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="curved-box-stat py-4">
-                <i class="fas fa-wine-glass-alt fa-3x text-danger mb-3"></i>
-                <h3 class="fw-bold">{{ about.stats_years if about else '3' }}+</h3>
-                <p class="text-muted">Years of Service</p>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="curved-box-stat py-4">
-                <i class="fas fa-smile fa-3x text-danger mb-3"></i>
-                <h3 class="fw-bold">{{ (about.stats_customers/1000)|int if about else '2' }}k+</h3>
-                <p class="text-muted">Happy Customers</p>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="curved-box-stat py-4">
-                <i class="fas fa-award fa-3x text-danger mb-3"></i>
-                <h3 class="fw-bold">{{ about.stats_awards if about else '1' }}+</h3>
-                <p class="text-muted">Awards Won</p>
-            </div>
-        </div>
-    </div>
-</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
-    .curved-box {
-        border-radius: 50px 20px 50px 20px;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-    }
-    .curved-box:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 25px 50px rgba(139, 30, 30, 0.2);
-    }
-    .curved-box-stat {
-        border-radius: 30px 30px 30px 5px;
-        background: white;
-        padding: 1.5rem;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        transition: all 0.3s ease;
-    }
-    .curved-box-stat:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 40px rgba(139, 30, 30, 0.1);
-    }
-    .image-frame {
-        border-radius: 5%;
-        overflow: hidden;
-        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-        transition: all 0.3s ease;
-        position: relative;
-    }
-    .image-frame:hover {
-        transform: scale(1.02);
-        box-shadow: 0 20px 40px rgba(139, 30, 30, 0.2);
-    }
-    .image-overlay {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: linear-gradient(transparent, rgba(0,0,0,0.7));
-        color: white;
-        padding: 1rem;
-        transform: translateY(100%);
-        transition: transform 0.3s ease;
-    }
-    .image-frame:hover .image-overlay {
-        transform: translateY(0);
-    }
-    
-    /* ===== HERO VIDEO STYLES ===== */
-    .hero-video-wrapper {
-        width: 100%;
-        border-radius: 30px;
-        overflow: hidden;
-        box-shadow: 0 30px 60px rgba(0,0,0,0.2);
-        background-color: #000000;
-    }
-    
-    .video-responsive {
-        position: relative;
-        padding-bottom: 56.25%;
-        height: 0;
-        overflow: hidden;
-        background-color: #000000;
-    }
-    
-    .video-responsive iframe {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        border: 0;
-    }
-    
-    .video-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: #000000;
-        min-height: 500px;
-        padding: 20px;
-    }
-    
-    .video-container video {
-        max-width: 100%;
-        max-height: 500px;
-        width: auto;
-        height: auto;
-        margin: 0 auto;
-        display: block;
-        border-radius: 15px;
-    }
-    
-    .gif-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: #000000;
-        min-height: 500px;
-        padding: 20px;
-    }
-    
-    .gif-container img {
-        max-width: 100%;
-        max-height: 500px;
-        width: auto;
-        height: auto;
-        object-fit: contain;
-        display: block;
-        margin: 0 auto;
-        border-radius: 15px;
-    }
-    
-    .image-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: #000000;
-        min-height: 500px;
-        padding: 20px;
-    }
-    
-    .image-container img {
-        max-width: 100%;
-        max-height: 500px;
-        width: auto;
-        height: auto;
-        object-fit: contain;
-        display: block;
-        margin: 0 auto;
-        border-radius: 15px;
-    }
-    
-    /* ===== OWNERS SECTION STYLES ===== */
-    .title-decoration {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 1rem;
-        margin: 1rem 0;
-    }
-    
-    .title-decoration .line {
-        width: 60px;
-        height: 2px;
-        background: linear-gradient(90deg, #8B1E1E, #FFD700, #8B1E1E);
-    }
-    
-    .owner-card {
-        background: white;
-        border-radius: 30px;
-        overflow: hidden;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-    }
-    
-    .owner-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 30px 60px rgba(139, 30, 30, 0.2);
-    }
-    
-    .owner-image-wrapper {
-        position: relative;
-        padding: 2rem 2rem 0 2rem;
-        background: linear-gradient(135deg, #f8f9fa, #ffffff);
-    }
-    
-    .owner-image-frame {
-        position: relative;
-        width: 100%;
-        padding-bottom: 100%;
-        border-radius: 30px 30px 30px 30px;
-        overflow: hidden;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-        border: 4px solid white;
-    }
-    
-    .owner-image {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.5s ease;
-    }
-    
-    .owner-card:hover .owner-image {
-        transform: scale(1.05);
-    }
-    
-    .owner-image-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, rgba(139,30,30,0.2), rgba(0,0,0,0.4));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        border-radius: 30px;
-    }
-    
-    .owner-card:hover .owner-image-overlay {
-        opacity: 1;
-    }
-    
-    .owner-initials {
-        color: white;
-        font-size: 2.5rem;
-        font-weight: 700;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        background: rgba(139,30,30,0.7);
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 3px solid #FFD700;
-        animation: fadeIn 0.5s ease;
-    }
-    
-    @keyframes fadeIn {
-        from { opacity: 0; transform: scale(0.8); }
-        to { opacity: 1; transform: scale(1); }
-    }
-    
-    .owner-badge {
-        position: absolute;
-        top: 20px;
-        right: 30px;
-        background: #8B1E1E;
-        color: #FFD700;
-        padding: 0.5rem 1rem;
-        border-radius: 50px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        z-index: 10;
-    }
-    
-    .owner-content {
-        padding: 2rem;
-        text-align: center;
-        background: white;
-        flex: 1;
-    }
-    
-    .owner-name {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: #8B1E1E;
-        margin-bottom: 0.5rem;
-    }
-    
-    .owner-title {
-        color: #666;
-        font-size: 1rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 1rem;
-    }
-    
-    .owner-divider {
-        width: 50px;
-        height: 3px;
-        background: #FFD700;
-        margin: 1rem auto;
-        border-radius: 3px;
-    }
-    
-    .owner-bio {
-        color: #555;
-        line-height: 1.8;
-        margin-bottom: 1.5rem;
-        font-size: 0.95rem;
-    }
-    
-    .owner-quote {
-        background: #f8f9fa;
-        padding: 1rem;
-        border-radius: 15px;
-        margin-bottom: 1.5rem;
-        font-size: 0.95rem;
-        color: #8B1E1E;
-        border-left: 4px solid #8B1E1E;
-    }
-    
-    .owner-quote i {
-        color: #FFD700;
-        margin-right: 0.5rem;
-        font-size: 0.8rem;
-    }
-    
-    .owners-joint-statement {
-        background: linear-gradient(135deg, #8B1E1E, #B13E3E);
-        color: white;
-        padding: 2.5rem;
-        border-radius: 30px;
-        text-align: center;
-        box-shadow: 0 20px 40px rgba(139,30,30,0.3);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .owners-joint-statement::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: linear-gradient(45deg, transparent, rgba(255,215,0,0.1), transparent);
-        transform: rotate(45deg);
-        animation: shine 6s infinite;
-    }
-    
-    @keyframes shine {
-        0% { transform: translateX(-100%) rotate(45deg); }
-        20%, 100% { transform: translateX(100%) rotate(45deg); }
-    }
-    
-    .owners-joint-statement p {
-        font-size: 1.3rem;
-        font-style: italic;
-        position: relative;
-        z-index: 2;
-    }
-    
-    .joint-signature {
-        margin-top: 1.5rem;
-        display: flex;
-        justify-content: center;
-        gap: 2rem;
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #FFD700;
-        position: relative;
-        z-index: 2;
-    }
-    
-    /* ===== HORIZONTAL TEAM CARD - Clean & Professional ===== */
-    .horizontal-team-card {
-        background: #ffffff;
-        border-radius: 40px;
-        overflow: hidden;
-        box-shadow: 0 30px 60px rgba(0,0,0,0.15);
-        transition: all 0.3s ease;
-        border: 1px solid rgba(139, 30, 30, 0.1);
-    }
-    
-    .horizontal-team-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 40px 80px rgba(139, 30, 30, 0.2);
-    }
-    
-    .horizontal-card-inner {
-        display: flex;
-        flex-direction: row;
-        min-height: 450px;
-    }
-    
-    /* Left Side - Image */
-    .horizontal-card-image {
-        flex: 1.2;
-        overflow: hidden;
-        background: #f8f9fa;
-    }
-    
-    .team-group-photo {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.8s ease;
-        display: block;
-    }
-    
-    .horizontal-team-card:hover .team-group-photo {
-        transform: scale(1.03);
-    }
-    
-    /* Right Side - Text Content (inside card) */
-    .horizontal-card-content {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        padding: 3rem;
-        background: white;
-    }
-    
-    .content-inner {
-        width: 100%;
-    }
-    
-    .team-card-title {
-        font-size: 2.2rem;
-        font-weight: 600;
-        color: #8B1E1E;
-        margin-bottom: 1.5rem;
-        font-family: 'Playfair Display', serif;
-        position: relative;
-        padding-bottom: 1rem;
-    }
-    
-    .team-card-title::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 80px;
-        height: 3px;
-        background: #FFD700;
-        border-radius: 3px;
-    }
-    
-    .team-card-text {
-        font-size: 1.1rem;
-        line-height: 1.8;
-        color: #555;
-        margin-bottom: 1.5rem;
-    }
-    
-    .team-signature {
-        margin-top: 2rem;
-        text-align: right;
-        font-style: italic;
-        color: #888;
-        border-top: 1px dashed #ddd;
-        padding-top: 1rem;
-    }
-    
-    .team-signature span {
-        font-size: 1.1rem;
-        font-weight: 500;
-        color: #8B1E1E;
-    }
-    
-    /* Mobile Responsiveness */
-    @media (max-width: 992px) {
-        .horizontal-card-inner {
-            flex-direction: column;
-        }
-        
-        .horizontal-card-image {
-            height: 350px;
-        }
-        
-        .horizontal-card-content {
-            padding: 2rem;
-        }
-        
-        .team-card-title {
-            font-size: 1.8rem;
-        }
-    }
-    
-    @media (max-width: 768px) {
-        .horizontal-card-content {
-            padding: 1.5rem;
-        }
-        
-        .team-card-title {
-            font-size: 1.5rem;
-        }
-        
-        .team-card-text {
-            font-size: 1rem;
-        }
-    }
+  :root {
+    --red:       #A32D2D;
+    --red-dark:  #791F1F;
+    --red-deep:  #501313;
+    --red-light: #FCEBEB;
+    --red-mid:   #F09595;
+    --gold:      #BA7517;
+  }
+
+  .ab-root { font-family: 'DM Sans', sans-serif; max-width: 1100px; margin: 3rem auto; padding: 0 1.5rem; }
+
+  /* ── Hero ── */
+  .ab-eyebrow { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--red); font-weight: 500; text-align: center; margin-bottom: .75rem; }
+  .ab-hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(32px, 5vw, 54px); font-weight: 600; color: #1a1a1a; text-align: center; line-height: 1.1; margin-bottom: .6rem; }
+  .ab-hero-title em { font-style: italic; font-weight: 500; color: var(--red); }
+  .ab-hero-sub { text-align: center; font-size: 15px; color: #777; margin-bottom: 2.5rem; }
+
+  /* ── Media hero ── */
+  .ab-media { border-radius: 24px; overflow: hidden; border: 1px solid #eee; background: #111; aspect-ratio: 16/6; display: flex; align-items: center; justify-content: center; margin-bottom: 4rem; }
+  .ab-media img { width: 100%; height: 100%; object-fit: cover; opacity: .92; display: block; }
+  .ab-media iframe { width: 100%; height: 100%; border: 0; }
+  .ab-media video { width: 100%; height: 100%; object-fit: cover; }
+
+  /* ── Section header ── */
+  .ab-section-header { text-align: center; margin-bottom: 2rem; }
+  .ab-section-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(26px, 3vw, 36px); font-weight: 600; color: #1a1a1a; margin-bottom: .4rem; }
+  .ab-section-sub { font-size: 13px; color: #888; }
+
+  /* ── Owner cards ── */
+  .ab-owners { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 1.5rem; }
+  .ab-owner-card { background: #fff; border: 1px solid #eee; border-radius: 20px; overflow: hidden; transition: border-color .2s, transform .2s; }
+  .ab-owner-card:hover { border-color: var(--red); transform: translateY(-4px); }
+
+  .ab-owner-img-wrap { position: relative; aspect-ratio: 1/1; background: #f5f5f5; overflow: hidden; }
+  .ab-owner-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s; }
+  .ab-owner-card:hover .ab-owner-img-wrap img { transform: scale(1.05); }
+
+  .ab-owner-badge { position: absolute; top: 12px; right: 12px; background: var(--red); color: var(--red-light); font-size: 11px; font-weight: 500; padding: 5px 12px; border-radius: 99px; display: flex; align-items: center; gap: 5px; }
+  .ab-owner-badge i { font-size: 13px; }
+
+  .ab-owner-body { padding: 1.25rem; }
+  .ab-owner-name { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
+  .ab-owner-role { font-size: 11px; color: var(--red); font-weight: 500; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 10px; }
+  .ab-owner-rule { width: 32px; height: 2px; background: var(--red); border-radius: 1px; margin-bottom: 12px; }
+  .ab-owner-bio { font-size: 13px; color: #666; line-height: 1.7; margin-bottom: 12px; }
+  .ab-owner-quote { border-left: 2px solid var(--red); border-radius: 0; padding-left: 12px; font-size: 13px; color: #888; font-style: italic; line-height: 1.55; }
+
+  /* ── Joint statement ── */
+  .ab-joint { background: var(--red); border-radius: 20px; padding: 2.25rem 2.5rem; margin-bottom: 4rem; text-align: center; position: relative; overflow: hidden; }
+  .ab-joint::after { content: ''; position: absolute; top: -60%; right: -10%; width: 300px; height: 300px; border-radius: 50%; background: rgba(255,255,255,.04); pointer-events: none; }
+  .ab-joint-text { font-family: 'Cormorant Garamond', serif; font-size: clamp(16px, 2vw, 22px); font-style: italic; color: var(--red-light); line-height: 1.65; margin-bottom: 1.25rem; position: relative; z-index: 1; }
+  .ab-joint-sig { font-size: 16px; font-weight: 500; color: var(--red-mid); letter-spacing: .18em; position: relative; z-index: 1; }
+
+  /* ── Team card ── */
+  .ab-team-card { display: grid; grid-template-columns: 1.15fr 1fr; border-radius: 20px; overflow: hidden; border: 1px solid #eee; margin-bottom: 4rem; transition: border-color .2s; }
+  .ab-team-card:hover { border-color: var(--red); }
+  .ab-team-img { overflow: hidden; background: #f5f5f5; min-height: 380px; }
+  .ab-team-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s; }
+  .ab-team-card:hover .ab-team-img img { transform: scale(1.04); }
+  .ab-team-body { padding: 2.5rem; display: flex; flex-direction: column; justify-content: center; background: #fff; }
+  .ab-team-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600; color: #1a1a1a; margin-bottom: .75rem; }
+  .ab-team-rule { width: 40px; height: 2px; background: var(--red); border-radius: 1px; margin-bottom: 1.25rem; }
+  .ab-team-text { font-size: 14px; color: #666; line-height: 1.75; margin-bottom: 1rem; }
+  .ab-team-sig { font-size: 13px; color: var(--red); font-style: italic; border-top: 1px solid #f0f0f0; padding-top: .9rem; margin-top: .5rem; }
+
+  /* ── Info cards (story / philosophy / promise) ── */
+  .ab-info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 4rem; }
+  .ab-info-card { border: 1px solid #eee; border-radius: 16px; overflow: hidden; transition: transform .2s, border-color .2s; }
+  .ab-info-card:hover { transform: translateY(-3px); border-color: var(--red); }
+  .ab-info-top { padding: 1.5rem; }
+  .ab-info-top i { font-size: 22px; color: #fff; display: block; margin-bottom: 8px; }
+  .ab-info-top h3 { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: #fff; margin: 0; }
+  .ab-info-body { padding: 1.25rem; background: #fff; }
+  .ab-info-body p { font-size: 13px; color: #666; line-height: 1.7; margin: 0; }
+
+  /* ── Gallery ── */
+  .ab-gallery { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; gap: 12px; margin-bottom: 4rem; }
+  .ab-gal { border-radius: 14px; overflow: hidden; background: #f5f5f5; }
+  .ab-gal img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
+  .ab-gal:hover img { transform: scale(1.04); }
+  .ab-gal:first-child { grid-row: 1 / 3; min-height: 340px; }
+  .ab-gal:not(:first-child) { min-height: 160px; }
+  .ab-gal-overlay { position: relative; }
+  .ab-gal-overlay .ab-gal-caption { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,.6)); color: #fff; font-size: 12px; padding: .75rem 1rem; transform: translateY(100%); transition: transform .3s; border-radius: 0 0 14px 14px; }
+  .ab-gal-overlay:hover .ab-gal-caption { transform: translateY(0); }
+
+  /* ── Stats ── */
+  .ab-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .ab-stat { background: #fafafa; border: 1px solid #eee; border-radius: 14px; padding: 1.5rem 1rem; text-align: center; transition: border-color .2s, transform .2s; }
+  .ab-stat:hover { border-color: var(--red); transform: translateY(-2px); }
+  .ab-stat i { font-size: 26px; color: var(--red); display: block; margin-bottom: 10px; }
+  .ab-stat-num { font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 600; color: #1a1a1a; line-height: 1; }
+  .ab-stat-label { font-size: 12px; color: #888; margin-top: 5px; }
+
+  /* ── Image lightbox ── */
+  .ab-lightbox-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.85); z-index: 9999; align-items: center; justify-content: center; }
+  .ab-lightbox-backdrop.open { display: flex; }
+  .ab-lightbox-inner { position: relative; max-width: 90vw; max-height: 90vh; }
+  .ab-lightbox-inner img { max-width: 90vw; max-height: 80vh; object-fit: contain; border-radius: 12px; display: block; }
+  .ab-lightbox-caption { text-align: center; color: rgba(255,255,255,.7); font-size: 13px; margin-top: .75rem; }
+  .ab-lightbox-close { position: absolute; top: -14px; right: -14px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,.15); border: none; color: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .ab-lightbox-close:hover { background: var(--red); }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .ab-owners { grid-template-columns: 1fr; }
+    .ab-info-grid { grid-template-columns: 1fr; }
+    .ab-team-card { grid-template-columns: 1fr; }
+    .ab-team-img { min-height: 280px; }
+    .ab-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .ab-gallery { grid-template-columns: 1fr; }
+    .ab-gal:first-child { grid-row: auto; min-height: 220px; }
+    .ab-gal:not(:first-child) { min-height: 160px; }
+    .ab-stats { grid-template-columns: 1fr 1fr; }
+    .ab-joint { padding: 1.5rem; }
+  }
 </style>
 
+<div class="ab-root" id="about-page-content">
+
+  <!-- ── Hero ── -->
+  <p class="ab-eyebrow">Silver Spring, Maryland</p>
+  <h1 class="ab-hero-title">
+    {{ about.hero_title if about else 'The soul of <em>Ethiopia</em>,<br>on your table' }}
+  </h1>
+  <p class="ab-hero-sub">A restaurant born from heritage, love, and two extraordinary women.</p>
+
+  <!-- ── Media ── -->
+  <div class="ab-media">
+    {% if about and about.hero_video_url %}
+      {% if 'youtube' in about.hero_video_url or 'vimeo' in about.hero_video_url %}
+        <iframe src="{{ about.hero_video_url }}" allowfullscreen title="EFFOI Restaurant" loading="lazy"></iframe>
+      {% elif about.hero_video_url.endswith('.gif') %}
+        <img src="{{ about.hero_video_url }}" alt="EFFOI animation" loading="lazy">
+      {% elif about.hero_video_url.endswith(('.mp4', '.webm', '.ogg')) %}
+        <video autoplay loop muted playsinline preload="metadata">
+          <source src="{{ about.hero_video_url }}" type="video/mp4">
+          <source src="{{ about.hero_video_url }}" type="video/webm">
+        </video>
+      {% else %}
+        <img src="{{ about.hero_video_url }}" alt="EFFOI" loading="lazy">
+      {% endif %}
+    {% else %}
+      <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1400&q=80"
+           alt="EFFOI restaurant ambiance" loading="lazy">
+    {% endif %}
+  </div>
+
+  <!-- ── Owners ── -->
+  <div class="ab-section-header">
+    <p class="ab-eyebrow">The founders</p>
+    <h2 class="ab-section-title">Meet the owners</h2>
+    <p class="ab-section-sub">The passionate women behind EFFOI Restaurant &amp; Bar</p>
+  </div>
+
+  <div class="ab-owners">
+    <!-- Marye -->
+    <div class="ab-owner-card">
+      <div class="ab-owner-img-wrap">
+        <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Marye_Profile.png"
+             alt="Marye Effoi — Co-Founder &amp; Executive Chef" loading="lazy"
+             onerror="this.src='https://via.placeholder.com/600x600/A32D2D/ffffff?text=ME'">
+        <div class="ab-owner-badge">
+          <i class="ti ti-crown" aria-hidden="true"></i> Co-Founder
+        </div>
+      </div>
+      <div class="ab-owner-body">
+        <div class="ab-owner-name">Marye Effoi</div>
+        <div class="ab-owner-role">Co-Founder &amp; Executive Chef</div>
+        <div class="ab-owner-rule"></div>
+        <p class="ab-owner-bio">
+          With over 20 years of culinary experience, Marye brings the authentic flavours of Ethiopia to every dish.
+          Trained by her grandmother in the traditional cooking methods of Addis Ababa, she ensures every recipe
+          maintains its cultural integrity while delighting modern palates.
+        </p>
+        <div class="ab-owner-quote">"Cooking is my love language. Every dish tells a story of our heritage."</div>
+      </div>
+    </div>
+
+    <!-- Nigist -->
+    <div class="ab-owner-card">
+      <div class="ab-owner-img-wrap">
+        <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Nigist_Profile.png"
+             alt="Nigist Effoi — Co-Founder &amp; Hospitality Director" loading="lazy"
+             onerror="this.src='https://via.placeholder.com/600x600/A32D2D/ffffff?text=NE'">
+        <div class="ab-owner-badge">
+          <i class="ti ti-glass" aria-hidden="true"></i> Co-Founder
+        </div>
+      </div>
+      <div class="ab-owner-body">
+        <div class="ab-owner-name">Nigist Effoi</div>
+        <div class="ab-owner-role">Co-Founder &amp; Hospitality Director</div>
+        <div class="ab-owner-rule"></div>
+        <p class="ab-owner-bio">
+          Nigist's journey in hospitality began in her family's traditional coffee ceremony in Ethiopia.
+          Her warm smile and genuine care for guests create the unforgettable atmosphere that EFFOI is known for.
+        </p>
+        <div class="ab-owner-quote">"Hospitality is not a service — it's a tradition passed through generations."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Joint statement -->
+  <div class="ab-joint">
+    <p class="ab-joint-text">
+      "Together, we built EFFOI to share the rich culinary heritage of Ethiopia with our community.
+      Every dish, every smile, every moment is a reflection of our love for our culture and our guests."
+    </p>
+    <div class="ab-joint-sig">M.E. &nbsp;&amp;&nbsp; N.E.</div>
+  </div>
+
+  <!-- ── Team card ── -->
+  <div class="ab-section-header">
+    <p class="ab-eyebrow">Our team</p>
+    <h2 class="ab-section-title">The EFFOI family</h2>
+    <p class="ab-section-sub">The dedicated people behind your unforgettable dining experience</p>
+  </div>
+
+  <div class="ab-team-card">
+    <div class="ab-team-img">
+      <img src="https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/nigist1.jpg"
+           alt="EFFOI team" loading="lazy"
+           onerror="this.src='https://via.placeholder.com/800x600/A32D2D/ffffff?text=EFFOI+Team'">
+    </div>
+    <div class="ab-team-body">
+      <div class="ab-team-title">One team, one family</div>
+      <div class="ab-team-rule"></div>
+      <p class="ab-team-text">
+        From our culinary artists who craft each dish with precision, to our service staff who greet you with genuine
+        smiles — every member of our family is dedicated to creating unforgettable moments for our guests.
+      </p>
+      <p class="ab-team-text">
+        What makes us special isn't just our skills, but our spirit. This family atmosphere radiates from our kitchen
+        to every table — when you dine with us, you're truly dining with family.
+      </p>
+      <div class="ab-team-sig">The EFFOI Team</div>
+    </div>
+  </div>
+
+  <!-- ── Info cards + gallery ── -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 4rem; align-items: start;">
+
+    <!-- Info cards -->
+    <div class="ab-info-grid" style="grid-template-columns: 1fr; margin-bottom: 0;">
+      <div class="ab-info-card">
+        <div class="ab-info-top" style="background: var(--red);">
+          <i class="ti ti-book" aria-hidden="true"></i>
+          <h3>{{ about.card1_title if about else 'Our story' }}</h3>
+        </div>
+        <div class="ab-info-body">
+          <p>{{ about.card1_text if about else 'Founded in 2024, EFFOI Restaurant brings the authentic taste of Ethiopia to Silver Spring. Our recipes have been passed down through generations, preserving the rich culinary heritage of Ethiopia.' }}</p>
+        </div>
+      </div>
+
+      <div class="ab-info-card">
+        <div class="ab-info-top" style="background: var(--red-dark);">
+          <i class="ti ti-leaf" aria-hidden="true"></i>
+          <h3>{{ about.card2_title if about else 'Our philosophy' }}</h3>
+        </div>
+        <div class="ab-info-body">
+          <p>{{ about.card2_text if about else 'We believe in using only the freshest ingredients, traditional cooking methods, and serving with the warm hospitality that Ethiopia is known for.' }}</p>
+        </div>
+      </div>
+
+      <div class="ab-info-card">
+        <div class="ab-info-top" style="background: var(--red-deep);">
+          <i class="ti ti-heart" aria-hidden="true"></i>
+          <h3>{{ about.card3_title if about else 'Our promise' }}</h3>
+        </div>
+        <div class="ab-info-body">
+          <p>{{ about.card3_text if about else 'Every dish is prepared with love and care, ensuring an unforgettable dining experience that will keep you coming back for more.' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gallery -->
+    <div class="ab-gallery" id="aboutGallery">
+      {% if about and about.gallery_images_rel %}
+        {% for image in about.gallery_images_rel if image.is_active %}
+        <div class="ab-gal ab-gal-overlay" onclick="openLightbox('{{ image.image_url }}', '{{ image.title }}')">
+          <img src="{{ image.image_url }}" alt="{{ image.title }}" loading="lazy">
+          {% if image.title %}
+          <div class="ab-gal-caption">{{ image.title }}</div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="ab-gal">
+          <img src="https://images.unsplash.com/photo-1517244683847-7456bb63ff54?w=800&q=80" alt="Restaurant interior" loading="lazy">
+        </div>
+        <div class="ab-gal">
+          <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?w=600&q=80" alt="Ethiopian coffee" loading="lazy">
+        </div>
+        <div class="ab-gal">
+          <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80" alt="Ethiopian cuisine" loading="lazy">
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ── Stats ── -->
+  <div class="ab-stats">
+    <div class="ab-stat">
+      <i class="ti ti-tools-kitchen-2" aria-hidden="true"></i>
+      <div class="ab-stat-num">{{ about.stats_dishes if about else '100' }}+</div>
+      <div class="ab-stat-label">Authentic dishes</div>
+    </div>
+    <div class="ab-stat">
+      <i class="ti ti-calendar" aria-hidden="true"></i>
+      <div class="ab-stat-num">{{ about.stats_years if about else '3' }}+</div>
+      <div class="ab-stat-label">Years of service</div>
+    </div>
+    <div class="ab-stat">
+      <i class="ti ti-mood-happy" aria-hidden="true"></i>
+      <div class="ab-stat-num">{{ (about.stats_customers / 1000) | int if about else '2' }}k+</div>
+      <div class="ab-stat-label">Happy customers</div>
+    </div>
+    <div class="ab-stat">
+      <i class="ti ti-award" aria-hidden="true"></i>
+      <div class="ab-stat-num">{{ about.stats_awards if about else '1' }}+</div>
+      <div class="ab-stat-label">Awards won</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Lightbox ── -->
+<div class="ab-lightbox-backdrop" id="ab-lightbox" role="dialog" aria-modal="true" aria-label="Image viewer" onclick="closeLightbox(event)">
+  <div class="ab-lightbox-inner">
+    <button class="ab-lightbox-close" onclick="closeLightbox()" aria-label="Close image viewer">
+      <i class="ti ti-x" aria-hidden="true"></i>
+    </button>
+    <img id="ab-lightbox-img" src="" alt="">
+    <p class="ab-lightbox-caption" id="ab-lightbox-caption"></p>
+  </div>
+</div>
+
 <script>
-function openImageModal(imageUrl, caption) {
-    try {
-        let modal = document.getElementById('imageModal');
-        if (!modal) {
-            const modalHtml = `
-                <div class="modal fade" id="imageModal" tabindex="-1">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content bg-transparent border-0">
-                            <div class="modal-body text-center">
-                                <img src="" id="modalImage" class="img-fluid rounded-4" style="max-height: 80vh;">
-                                <p id="modalCaption" class="text-white mt-2"></p>
-                                <button type="button" class="btn btn-light mt-3" data-bs-dismiss="modal">Close</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-            modal = document.getElementById('imageModal');
-        }
-        
-        document.getElementById('modalImage').src = imageUrl;
-        document.getElementById('modalCaption').textContent = caption || '';
-        
-        const bsModal = new bootstrap.Modal(modal);
-        bsModal.show();
-    } catch (e) {
-        console.error('Modal error:', e);
-        alert('Image: ' + imageUrl);
-    }
+function openLightbox(src, caption) {
+  const lb = document.getElementById('ab-lightbox');
+  document.getElementById('ab-lightbox-img').src = src;
+  document.getElementById('ab-lightbox-caption').textContent = caption || '';
+  lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
+
+function closeLightbox(e) {
+  if (e && e.target !== document.getElementById('ab-lightbox') && !e.target.closest('.ab-lightbox-close')) return;
+  document.getElementById('ab-lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeLightbox({ target: document.getElementById('ab-lightbox') });
+});
+
+/* Scroll-triggered counter animation for stats */
+const stats = document.querySelectorAll('.ab-stat-num');
+const observed = new Set();
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && !observed.has(entry.target)) {
+      observed.add(entry.target);
+      const el = entry.target;
+      const raw = el.textContent.trim();
+      const suffix = raw.replace(/[\d.]/g, '');
+      const target = parseFloat(raw);
+      if (isNaN(target)) return;
+      let start = 0;
+      const step = target / 40;
+      const tick = () => {
+        start = Math.min(start + step, target);
+        el.textContent = (Number.isInteger(target) ? Math.round(start) : start.toFixed(1)) + suffix;
+        if (start < target) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+  });
+}, { threshold: 0.5 });
+
+stats.forEach(s => observer.observe(s));
 </script>
+
 {% endblock %}
