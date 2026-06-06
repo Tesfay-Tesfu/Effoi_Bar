@@ -1,4 +1,4 @@
-from effoi_app import app, db, Admin
+from app import app, db, Admin
 
 SUPER_ADMIN_USERNAME = 'admin'
 SUPER_ADMIN_EMAIL = 'superadmin@effoi.com'
