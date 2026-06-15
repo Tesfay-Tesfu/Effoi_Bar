@@ -1,5 +1,3 @@
-
-
 """
 EFFOI RESTAURANT - Complete Clean Flask Application
 """
@@ -16,6 +14,9 @@ from werkzeug.utils import secure_filename
 from urllib.parse import urlparse
 from dotenv import load_dotenv
 import secrets
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from email_validator import validate_email, EmailNotValidError
 
 # Load environment variables
 load_dotenv()
@@ -45,6 +46,23 @@ app.config['BASE_URL'] = os.getenv('BASE_URL', 'http://localhost:5001')
 # Initialize extensions
 db = SQLAlchemy(app)
 mail = Mail(app)
+
+# Limiter for rate limiting
+limiter = Limiter(
+    key_func=get_remote_address,
+    app=app,
+    default_limits=["10 per day"]
+)
+
+# blocked main domain
+BLOCKED_DOMAINS = {
+    "mailinator.com",
+    "10minutemail.com",
+    "guerrillamail.com",
+    "tempmail.com",
+    "yopmail.com",
+    "trashmail.com"
+}
 
 # ==================== TEMPLATE FILTERS ====================
 @app.template_filter('from_json')
@@ -420,46 +438,183 @@ def blog_post(post_id):
 
 @app.route('/blog/submit', methods=['GET', 'POST'])
 def submit_blog():
+
     if request.method == 'POST':
-        image_file = request.files.get('photo')
-        image_url = request.form.get('image_url')
-        
-        if image_file and image_file.filename:
-            filename = secure_filename(image_file.filename)
-            filename = f"{int(time.time())}_{filename}"
-            
-            upload_dir = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'blog')
-            os.makedirs(upload_dir, exist_ok=True)
-            
-            file_path = os.path.join(upload_dir, filename)
-            try:
-                image_file.save(file_path)
-                print(f"Saved blog image to {file_path}")
-                if not os.path.exists(file_path):
-                    print(f"Blog image not found after save: {file_path}")
-                    flash('Uploaded file could not be saved. Check server disk/permissions.', 'danger')
-                    return render_template('public/submit_blog.html')
-                image_url = url_for('static', filename=f'uploads/blog/{filename}', _external=True)
-            except Exception as e:
-                print(f"Failed to save blog image: {e}")
-                flash('Failed to save uploaded image. Check server permissions.', 'danger')
+
+        try:
+            title = request.form.get('title', '').strip()
+            content = request.form.get('content', '').strip()
+            author_name = request.form.get('author_name', '').strip()
+            author_email = request.form.get('author_email', '').strip().lower()
+
+            # -------------------------
+            # Validate required fields
+            # -------------------------
+            if not title or not content or not author_name or not author_email:
+                flash(
+                    'Please fill in all required fields.',
+                    'danger'
+                )
                 return render_template('public/submit_blog.html')
-        
-        post = BlogPost(
-            title=request.form.get('title'),
-            content=request.form.get('content'),
-            author_name=request.form.get('author_name'),
-            author_email=request.form.get('author_email'),
-            image_url=image_url,
-            status='pending'
-        )
-        db.session.add(post)
-        db.session.commit()
-        
-        flash('Thank you for sharing your experience! Your post will be reviewed shortly.', 'success')
-        return redirect(url_for('blog'))
-    
-    return render_template('public/submit_blog.html')
+
+            # -------------------------
+            # Prevent duplicate titles
+            # -------------------------
+            duplicate_title = BlogPost.query.filter(
+                BlogPost.author_email == author_email,
+                BlogPost.title == title
+            ).first()
+
+            if duplicate_title:
+                flash(
+                    'You have already submitted a blog post with this title.',
+                    'warning'
+                )
+                return render_template('public/submit_blog.html')
+
+            # -------------------------
+            # Prevent multiple pending posts
+            # -------------------------
+            pending_post = BlogPost.query.filter(
+                BlogPost.author_email == author_email,
+                BlogPost.status == 'pending'
+            ).first()
+
+            if pending_post:
+                flash(
+                    'You already have a blog post awaiting review.',
+                    'warning'
+                )
+                return render_template('public/submit_blog.html')
+
+            # -------------------------
+            # Cooldown (1 hour)
+            # -------------------------
+            recent_post = BlogPost.query.filter(
+                BlogPost.author_email == author_email,
+                BlogPost.created_at >= (
+                    datetime.utcnow() - timedelta(hours=1)
+                )
+            ).first()
+
+            if recent_post:
+                flash(
+                    'Please wait one hour before submitting another blog post.',
+                    'warning'
+                )
+                return render_template('public/submit_blog.html')
+
+            # -------------------------
+            # Handle Image Upload
+            # -------------------------
+            image_file = request.files.get('photo')
+            image_url = request.form.get('image_url')
+
+            if image_file and image_file.filename:
+
+                filename = secure_filename(
+                    image_file.filename
+                )
+
+                filename = (
+                    f"{int(time.time())}_{filename}"
+                )
+
+                upload_dir = os.path.join(
+                    app.root_path,
+                    'frontend',
+                    'static',
+                    'uploads',
+                    'blog'
+                )
+
+                os.makedirs(
+                    upload_dir,
+                    exist_ok=True
+                )
+
+                file_path = os.path.join(
+                    upload_dir,
+                    filename
+                )
+
+                try:
+                    image_file.save(file_path)
+
+                    if not os.path.exists(file_path):
+                        flash(
+                            'Uploaded image could not be saved.',
+                            'danger'
+                        )
+                        return render_template(
+                            'public/submit_blog.html'
+                        )
+
+                    image_url = url_for(
+                        'static',
+                        filename=f'uploads/blog/{filename}',
+                        _external=True
+                    )
+
+                except Exception as e:
+
+                    app.logger.error(
+                        f"Blog image upload error: {e}"
+                    )
+
+                    flash(
+                        'Failed to save uploaded image.',
+                        'danger'
+                    )
+
+                    return render_template(
+                        'public/submit_blog.html'
+                    )
+
+            # -------------------------
+            # Save Blog Post
+            # -------------------------
+            post = BlogPost(
+                title=title,
+                content=content,
+                author_name=author_name,
+                author_email=author_email,
+                image_url=image_url,
+                status='pending'
+            )
+
+            db.session.add(post)
+            db.session.commit()
+
+            flash(
+                'Thank you for sharing your experience! Your post will be reviewed shortly.',
+                'success'
+            )
+
+            return redirect(
+                url_for('blog')
+            )
+
+        except Exception as e:
+
+            db.session.rollback()
+
+            app.logger.error(
+                f"Blog submission error: {e}"
+            )
+
+            flash(
+                'An error occurred while submitting your blog post.',
+                'danger'
+            )
+
+            return render_template(
+                'public/submit_blog.html'
+            )
+
+    return render_template(
+        'public/submit_blog.html'
+    )
 
 @app.route('/blog/<int:post_id>/comment', methods=['POST'])
 def add_comment(post_id):
@@ -485,19 +640,52 @@ def reviews():
 
 @app.route('/reviews/submit', methods=['POST'])
 def submit_review():
+
+    customer_email = request.form.get(
+        'customer_email',
+        ''
+    ).strip().lower()
+
+    # Check for existing pending review
+    pending_review = Review.query.filter(
+        Review.customer_email == customer_email,
+        Review.is_approved == False
+    ).first()
+
+    if pending_review:
+        flash(
+            'You already have a review awaiting approval.',
+            'warning'
+        )
+        return redirect(
+            url_for('reviews')
+        )
+
     review = Review(
-        customer_name=request.form.get('customer_name'),
-        customer_email=request.form.get('customer_email'),
-        rating=int(request.form.get('rating')),
-        comment=request.form.get('comment'),
+        customer_name=request.form.get(
+            'customer_name'
+        ),
+        customer_email=customer_email,
+        rating=int(
+            request.form.get('rating')
+        ),
+        comment=request.form.get(
+            'comment'
+        ),
         is_approved=False
     )
+
     db.session.add(review)
     db.session.commit()
-    
-    flash('Thank you for your review! It will appear after approval.', 'success')
-    return redirect(url_for('reviews'))
 
+    flash(
+        'Thank you for your review! It will appear after approval.',
+        'success'
+    )
+
+    return redirect(
+        url_for('reviews')
+    )
 
 @app.route('/about')
 def about():
@@ -541,90 +729,188 @@ def send_contact():
 @app.route('/reserve', methods=['GET', 'POST'])
 def reserve():
     if request.method == 'POST':
+
         try:
+            name = request.form.get('name', '').strip()
+            email = request.form.get('email', '').strip().lower()
+            phone = request.form.get('phone', '').strip()
+
+            reservation_date = datetime.strptime(
+                request.form.get('date'),
+                '%Y-%m-%d'
+            ).date()
+
+            reservation_time = request.form.get('time')
+            party_size = int(request.form.get('party_size'))
+            special_requests = request.form.get(
+                'special_requests'
+            )
+
+            # -------------------------
+            # Email validation
+            # -------------------------
+            try:
+                validate_email(email)
+            except EmailNotValidError:
+                flash(
+                    'Please enter a valid email address.',
+                    'danger'
+                )
+                return redirect(url_for('reserve'))
+
+            # -------------------------
+            # Block disposable emails
+            # -------------------------
+            domain = email.split('@')[1]
+
+            if domain in BLOCKED_DOMAINS:
+                flash(
+                    'Temporary email addresses are not allowed.',
+                    'danger'
+                )
+                return redirect(url_for('reserve'))
+
+            # -------------------------
+            # Duplicate reservation
+            # -------------------------
+            duplicate = Reservation.query.filter(
+                Reservation.customer_email == email,
+                Reservation.reservation_date == reservation_date,
+                Reservation.reservation_time == reservation_time
+            ).first()
+
+            if duplicate:
+                flash(
+                    'A reservation already exists for this date and time.',
+                    'warning'
+                )
+                return redirect(url_for('reserve'))
+
+            # -------------------------
+            # Cooldown check
+            # -------------------------
+            recent = Reservation.query.filter(
+                Reservation.customer_email == email,
+                Reservation.status.in_(['pending']),
+                Reservation.created_at >= (
+                    datetime.utcnow() -
+                    timedelta(hours=1)
+                )
+            ).first()
+
+            if recent:
+                flash(
+                    'Please wait before submitting another reservation.',
+                    'warning'
+                )
+                return redirect(url_for('reserve'))
+
+            # -------------------------
+            # Save reservation
+            # -------------------------
             reservation = Reservation(
-                customer_name=request.form.get('name'),
-                customer_email=request.form.get('email'),
-                customer_phone=request.form.get('phone'),
-                reservation_date=datetime.strptime(request.form.get('date'), '%Y-%m-%d').date(),
-                reservation_time=request.form.get('time'),
-                party_size=int(request.form.get('party_size')),
-                special_requests=request.form.get('special_requests'),
+                customer_name=name,
+                customer_email=email,
+                customer_phone=phone,
+                reservation_date=reservation_date,
+                reservation_time=reservation_time,
+                party_size=party_size,
+                special_requests=special_requests,
                 status='pending'
             )
+
             db.session.add(reservation)
             db.session.commit()
-            
-            # Send confirmation email to customer
+
+            # -------------------------
+            # Customer Email
+            # -------------------------
             try:
+
                 msg = Message(
                     subject="Reservation Request Received - EFFOI Restaurant",
-                    recipients=[reservation.customer_email],
-                    html=f"""
-                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                        <div style="background-color: #8B1E1E; color: #FFD700; padding: 20px; text-align: center;">
-                            <h1>EFFOI Restaurant</h1>
-                        </div>
-                        <div style="padding: 30px; background-color: #f9f9f9;">
-                            <h2 style="color: #8B1E1E;">Thank You for Your Reservation Request</h2>
-                            <p>Dear <strong>{reservation.customer_name}</strong>,</p>
-                            <p>We have received your reservation request and will confirm it shortly.</p>
-                            
-                            <div style="background-color: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
-                                <h3 style="color: #8B1E1E; margin-top: 0;">Reservation Details:</h3>
-                                <p><strong>Date:</strong> {reservation.reservation_date.strftime('%B %d, %Y')}</p>
-                                <p><strong>Time:</strong> {reservation.reservation_time}</p>
-                                <p><strong>Party Size:</strong> {reservation.party_size} people</p>
-                                {f'<p><strong>Special Requests:</strong> {reservation.special_requests}</p>' if reservation.special_requests else ''}
-                            </div>
-                            
-                            <p><strong>Status:</strong> <span style="color: #FFA500; font-weight: bold;">Pending Confirmation</span></p>
-                            <p>We will send you another email once your reservation is confirmed.</p>
-                            
-                            <p>If you need to make any changes, please call us at <strong>(240) 660-1337</strong>.</p>
-                        </div>
-                        <div style="background-color: #8B1E1E; color: white; padding: 15px; text-align: center; font-size: 12px;">
-                            <p>8233 Fenton St, Silver Spring, MD 20910 | (240) 660-1337</p>
-                        </div>
-                    </div>
-                    """
+                    recipients=[email]
                 )
+
+                msg.html = f"""
+                <h2>Thank You For Your Reservation Request</h2>
+
+                <p>Hello <b>{name}</b>,</p>
+
+                <p>We have received your reservation request.</p>
+
+                <ul>
+                    <li>Date: {reservation_date}</li>
+                    <li>Time: {reservation_time}</li>
+                    <li>Party Size: {party_size}</li>
+                </ul>
+
+                <p>Status:
+                    <b style="color:orange;">
+                        Pending Confirmation
+                    </b>
+                </p>
+                """
+
                 mail.send(msg)
-                print(f"✅ Confirmation email sent to {reservation.customer_email}")
+
             except Exception as e:
-                print(f"❌ Failed to send confirmation email: {str(e)}")
-            
-            # Send notification to admin
-            try:
-                admin_msg = Message(
-                    subject=f"New Reservation: {reservation.customer_name}",
-                    recipients=['nigistme1277@gmail.com'],
-                    html=f"""
-                    <h2>New Reservation Request</h2>
-                    <p><strong>Name:</strong> {reservation.customer_name}</p>
-                    <p><strong>Email:</strong> {reservation.customer_email}</p>
-                    <p><strong>Phone:</strong> {reservation.customer_phone}</p>
-                    <p><strong>Date:</strong> {reservation.reservation_date.strftime('%Y-%m-%d')}</p>
-                    <p><strong>Time:</strong> {reservation.reservation_time}</p>
-                    <p><strong>Party Size:</strong> {reservation.party_size}</p>
-                    {f'<p><strong>Special Requests:</strong> {reservation.special_requests}</p>' if reservation.special_requests else ''}
-                    <p><a href="{url_for('admin_reservations', _external=True)}">View in Admin Panel</a></p>
-                    """
+                app.logger.error(
+                    f"Customer email error: {e}"
                 )
+
+            # -------------------------
+            # Admin Email
+            # -------------------------
+            try:
+
+                admin_msg = Message(
+                    subject=f"New Reservation: {name}",
+                    recipients=[
+                        "nigistme1277@gmail.com"
+                    ]
+                )
+
+                admin_msg.html = f"""
+                <h2>New Reservation</h2>
+
+                <p><b>Name:</b> {name}</p>
+                <p><b>Email:</b> {email}</p>
+                <p><b>Phone:</b> {phone}</p>
+                <p><b>Date:</b> {reservation_date}</p>
+                <p><b>Time:</b> {reservation_time}</p>
+                <p><b>Party Size:</b> {party_size}</p>
+                """
+
                 mail.send(admin_msg)
-                print(f"✅ Admin notification sent")
+
             except Exception as e:
-                print(f"❌ Failed to send admin notification: {str(e)}")
-            
-            flash('Your reservation request has been submitted. We\'ll confirm shortly!', 'success')
-            
+                app.logger.error(
+                    f"Admin email error: {e}"
+                )
+
+            flash(
+                'Your reservation request has been submitted successfully.',
+                'success'
+            )
+
+            return redirect(url_for('index'))
+
         except Exception as e:
-            print(f"❌ Reservation error: {str(e)}")
-            flash('There was an error processing your reservation. Please try again.', 'danger')
+
             db.session.rollback()
-        
-        return redirect(url_for('index'))
-    
+
+            app.logger.error(
+                f"Reservation error: {e}"
+            )
+
+            flash(
+                'There was an error processing your reservation.',
+                'danger'
+            )
+
+            return redirect(url_for('reserve'))
+
     return render_template('public/reserve.html')
 
 @app.route('/admin/reservations/update/<int:reservation_id>', methods=['POST'])
@@ -971,31 +1257,45 @@ def admin_download_menu_json():
 @app.route('/admin/menu/import', methods=['GET', 'POST'])
 @admin_required
 def admin_import_menu():
+
     if request.method == 'POST':
+
         if 'confirm' not in request.form:
-            flash('Please confirm that you understand this action', 'danger')
+            flash('Please confirm this action', 'danger')
             return redirect(url_for('admin_import_menu'))
-        
+
         json_file = request.files.get('menu_json')
+
         if not json_file:
             flash('No file uploaded', 'danger')
             return redirect(url_for('admin_import_menu'))
-        
+
+        if not json_file.filename.endswith('.json'):
+            flash('Only JSON files are allowed', 'danger')
+            return redirect(url_for('admin_import_menu'))
+
         try:
-            menu_data = json.load(json_file)
-            MenuItem.query.delete()
-            Category.query.delete()
-            
+            menu_data = json.loads(
+                json_file.read().decode('utf-8')
+            )
+
+            # safer delete
+            MenuItem.query.delete(synchronize_session=False)
+            Category.query.delete(synchronize_session=False)
+
             for cat_data in menu_data:
+
                 category = Category(
                     name=cat_data['category'],
                     display_order=cat_data.get('display_order', 0),
                     is_active=cat_data.get('is_active', True)
                 )
+
                 db.session.add(category)
                 db.session.flush()
-                
+
                 for item_data in cat_data.get('items', []):
+
                     item = MenuItem(
                         name=item_data['name'],
                         description=item_data.get('description', ''),
@@ -1007,16 +1307,21 @@ def admin_import_menu():
                         is_active=item_data.get('is_active', True),
                         display_order=item_data.get('display_order', 0)
                     )
+
                     db.session.add(item)
-            
+
             db.session.commit()
+
             flash('Menu imported successfully!', 'success')
+
         except Exception as e:
+
             db.session.rollback()
+
             flash(f'Error importing menu: {str(e)}', 'danger')
-        
+
         return redirect(url_for('admin_menu'))
-    
+
     return render_template('admin/import_menu.html')
 
 # ==================== ADMIN EVENTS ====================

@@ -1147,6 +1147,44 @@
             object-fit: cover;
         }
     </style>
+
+    <style>
+    .fw-black { fw-weight: 900; }
+    .fw-extrabold { fw-weight: 800; }
+    .bg-warning-subtle { background-color: rgba(255, 193, 7, 0.12) !important; }
+    .bg-warning-light { background-color: rgba(255, 193, 7, 0.15) !important; }
+    .transition-all { transition: all 0.25s ease-in-out; }
+    .hover-lift:hover { transform: translateY(-5px); box-shadow: 0 1rem 3rem rgba(0,0,0,0.1) !important; }
+    .hover-bg-light:hover { background-color: #f8f9fa; }
+    .fw-extrabold { font-weight: 800; }
+    .bg-warning-subtle { background-color: rgba(255, 193, 7, 0.12) !important; }
+    .transition-all { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    .duration-500 { transition-duration: 500ms; }
+    .backdrop-blur { backdrop-filter: blur(6px); background-color: rgba(33, 37, 41, 0.6) !important; }
+    .cursor-pointer { cursor: pointer; }
+    .italic-quote { font-style: italic; font-weight: 400; }
+    
+    /* Smart Visual Micro-Interactions */
+    .hover-lift:hover { 
+        transform: translateY(-6px); 
+        box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.075) !important; 
+    }
+    .hover-shadow:hover {
+        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.04) !important;
+    }
+    .hover-zoom-container {
+        outline: 0px solid rgba(255, 193, 7, 0);
+    }
+    .hover-zoom-container:hover img {
+        transform: scale(1.06);
+    }
+    .hover-zoom-container img {
+        transition: transform 0.4s ease;
+    }
+    .card:hover .hover-zoom {
+        transform: scale(1.04);
+    }
+    </style>
     
     {% block extra_css %}{% endblock %}
 </head>

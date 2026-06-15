@@ -3,63 +3,86 @@
 {% block title %}Club Events - EFFOI Restaurant{% endblock %}
 
 {% block content %}
-<div class="my-5">
-    <h1 class="display-3 text-center mb-5" data-aos="fade-up">Club Events at EFFOI</h1>
+<div class="container py-5">
+    <div class="text-center mb-5 position-relative page-hero-header py-4" data-aos="fade-up">
+        <h1 class="display-3 fw-bold text-gradient mb-2">Club Events at EFFOI</h1>
+        <p class="text-muted fs-5 mx-auto" style="max-width: 600px;">Experience unforgettable nights, exquisite flavors, and premium entertainment.</p>
+        <div class="header-line mx-auto"></div>
+    </div>
     
-    <!-- Upcoming Events -->
-    <h2 class="mb-4" data-aos="fade-right">Upcoming Events</h2>
+    <div class="d-flex align-items-center mb-4" data-aos="fade-right">
+        <div class="section-indicator me-3"></div>
+        <h2 class="fw-bold m-0 text-uppercase tracking-wide fs-4">Upcoming Events</h2>
+    </div>
+
     <div class="row g-4 mb-5">
         {% if upcoming %}
             {% for event in upcoming %}
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
-                <div class="card border-0 shadow-lg rounded-4 overflow-hidden h-100">
-                    <div class="position-relative">
+            <div class="col-12 col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                <div class="card h-100 border-0 shadow-sm event-card hover-lift overflow-hidden">
+                    <div class="event-img-container bg-dark position-relative d-flex align-items-center justify-content-center">
                         {% if event.image_url %}
-                        <img src="{{ event.image_url }}" class="card-img-top" alt="{{ event.title }}" style="height: 200px; object-fit: cover;">
+                            <img src="{{ event.image_url }}" class="img-fluid presentation-img" alt="{{ event.title }}">
                         {% else %}
-                        <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2070" class="card-img-top" alt="Event" style="height: 200px; object-fit: cover;">
+                            <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2070" class="img-fluid presentation-img" alt="Event">
                         {% endif %}
-                        <span class="position-absolute top-0 end-0 bg-danger text-white px-3 py-2 m-3 rounded-pill">
-                            <i class="far fa-calendar-alt me-1"></i> {{ event.event_date.strftime('%b %d') }}
-                        </span>
+                        
+                        <div class="position-absolute top-0 end-0 m-3 dynamic-date-badge shadow-sm">
+                            <span class="d-block fw-bold text-uppercase small text-center month">{{ event.event_date.strftime('%b') }}</span>
+                            <span class="d-block fs-4 fw-black text-center day lh-1">{{ event.event_date.strftime('%d') }}</span>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <h5 class="card-title">{{ event.title }}</h5>
-                        <p class="card-text text-muted">{{ event.description|default('Join us for an unforgettable evening!') }}</p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <i class="far fa-clock text-danger me-1"></i> {{ event.event_time|default('8:00 PM') }}
-                                <i class="fas fa-map-marker-alt text-danger ms-3 me-1"></i> {{ event.location|default('Main Hall') }}
+
+                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                {% if event.price and event.price > 0 %}
+                                    <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill px-3 py-1.5 fw-semibold fs-7">${{ "%.2f"|format(event.price) }}</span>
+                                {% else %}
+                                    <span class="badge bg-success-subtle text-success-emphasis rounded-pill px-3 py-1.5 fw-semibold fs-7">Free Entry</span>
+                                {% endif %}
                             </div>
-                            {% if event.price and event.price > 0 %}
-                            <span class="badge bg-warning text-dark">${{ "%.2f"|format(event.price) }}</span>
-                            {% else %}
-                            <span class="badge bg-success">Free Entry</span>
-                            {% endif %}
+                            
+                            <h5 class="card-title fw-bold text-dark text-truncate mb-2" title="{{ event.title }}">{{ event.title }}</h5>
+                            <p class="card-text text-secondary small line-clamp-3 mb-4">{{ event.description|default('Join us for an unforgettable evening at EFFOI!') }}</p>
+                        </div>
+
+                        <div class="border-top pt-3 mt-auto">
+                            <div class="row text-muted g-1 small">
+                                <div class="col-6 text-truncate">
+                                    <i class="far fa-clock text-danger me-1.5"></i>{{ event.event_time|default('8:00 PM') }}
+                                </div>
+                                <div class="col-6 text-truncate text-end">
+                                    <i class="fas fa-map-marker-alt text-danger me-1.5"></i>{{ event.location|default('Main Hall') }}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             {% endfor %}
         {% else %}
-            <div class="col-12 text-center py-5">
-                <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
-                <h4>No Upcoming Events</h4>
-                <p class="text-muted">Check back soon for exciting events!</p>
+            <div class="col-12 text-center py-5 shadow-sm rounded-4 bg-light border" data-aos="zoom-in">
+                <div class="empty-state-icon mx-auto mb-3 text-muted d-flex align-items-center justify-content-center bg-white rounded-circle shadow-sm" style="width: 80px; height: 80px;">
+                    <i class="fas fa-calendar-times fa-2x"></i>
+                </div>
+                <h4 class="fw-bold text-secondary">No Upcoming Events Right Now</h4>
+                <p class="text-muted small mb-0">We are planning things behind the scenes. Check back soon!</p>
             </div>
         {% endif %}
     </div>
     
-    <!-- Event Gallery - FIXED: Show ALL images regardless of event date -->
-    <h2 class="mb-4" data-aos="fade-right">Event Gallery</h2>
+    <div class="d-flex align-items-center mb-4 mt-5" data-aos="fade-right">
+        <div class="section-indicator me-3 bg-warning"></div>
+        <h2 class="fw-bold m-0 text-uppercase tracking-wide fs-4">Event Gallery</h2>
+    </div>
     
-    {# Get all images from all events #}
+    {# Media aggregation algorithm #}
     {% set all_images = [] %}
-    {% for event in events %}  {# Use 'events' which contains all events #}
+    {% for event in events %}
         {% if event.gallery_images and event.gallery_images|length > 0 %}
             {% for image in event.gallery_images %}
                 {% if image.is_active %}
-                    {# Add to our collection #}
                     {% set temp = all_images.append({
                         'url': image.image_url,
                         'title': image.title or event.title,
@@ -72,104 +95,193 @@
     {% endfor %}
     
     {% if all_images|length > 0 %}
-        <div class="row g-4">
+        <div class="row g-3">
             {% for image in all_images %}
-            <div class="col-md-4 col-lg-3" data-aos="zoom-in" data-aos-delay="{{ loop.index * 50 }}">
-                <div class="image-frame" style="height: 200px; cursor: pointer;" 
+            <div class="col-6 col-md-4 col-lg-3" data-aos="zoom-in" data-aos-delay="{{ loop.index * 30 }}">
+                <div class="gallery-item-frame bg-dark position-relative rounded-4 overflow-hidden shadow-sm" 
                      onclick="openImageModal('{{ image.url }}', '{{ image.title }}')">
-                    <img src="{{ image.url }}" class="w-100 h-100" 
-                         alt="{{ image.title }}" 
-                         style="object-fit: cover;"
+                    <img src="{{ image.url }}" class="gallery-img" alt="{{ image.title }}" 
                          onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2070';">
-                    <div class="image-overlay">
-                        <small>{{ image.title }}</small>
-                        <br>
-                        <small class="text-warning">{{ image.event_date.strftime('%b %d, %Y') }}</small>
+                    <div class="gallery-overlay p-3 d-flex flex-column justify-content-end">
+                        <p class="m-0 fw-bold text-white text-truncate small">{{ image.title }}</p>
+                        <span class="gallery-date-text text-warning text-truncate"><i class="far fa-calendar-alt me-1"></i>{{ image.event_date.strftime('%b %d, %Y') }}</span>
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
     {% else %}
-        <!-- Default gallery images -->
-        <div class="row g-4">
-            <div class="col-md-4 col-lg-3">
-                <div class="image-frame" style="height: 200px; cursor: pointer;" onclick="openImageModal('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2070')">
-                    <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2070" class="w-100 h-100" alt="Event" style="object-fit: cover;">
+        <div class="row g-3">
+            {% set defaults = [
+                'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2070',
+                'https://images.unsplash.com/photo-1501286353178-1ec871214cf9?q=80&w=2070',
+                'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=2070',
+                'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070'
+            ] %}
+            {% for img_url in defaults %}
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="gallery-item-frame bg-dark position-relative rounded-4 overflow-hidden shadow-sm" onclick="openImageModal('{{ img_url }}', 'EFFOI Special Moments')">
+                    <img src="{{ img_url }}" class="gallery-img" alt="Event Highlights">
+                    <div class="gallery-overlay p-3 d-flex flex-column justify-content-end">
+                        <p class="m-0 fw-bold text-white text-truncate small">EFFOI Moments</p>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-4 col-lg-3">
-                <div class="image-frame" style="height: 200px; cursor: pointer;" onclick="openImageModal('https://images.unsplash.com/photo-1501286353178-1ec871214cf9?q=80&w=2070')">
-                    <img src="https://images.unsplash.com/photo-1501286353178-1ec871214cf9?q=80&w=2070" class="w-100 h-100" alt="Event" style="object-fit: cover;">
-                </div>
-            </div>
-            <div class="col-md-4 col-lg-3">
-                <div class="image-frame" style="height: 200px; cursor: pointer;" onclick="openImageModal('https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=2070')">
-                    <img src="https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=2070" class="w-100 h-100" alt="Event" style="object-fit: cover;">
-                </div>
-            </div>
-            <div class="col-md-4 col-lg-3">
-                <div class="image-frame" style="height: 200px; cursor: pointer;" onclick="openImageModal('https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070')">
-                    <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070" class="w-100 h-100" alt="Event" style="object-fit: cover;">
-                </div>
-            </div>
+            {% endfor %}
         </div>
-        <div class="text-center mt-3 text-muted">
-            <p>No gallery images yet. Check back after our events!</p>
+        <div class="text-center mt-4 bg-light rounded-3 py-3 border border-dashed">
+            <p class="text-muted small m-0"><i class="info-circle me-1"></i> Showing curated highlights. Real-time community images populate post-event.</p>
         </div>
     {% endif %}
 </div>
 
-<!-- Image Modal -->
-<div class="modal fade" id="imageModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content bg-transparent border-0">
-            <div class="modal-body text-center">
-                <img src="" id="modalImage" class="img-fluid rounded-4" style="max-height: 80vh;">
-                <p id="modalCaption" class="text-white mt-2"></p>
-                <button type="button" class="btn btn-light mt-3 rounded-pill" data-bs-dismiss="modal">Close</button>
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content glass-modal-content border-0">
+            <div class="modal-header border-0 pb-0 justify-content-end">
+                <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center pt-0 px-4 pb-4">
+                <div class="modal-image-wrapper mb-3 rounded-3 bg-black-25 d-flex align-items-center justify-content-center">
+                    <img src="" id="modalImage" class="img-fluid rounded-3 target-modal-asset" alt="Enlarged gallery view">
+                </div>
+                <h5 id="modalCaption" class="text-white fw-bold m-0 tracking-wide"></h5>
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    .image-frame {
-        position: relative;
-        border-radius: 5%;
+    /* Typography and Branding Layout Accents */
+    .tracking-wide { letter-spacing: 0.05em; }
+    .text-gradient {
+        background: linear-gradient(45deg, #111111, #dc3545);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .header-line {
+        width: 60px;
+        height: 4px;
+        background-color: #dc3545;
+        border-radius: 2px;
+    }
+    .section-indicator {
+        width: 6px;
+        height: 24px;
+        background-color: #dc3545;
+        border-radius: 3px;
+    }
+    .fs-7 { font-size: 0.8rem; }
+    
+    /* Elegant Content Card Optimization Rules */
+    .event-card {
+        background-color: #ffffff;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+    }
+    .hover-lift:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,0.12) !important;
+    }
+    
+    /* Smart Core Engine - Preventing Image Cropping across platforms */
+    .event-img-container {
+        height: 220px;
+        width: 100%;
         overflow: hidden;
-        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-        transition: all 0.3s ease;
+        background: radial-gradient(circle, #2c2c2c 0%, #121212 100%);
     }
-    .image-frame:hover {
-        transform: scale(1.05);
-        box-shadow: 0 25px 50px rgba(139, 30, 30, 0.2);
+    .presentation-img {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain; /* Prevents text/heads from cutting off on flyers */
     }
-    .image-overlay {
+
+    /* Floating Dynamic Badge Structuring */
+    .dynamic-date-badge {
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        color: #111;
+        border-radius: 12px;
+        padding: 8px 12px;
+        min-width: 55px;
+    }
+    .dynamic-date-badge .month { color: #dc3545; font-size: 0.7rem; }
+    .dynamic-date-badge .day { font-weight: 800; color: #111; }
+    
+    /* Multi-line clamp configuration control */
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;  
+        overflow: hidden;
+    }
+
+    /* Grid Gallery Engine */
+    .gallery-item-frame {
+        height: 200px;
+        width: 100%;
+        cursor: pointer;
+        background-color: #121212;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    .gallery-img {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain; /* Protects native aspect ratio of your records */
+        transition: transform 0.5s ease;
+    }
+    .gallery-overlay {
         position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: linear-gradient(transparent, rgba(0,0,0,0.8));
-        color: white;
-        padding: 0.5rem;
-        font-size: 0.8rem;
-        text-align: center;
+        top: 0; bottom: 0; left: 0; right: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
         opacity: 0;
         transition: opacity 0.3s ease;
-        transform: translateY(0);
     }
-    .image-frame:hover .image-overlay {
-        opacity: 1;
+    .gallery-item-frame:hover .gallery-overlay { opacity: 1; }
+    .gallery-item-frame:hover .gallery-img { transform: scale(1.03); }
+    .gallery-date-text { font-size: 0.72rem; }
+
+    /* Modal Architecture Settings */
+    .glass-modal-content {
+        background: rgba(20, 20, 20, 0.85) !important;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
     }
+    .modal-image-wrapper {
+        width: 100%;
+        max-height: 70vh;
+        overflow: hidden;
+    }
+    .target-modal-asset {
+        max-height: 70vh;
+        object-fit: contain; /* Complete uncropped delivery in overlay popup */
+    }
+    .bg-black-25 { background-color: rgba(0, 0, 0, 0.25); }
+    .border-dashed { border-style: dashed !important; }
 </style>
 
 {% block extra_js %}
 <script>
+/**
+ * Triggers and renders the full uncropped asset frame inside modal presentation space.
+ * @param {string} imageUrl - The destination graphic file reference route.
+ * @param {string} caption - Headline text explaining the chosen asset context.
+ */
 function openImageModal(imageUrl, caption) {
-    document.getElementById('modalImage').src = imageUrl;
-    document.getElementById('modalCaption').textContent = caption || '';
-    new bootstrap.Modal(document.getElementById('imageModal')).show();
+    const targetImg = document.getElementById('modalImage');
+    const targetCaption = document.getElementById('modalCaption');
+    
+    if(targetImg && targetCaption) {
+        targetImg.src = imageUrl;
+        targetCaption.textContent = caption || '';
+        const instance = bootstrap.Modal.getOrCreateInstance(document.getElementById('imageModal'));
+        instance.show();
+    }
 }
 </script>
 {% endblock %}
