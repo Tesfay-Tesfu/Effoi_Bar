@@ -355,18 +355,12 @@ class AboutUs(db.Model):
 
 # ==================== HELPER FUNCTIONS ====================
 # Helper function to upload file to R2
-def upload_to_r2(file_obj, filename, folder='general'):
-    """
-    Upload a file to Cloudflare R2 bucket
-    Returns the public URL of the uploaded file
-    """
+ddef upload_to_r2(file_obj, filename, folder='general'):
     try:
-        # Generate a unique filename
         timestamp = int(time.time())
         secure_name = secure_filename(filename)
         unique_filename = f"{folder}/{timestamp}_{secure_name}"
         
-        # Upload to R2
         r2_client.upload_fileobj(
             file_obj,
             R2_BUCKET_NAME,
@@ -374,10 +368,10 @@ def upload_to_r2(file_obj, filename, folder='general'):
             ExtraArgs={'ContentType': file_obj.content_type if hasattr(file_obj, 'content_type') else 'application/octet-stream'}
         )
         
-        # Generate URL (if bucket is public) or use presigned URL
-        file_url = f"https://{R2_BUCKET_NAME}.{R2_ACCOUNT_ID}.r2.cloudflarestorage.com/{unique_filename}"
-        #file_url = f"https://{R2_BUCKET_NAME}.r2.dev/{unique_filename}"
-        #file_url = f"https://{R2_BUCKET_NAME}.r2.dev/{unique_filename}"
+        # PUBLIC URL using r2.dev domain
+        file_url = f"https://{R2_BUCKET_NAME}.r2.dev/{unique_filename}"
+        app.logger.info(f"R2 upload successful: {file_url}")
+        
         return file_url
     except ClientError as e:
         app.logger.error(f"R2 upload error: {e}")
