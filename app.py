@@ -375,9 +375,9 @@ def upload_to_r2(file_obj, filename, folder='general'):
         )
         
         # Generate URL (if bucket is public) or use presigned URL
-        #file_url = f"https://{R2_BUCKET_NAME}.{R2_ACCOUNT_ID}.r2.cloudflarestorage.com/{unique_filename}"
+        file_url = f"https://{R2_BUCKET_NAME}.{R2_ACCOUNT_ID}.r2.cloudflarestorage.com/{unique_filename}"
         #file_url = f"https://{R2_BUCKET_NAME}.r2.dev/{unique_filename}"
-        file_url = f"https://{R2_BUCKET_NAME}.r2.dev/{unique_filename}"
+        #file_url = f"https://{R2_BUCKET_NAME}.r2.dev/{unique_filename}"
         return file_url
     except ClientError as e:
         app.logger.error(f"R2 upload error: {e}")
