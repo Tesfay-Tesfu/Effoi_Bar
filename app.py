@@ -355,7 +355,7 @@ class AboutUs(db.Model):
 
 # ==================== HELPER FUNCTIONS ====================
 # Helper function to upload file to R2
-ddef upload_to_r2(file_obj, filename, folder='general'):
+def upload_to_r2(file_obj, filename, folder='general'):
     try:
         timestamp = int(time.time())
         secure_name = secure_filename(filename)
