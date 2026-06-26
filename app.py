@@ -17,6 +17,9 @@ import secrets
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from email_validator import validate_email, EmailNotValidError
+import boto3
+from botocore.config import Config
+from botocore.exceptions import ClientError
 
 # Load environment variables
 load_dotenv()
@@ -46,6 +49,21 @@ app.config['BASE_URL'] = os.getenv('BASE_URL', 'http://localhost:5001')
 # Initialize extensions
 db = SQLAlchemy(app)
 mail = Mail(app)
+
+# ==================== CLOUDFLARE R2 CONFIGURATION ====================
+R2_ACCOUNT_ID = os.getenv('R2_ACCOUNT_ID')
+R2_ACCESS_KEY = os.getenv('R2_ACCESS_KEY')
+R2_SECRET_KEY = os.getenv('R2_SECRET_KEY')
+R2_BUCKET_NAME = os.getenv('R2_BUCKET_NAME', 'effoi-media')
+
+r2_client = boto3.client(
+    service_name='s3',
+    endpoint_url=f'https://{R2_ACCOUNT_ID}.r2.cloudflarestorage.com',
+    aws_access_key_id=R2_ACCESS_KEY,
+    aws_secret_access_key=R2_SECRET_KEY,
+    region_name='auto',
+    config=Config(s3={'addressing_style': 'virtual'})
+)
 
 # Limiter for rate limiting
 limiter = Limiter(
@@ -336,6 +354,55 @@ class AboutUs(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 # ==================== HELPER FUNCTIONS ====================
+# Helper function to upload file to R2
+def upload_to_r2(file_obj, filename, folder='general'):
+    """
+    Upload a file to Cloudflare R2 bucket
+    Returns the public URL of the uploaded file
+    """
+    try:
+        # Generate a unique filename
+        timestamp = int(time.time())
+        secure_name = secure_filename(filename)
+        unique_filename = f"{folder}/{timestamp}_{secure_name}"
+        
+        # Upload to R2
+        r2_client.upload_fileobj(
+            file_obj,
+            R2_BUCKET_NAME,
+            unique_filename,
+            ExtraArgs={'ContentType': file_obj.content_type if hasattr(file_obj, 'content_type') else 'application/octet-stream'}
+        )
+        
+        # Generate URL (if bucket is public) or use presigned URL
+        file_url = f"https://{R2_BUCKET_NAME}.{R2_ACCOUNT_ID}.r2.cloudflarestorage.com/{unique_filename}"
+        return file_url
+    except ClientError as e:
+        app.logger.error(f"R2 upload error: {e}")
+        return None
+
+# Helper function to delete file from R2
+def delete_from_r2(file_url):
+    """Delete a file from R2 bucket by its URL"""
+    try:
+        # Extract key from URL
+        if 'r2.cloudflarestorage.com' in file_url:
+            key = file_url.split('/')[-1]
+            # If there are more path parts, reconstruct the key
+            parts = file_url.split('.r2.cloudflarestorage.com/')
+            if len(parts) > 1:
+                key = parts[1]
+            
+            r2_client.delete_object(
+                Bucket=R2_BUCKET_NAME,
+                Key=key
+            )
+            return True
+    except ClientError as e:
+        app.logger.error(f"R2 delete error: {e}")
+        return False
+
+        
 def get_available_times(date):
     all_times = []
     for hour in range(11, 22):
@@ -505,71 +572,25 @@ def submit_blog():
                 return render_template('public/submit_blog.html')
 
             # -------------------------
-            # Handle Image Upload
+            # Handle Image Upload to R2
             # -------------------------
             image_file = request.files.get('photo')
             image_url = request.form.get('image_url')
 
             if image_file and image_file.filename:
-
-                filename = secure_filename(
-                    image_file.filename
-                )
-
-                filename = (
-                    f"{int(time.time())}_{filename}"
-                )
-
-                upload_dir = os.path.join(
-                    app.root_path,
-                    'frontend',
-                    'static',
-                    'uploads',
-                    'blog'
-                )
-
-                os.makedirs(
-                    upload_dir,
-                    exist_ok=True
-                )
-
-                file_path = os.path.join(
-                    upload_dir,
-                    filename
-                )
-
                 try:
-                    image_file.save(file_path)
-
-                    if not os.path.exists(file_path):
-                        flash(
-                            'Uploaded image could not be saved.',
-                            'danger'
-                        )
-                        return render_template(
-                            'public/submit_blog.html'
-                        )
-
-                    image_url = url_for(
-                        'static',
-                        filename=f'uploads/blog/{filename}',
-                        _external=True
-                    )
-
+                    # Upload to R2 instead of local storage
+                    uploaded_url = upload_to_r2(image_file, image_file.filename, 'blog')
+                    if uploaded_url:
+                        image_url = uploaded_url
+                        app.logger.info(f"Blog image uploaded to R2: {image_url}")
+                    else:
+                        flash('Failed to upload image to cloud storage.', 'danger')
+                        return render_template('public/submit_blog.html')
                 except Exception as e:
-
-                    app.logger.error(
-                        f"Blog image upload error: {e}"
-                    )
-
-                    flash(
-                        'Failed to save uploaded image.',
-                        'danger'
-                    )
-
-                    return render_template(
-                        'public/submit_blog.html'
-                    )
+                    app.logger.error(f"Blog image upload error: {e}")
+                    flash('Failed to save uploaded image.', 'danger')
+                    return render_template('public/submit_blog.html')
 
             # -------------------------
             # Save Blog Post
@@ -1109,22 +1130,22 @@ def admin_menu():
 @admin_required
 def admin_add_menu_item():
     if request.method == 'POST':
-        # Handle image upload
+        # Handle image upload to R2
         image_file = request.files.get('image')
         image_url = request.form.get('image_url')
         
         if image_file and image_file.filename:
-            filename = secure_filename(f"menu_{int(time.time())}_{image_file.filename}")
-            upload_dir = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'menu')
-            os.makedirs(upload_dir, exist_ok=True)
-            save_path = os.path.join(upload_dir, filename)
             try:
-                image_file.save(save_path)
-                print(f"Saved menu image to {save_path}")
-                image_url = url_for('static', filename=f'uploads/menu/{filename}', _external=True)
+                uploaded_url = upload_to_r2(image_file, image_file.filename, 'menu')
+                if uploaded_url:
+                    image_url = uploaded_url
+                    app.logger.info(f"Menu image uploaded to R2: {image_url}")
+                else:
+                    flash('Failed to upload image to cloud storage.', 'danger')
+                    return redirect(url_for('admin_menu'))
             except Exception as e:
-                print(f"Failed to save menu image: {e}")
-                flash('Failed to save uploaded image. Check server permissions.', 'danger')
+                app.logger.error(f"Menu image upload error: {e}")
+                flash('Failed to upload image.', 'danger')
                 return redirect(url_for('admin_menu'))
         
         item = MenuItem(
@@ -1153,41 +1174,24 @@ def admin_edit_menu_item(item_id):
     
     if request.method == 'POST':
         # Handle image upload
+        # Handle image upload to R2
         image_file = request.files.get('image')
         if image_file and image_file.filename:
-            filename = secure_filename(f"menu_{int(time.time())}_{image_file.filename}")
-            upload_dir = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'menu')
-            os.makedirs(upload_dir, exist_ok=True)
-            save_path = os.path.join(upload_dir, filename)
             try:
-                image_file.save(save_path)
-                print(f"Saved menu image to {save_path}")
-                # ensure file was actually written
-                if not os.path.exists(save_path):
-                    print(f"Menu image not found after save: {save_path}")
-                    flash('Uploaded file could not be saved. Check server disk/permissions.', 'danger')
+                # Delete old image from R2 if it exists
+                if item.image_url:
+                    delete_from_r2(item.image_url)
+                
+                uploaded_url = upload_to_r2(image_file, image_file.filename, 'menu')
+                if uploaded_url:
+                    item.image_url = uploaded_url
+                    app.logger.info(f"Menu image updated in R2: {uploaded_url}")
+                else:
+                    flash('Failed to upload image to cloud storage.', 'danger')
                     return redirect(url_for('admin_menu'))
-
-                # remove previous image file if it exists and was stored in uploads/menu
-                try:
-                    old_url = item.image_url
-                    if old_url:
-                        parsed = urlparse(old_url)
-                        old_name = os.path.basename(parsed.path)
-                        old_path = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'menu', old_name)
-                        if os.path.exists(old_path) and old_path != save_path:
-                            try:
-                                os.remove(old_path)
-                                print(f"Removed old menu image: {old_path}")
-                            except Exception as e:
-                                print(f"Failed to remove old menu image: {e}")
-                except Exception as e:
-                    print(f"Error while handling old image removal: {e}")
-
-                item.image_url = url_for('static', filename=f'uploads/menu/{filename}', _external=True)
             except Exception as e:
-                print(f"Failed to save menu image (edit): {e}")
-                flash('Failed to save uploaded image. Check server permissions.', 'danger')
+                app.logger.error(f"Menu image update error: {e}")
+                flash('Failed to upload image.', 'danger')
                 return redirect(url_for('admin_menu'))
         elif request.form.get('image_url'):
             item.image_url = request.form.get('image_url')
@@ -1336,25 +1340,22 @@ def admin_events():
 def admin_add_event():
     if request.method == 'POST':
         # Handle image upload
+        # Handle image upload to R2
         image_file = request.files.get('image')
         image_url = request.form.get('image_url')
         
         if image_file and image_file.filename:
-            filename = secure_filename(f"event_{int(time.time())}_{image_file.filename}")
-            upload_dir = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'events')
-            os.makedirs(upload_dir, exist_ok=True)
-            save_path = os.path.join(upload_dir, filename)
             try:
-                image_file.save(save_path)
-                print(f"Saved event image to {save_path}")
-                if not os.path.exists(save_path):
-                    print(f"Event image not found after save: {save_path}")
-                    flash('Uploaded file could not be saved. Check server disk/permissions.', 'danger')
+                uploaded_url = upload_to_r2(image_file, image_file.filename, 'events')
+                if uploaded_url:
+                    image_url = uploaded_url
+                    app.logger.info(f"Event image uploaded to R2: {image_url}")
+                else:
+                    flash('Failed to upload image to cloud storage.', 'danger')
                     return redirect(url_for('admin_events'))
-                image_url = url_for('static', filename=f'uploads/events/{filename}', _external=True)
             except Exception as e:
-                print(f"Failed to save event image: {e}")
-                flash('Failed to save uploaded image. Check server permissions.', 'danger')
+                app.logger.error(f"Event image upload error: {e}")
+                flash('Failed to upload image.', 'danger')
                 return redirect(url_for('admin_events'))
         
         event = Event(
@@ -1380,37 +1381,24 @@ def admin_edit_event(event_id):
     
     if request.method == 'POST':
         # Handle image upload
+        # Handle image upload to R2
         image_file = request.files.get('image')
         if image_file and image_file.filename:
-            filename = secure_filename(f"event_{int(time.time())}_{image_file.filename}")
-            upload_dir = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'events')
-            os.makedirs(upload_dir, exist_ok=True)
-            save_path = os.path.join(upload_dir, filename)
             try:
-                image_file.save(save_path)
-                print(f"Saved event image to {save_path}")
-                if not os.path.exists(save_path):
-                    print(f"Event image not found after save: {save_path}")
-                    flash('Uploaded file could not be saved. Check server disk/permissions.', 'danger')
+                # Delete old image from R2 if it exists
+                if event.image_url:
+                    delete_from_r2(event.image_url)
+                
+                uploaded_url = upload_to_r2(image_file, image_file.filename, 'events')
+                if uploaded_url:
+                    event.image_url = uploaded_url
+                    app.logger.info(f"Event image updated in R2: {uploaded_url}")
+                else:
+                    flash('Failed to upload image to cloud storage.', 'danger')
                     return redirect(url_for('admin_events'))
-                try:
-                    old_url = event.image_url
-                    if old_url:
-                        parsed = urlparse(old_url)
-                        old_name = os.path.basename(parsed.path)
-                        old_path = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'events', old_name)
-                        if os.path.exists(old_path) and old_path != save_path:
-                            try:
-                                os.remove(old_path)
-                                print(f"Removed old event image: {old_path}")
-                            except Exception as e:
-                                print(f"Failed to remove old event image: {e}")
-                except Exception as e:
-                    print(f"Error while handling old image removal: {e}")
-                event.image_url = url_for('static', filename=f'uploads/events/{filename}', _external=True)
             except Exception as e:
-                print(f"Failed to save event image (edit): {e}")
-                flash('Failed to save uploaded image. Check server permissions.', 'danger')
+                app.logger.error(f"Event image update error: {e}")
+                flash('Failed to upload image.', 'danger')
                 return redirect(url_for('admin_events'))
         elif request.form.get('image_url'):
             event.image_url = request.form.get('image_url')
@@ -1475,38 +1463,24 @@ def admin_blog_edit(post_id):
         post.author_name = author_name
         post.author_email = author_email if author_email else None
         post.status = status if status else post.status
-        
+        # Handle image upload to R2
         image_file = request.files.get('image')
         if image_file and image_file.filename:
-            filename = secure_filename(f"blog_{int(time.time())}_{image_file.filename}")
-            upload_dir = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'blog')
-            os.makedirs(upload_dir, exist_ok=True)
-            save_path = os.path.join(upload_dir, filename)
             try:
-                image_file.save(save_path)
-                print(f"Saved blog image to {save_path}")
-                if not os.path.exists(save_path):
-                    print(f"Blog image not found after save: {save_path}")
-                    flash('Uploaded file could not be saved. Check server disk/permissions.', 'danger')
+                # Delete old image from R2 if it exists
+                if post.image_url:
+                    delete_from_r2(post.image_url)
+                
+                uploaded_url = upload_to_r2(image_file, image_file.filename, 'blog')
+                if uploaded_url:
+                    post.image_url = uploaded_url
+                    app.logger.info(f"Blog image updated in R2: {uploaded_url}")
+                else:
+                    flash('Failed to upload image to cloud storage.', 'danger')
                     return redirect(url_for('admin_blog'))
-                try:
-                    old_url = post.image_url
-                    if old_url:
-                        parsed = urlparse(old_url)
-                        old_name = os.path.basename(parsed.path)
-                        old_path = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'blog', old_name)
-                        if os.path.exists(old_path) and old_path != save_path:
-                            try:
-                                os.remove(old_path)
-                                print(f"Removed old blog image: {old_path}")
-                            except Exception as e:
-                                print(f"Failed to remove old blog image: {e}")
-                except Exception as e:
-                    print(f"Error while handling old blog image removal: {e}")
-                post.image_url = url_for('static', filename=f'uploads/blog/{filename}', _external=True)
             except Exception as e:
-                print(f"Failed to save blog image (edit): {e}")
-                flash('Failed to save uploaded image. Check server permissions.', 'danger')
+                app.logger.error(f"Blog image update error: {e}")
+                flash('Failed to upload image.', 'danger')
                 return redirect(url_for('admin_blog'))
         elif request.form.get('image_url'):
             post.image_url = request.form.get('image_url')
@@ -1726,26 +1700,21 @@ def admin_hero_sliders():
 @admin_required
 def admin_add_slider():
     if request.method == 'POST':
+        # Handle image upload to R2
         image_file = request.files.get('image')
         image_url = request.form.get('image_url')
         if image_file and image_file.filename:
-            filename = secure_filename(f"slider_{int(time.time())}_{image_file.filename}")
-            # Use app.root_path to build a reliable path to the frontend static folder
-            upload_dir = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'sliders')
             try:
-                os.makedirs(upload_dir, exist_ok=True)
+                uploaded_url = upload_to_r2(image_file, image_file.filename, 'sliders')
+                if uploaded_url:
+                    image_url = uploaded_url
+                    app.logger.info(f"Slider image uploaded to R2: {image_url}")
+                else:
+                    flash('Failed to upload image to cloud storage.', 'danger')
+                    return redirect(url_for('admin_hero_sliders'))
             except Exception as e:
-                flash(f'Could not create upload directory: {str(e)}', 'danger')
-                return redirect(url_for('admin_hero_sliders'))
-
-            save_path = os.path.join(upload_dir, filename)
-            try:
-                image_file.save(save_path)
-                # Use the app static URL for saved files
-                image_url = url_for('static', filename=f'uploads/sliders/{filename}', _external=True)
-                print(f"Saved slider image to: {save_path}")
-            except Exception as e:
-                flash(f'Failed to save image: {str(e)}', 'danger')
+                app.logger.error(f"Slider image upload error: {e}")
+                flash('Failed to upload image.', 'danger')
                 return redirect(url_for('admin_hero_sliders'))
         
         slider = HeroSlider(
@@ -1770,23 +1739,24 @@ def admin_edit_slider(slider_id):
     slider = HeroSlider.query.get_or_404(slider_id)
     
     if request.method == 'POST':
+        # Handle image upload to R2
         image_file = request.files.get('image')
         if image_file and image_file.filename:
-            filename = secure_filename(f"slider_{int(time.time())}_{image_file.filename}")
-            upload_dir = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'sliders')
             try:
-                os.makedirs(upload_dir, exist_ok=True)
+                # Delete old image from R2 if it exists
+                if slider.image_url:
+                    delete_from_r2(slider.image_url)
+                
+                uploaded_url = upload_to_r2(image_file, image_file.filename, 'sliders')
+                if uploaded_url:
+                    slider.image_url = uploaded_url
+                    app.logger.info(f"Slider image updated in R2: {uploaded_url}")
+                else:
+                    flash('Failed to upload image to cloud storage.', 'danger')
+                    return redirect(url_for('admin_hero_sliders'))
             except Exception as e:
-                flash(f'Could not create upload directory: {str(e)}', 'danger')
-                return redirect(url_for('admin_hero_sliders'))
-
-            save_path = os.path.join(upload_dir, filename)
-            try:
-                image_file.save(save_path)
-                slider.image_url = url_for('static', filename=f'uploads/sliders/{filename}', _external=True)
-                print(f"Saved edited slider image to: {save_path}")
-            except Exception as e:
-                flash(f'Failed to save image: {str(e)}', 'danger')
+                app.logger.error(f"Slider image update error: {e}")
+                flash('Failed to upload image.', 'danger')
                 return redirect(url_for('admin_hero_sliders'))
         elif request.form.get('image_url'):
             slider.image_url = request.form.get('image_url')
@@ -1832,26 +1802,25 @@ def admin_gallery():
 @app.route('/admin/gallery/upload', methods=['POST'])
 @admin_required
 def admin_upload_gallery():
+    # Handle image upload to R2
     image_file = request.files.get('image')
     if image_file and image_file.filename:
-        filename = secure_filename(f"gallery_{int(time.time())}_{image_file.filename}")
-        upload_dir = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'gallery')
         try:
-            os.makedirs(upload_dir, exist_ok=True)
+            uploaded_url = upload_to_r2(image_file, image_file.filename, 'gallery')
+            if uploaded_url:
+                image_url = uploaded_url
+                app.logger.info(f"Gallery image uploaded to R2: {image_url}")
+            else:
+                flash('Failed to upload image to cloud storage.', 'danger')
+                return redirect(url_for('admin_gallery'))
         except Exception as e:
-            flash(f'Could not create upload directory: {str(e)}', 'danger')
-            return redirect(url_for('admin_gallery'))
-
-        save_path = os.path.join(upload_dir, filename)
-        try:
-            image_file.save(save_path)
-        except Exception as e:
-            flash(f'Failed to save image: {str(e)}', 'danger')
+            app.logger.error(f"Gallery image upload error: {e}")
+            flash('Failed to upload image.', 'danger')
             return redirect(url_for('admin_gallery'))
 
         image = GalleryImage(
             title=request.form.get('title'),
-            image_url=url_for('static', filename=f'uploads/gallery/{filename}', _external=True),
+            image_url=image_url,
             category=request.form.get('category'),
             display_order=int(request.form.get('display_order', 0)),
             is_active=True
@@ -1859,7 +1828,6 @@ def admin_upload_gallery():
         db.session.add(image)
         db.session.commit()
         flash('Image uploaded successfully', 'success')
-        print(f"Saved gallery image to: {save_path}")
     else:
         flash('No image file provided', 'danger')
     
@@ -2190,28 +2158,25 @@ def admin_edit_gallery(image_id):
     image.is_active = 'is_active' in request.form
     
     # Handle image upload
+    # Handle image upload to R2
     image_file = request.files.get('image')
     if image_file and image_file.filename:
-        filename = secure_filename(f"gallery_{int(time.time())}_{image_file.filename}")
-        upload_dir = os.path.join(app.root_path, 'frontend', 'static', 'uploads', 'gallery')
         try:
-            os.makedirs(upload_dir, exist_ok=True)
+            # Delete old image from R2 if it exists
+            if image.image_url:
+                delete_from_r2(image.image_url)
+            
+            uploaded_url = upload_to_r2(image_file, image_file.filename, 'gallery')
+            if uploaded_url:
+                image.image_url = uploaded_url
+                app.logger.info(f"Gallery image updated in R2: {uploaded_url}")
+            else:
+                flash('Failed to upload image to cloud storage.', 'danger')
+                return redirect(url_for('admin_gallery'))
         except Exception as e:
-            flash(f'Could not create upload directory: {str(e)}', 'danger')
+            app.logger.error(f"Gallery image update error: {e}")
+            flash('Failed to upload image.', 'danger')
             return redirect(url_for('admin_gallery'))
-
-        save_path = os.path.join(upload_dir, filename)
-        try:
-            image_file.save(save_path)
-            image.image_url = url_for('static', filename=f'uploads/gallery/{filename}', _external=True)
-            print(f"Saved edited gallery image to: {save_path}")
-        except Exception as e:
-            flash(f'Failed to save image: {str(e)}', 'danger')
-            return redirect(url_for('admin_gallery'))
-    
-    db.session.commit()
-    flash('Image updated successfully', 'success')
-    return redirect(url_for('admin_gallery'))
 
 # ==================== API - GET GALLERY IMAGE ====================
 @app.route('/api/gallery-image/<int:image_id>')
