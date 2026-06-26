@@ -369,7 +369,7 @@ def upload_to_r2(file_obj, filename, folder='general'):
         )
         
         # PUBLIC URL using r2.dev domain
-        file_url = f"https://{R2_BUCKET_NAME}.r2.dev/{unique_filename}"
+        file_url = f"https://pub-4c7ec5a99307440ab133ac966156aa11.r2.dev/{unique_filename}"
         app.logger.info(f"R2 upload successful: {file_url}")
         
         return file_url
