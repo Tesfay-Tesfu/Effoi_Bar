@@ -130,8 +130,7 @@
 </section>
 
 <!-- ==================== CATERING SECTION ==================== -->
-<section class="ct-section py-3 bg-linear-gradient"
-    style="background: linear-gradient(180deg, #fdfbf7 0%, #ffffff 100%);">
+<section class="ct-section py-3 bg-linear-gradient" style="background: linear-gradient(180deg, #fdfbf7 0%, #ffffff 100%);">
     <div class="container py-4">
 
         <div class="text-center mb-5 animate-fade-in">
@@ -3719,17 +3718,17 @@
     // ── Build slider data from Jinja context ──────────────────────
     let heroSliders = [
         {% if hero_sliders and hero_sliders | length > 1 %}
-    {% for slider in hero_sliders[1:] %}
-    {
-        id: { { slider.id } },
-        title: "{{ slider.title|replace('"', '\\"')|safe }}",
+        {% for slider in hero_sliders[1:] %}
+        {
+            id: {{ slider.id }},
+            title: "{{ slider.title|replace('"', '\\"')|safe }}",
             subtitle: "{{ slider.subtitle|replace('"', '\\"')|safe if slider.subtitle else '' }}",
-                image_url: "{{ slider.image_url|replace('"', '\\"')|safe }}",
-                    button_link: "{{ slider.button_link|replace('"', '\\"')|safe }}"
-    } {% if not loop.last %}, {% endif %}
-    {% endfor %}
-    {% endif %}
-];
+            image_url: "{{ slider.image_url|replace('"', '\\"')|safe }}",
+            button_link: "{{ slider.button_link|replace('"', '\\"')|safe }}"
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+        {% endif %}
+    ];
 
     // Fallback gallery when no DB data
     if (heroSliders.length === 0) {
@@ -3805,7 +3804,6 @@
     });
 
     startSlideShow();
-    setInterval(buildGrid, 3200);
 
     // ── Image modal helper ────────────────────────────────────────
     function openImageModal(imageUrl) {
