@@ -3,82 +3,637 @@
 {% block title %}Manage Today's Specials - EFFOI Admin{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Today's Specials</h1>
-    <a href="{{ url_for('admin_menu') }}" class="btn btn-outline-primary">
-        <i class="fas fa-utensils"></i> View Full Menu
-    </a>
+
+<style>
+  /* ── Page Variables ── */
+  :root {
+    --ef-brown:       #6B3F1F;
+    --ef-brown-light: #8B5A2B;
+    --ef-cream:       #FDF8F3;
+    --ef-sand:        #F0E6D8;
+    --ef-border:      #E2D0BC;
+    --ef-text:        #2C1A0E;
+    --ef-muted:       #7A6252;
+    --ef-success:     #2D7A4F;
+    --ef-warning:     #B8860B;
+    --ef-radius:      10px;
+    --ef-shadow:      0 2px 8px rgba(107,63,31,.10);
+  }
+
+  /* ── Page Header ── */
+  .ef-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: .75rem;
+  }
+  .ef-page-header h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--ef-brown);
+    margin: 0;
+  }
+  .btn-ef-outline {
+    border: 2px solid var(--ef-brown);
+    color: var(--ef-brown);
+    background: transparent;
+    border-radius: var(--ef-radius);
+    padding: .45rem 1rem;
+    font-weight: 600;
+    font-size: .875rem;
+    transition: background .18s, color .18s;
+  }
+  .btn-ef-outline:hover {
+    background: var(--ef-brown);
+    color: #fff;
+  }
+
+  /* ── Info Banner ── */
+  .ef-info-banner {
+    background: #EEF4FF;
+    border: 1px solid #C7D9F8;
+    border-radius: var(--ef-radius);
+    padding: .7rem 1rem;
+    color: #2354A4;
+    font-size: .875rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+
+  /* ── Controls Bar ── */
+  .ef-controls {
+    background: var(--ef-cream);
+    border: 1px solid var(--ef-border);
+    border-radius: var(--ef-radius);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    align-items: flex-end;
+  }
+  .ef-control-group {
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+    min-width: 140px;
+  }
+  .ef-control-group label {
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--ef-muted);
+  }
+  .ef-control-group select,
+  .ef-control-group input {
+    border: 1.5px solid var(--ef-border);
+    border-radius: 7px;
+    padding: .4rem .7rem;
+    font-size: .875rem;
+    color: var(--ef-text);
+    background: #fff;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .ef-control-group select:focus,
+  .ef-control-group input:focus {
+    border-color: var(--ef-brown-light);
+  }
+  .ef-search-group {
+    flex: 1;
+    min-width: 200px;
+  }
+  .ef-search-wrap {
+    position: relative;
+  }
+  .ef-search-wrap i {
+    position: absolute;
+    left: .7rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ef-muted);
+    font-size: .85rem;
+  }
+  .ef-search-wrap input {
+    padding-left: 2.1rem !important;
+    width: 100%;
+  }
+  .btn-ef-reset {
+    border: 1.5px solid var(--ef-border);
+    background: #fff;
+    color: var(--ef-muted);
+    border-radius: 7px;
+    padding: .4rem .9rem;
+    font-size: .875rem;
+    cursor: pointer;
+    align-self: flex-end;
+    transition: border-color .15s, color .15s;
+  }
+  .btn-ef-reset:hover {
+    border-color: var(--ef-brown);
+    color: var(--ef-brown);
+  }
+
+  /* ── Result Summary ── */
+  .ef-result-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: .83rem;
+    color: var(--ef-muted);
+    margin-bottom: .6rem;
+    flex-wrap: wrap;
+    gap: .5rem;
+  }
+  .ef-result-bar strong {
+    color: var(--ef-text);
+  }
+
+  /* ── Table Card ── */
+  .ef-card {
+    background: #fff;
+    border: 1px solid var(--ef-border);
+    border-radius: var(--ef-radius);
+    box-shadow: var(--ef-shadow);
+    overflow: hidden;
+  }
+  .ef-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .875rem;
+  }
+  .ef-table thead tr {
+    background: var(--ef-sand);
+    border-bottom: 2px solid var(--ef-border);
+  }
+  .ef-table thead th {
+    padding: .75rem 1rem;
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--ef-brown);
+    white-space: nowrap;
+  }
+  .ef-table tbody tr {
+    border-bottom: 1px solid var(--ef-border);
+    transition: background .12s;
+  }
+  .ef-table tbody tr:last-child { border-bottom: none; }
+  .ef-table tbody tr:hover { background: var(--ef-cream); }
+  .ef-table td {
+    padding: .7rem 1rem;
+    color: var(--ef-text);
+    vertical-align: middle;
+  }
+
+  /* ── Thumb ── */
+  .ef-thumb {
+    width: 46px;
+    height: 46px;
+    object-fit: cover;
+    border-radius: 7px;
+    border: 1px solid var(--ef-border);
+  }
+  .ef-thumb-placeholder {
+    width: 46px;
+    height: 46px;
+    background: var(--ef-sand);
+    border-radius: 7px;
+    border: 1px solid var(--ef-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ef-muted);
+    font-size: .75rem;
+  }
+
+  /* ── Item Name ── */
+  .ef-item-name {
+    font-weight: 600;
+    color: var(--ef-text);
+  }
+
+  /* ── Price ── */
+  .ef-price {
+    font-weight: 600;
+    color: var(--ef-brown);
+  }
+
+  /* ── Toggle Buttons ── */
+  .btn-toggle {
+    border: none;
+    border-radius: 6px;
+    padding: .3rem .6rem;
+    font-size: .8rem;
+    cursor: pointer;
+    transition: opacity .15s, transform .1s;
+  }
+  .btn-toggle:active { transform: scale(.93); }
+  .btn-toggle.is-on-special  { background: #D4EDDA; color: #155724; }
+  .btn-toggle.is-off-special { background: var(--ef-sand); color: var(--ef-muted); }
+  .btn-toggle.is-on-popular  { background: #FFF3CD; color: #856404; }
+  .btn-toggle.is-off-popular { background: var(--ef-sand); color: var(--ef-muted); }
+
+  /* ── Status Badge ── */
+  .ef-badge {
+    display: inline-block;
+    padding: .22rem .65rem;
+    border-radius: 20px;
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  .ef-badge.active   { background: #D4EDDA; color: #155724; }
+  .ef-badge.inactive { background: #E9ECEF; color: #6C757D; }
+
+  /* ── Edit Btn ── */
+  .btn-ef-edit {
+    background: var(--ef-brown);
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    padding: .3rem .75rem;
+    font-size: .8rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    transition: background .15s;
+  }
+  .btn-ef-edit:hover { background: var(--ef-brown-light); color: #fff; }
+
+  /* ── Empty State ── */
+  .ef-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--ef-muted);
+  }
+  .ef-empty i { font-size: 2.5rem; margin-bottom: .75rem; display: block; opacity: .4; }
+  .ef-empty p { margin: 0; font-size: .95rem; }
+
+  /* ── Pagination ── */
+  .ef-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .35rem;
+    padding: 1rem;
+    border-top: 1px solid var(--ef-border);
+    flex-wrap: wrap;
+  }
+  .ef-pg-btn {
+    min-width: 34px;
+    height: 34px;
+    border: 1.5px solid var(--ef-border);
+    background: #fff;
+    border-radius: 7px;
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--ef-text);
+    cursor: pointer;
+    transition: background .15s, border-color .15s, color .15s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 .5rem;
+  }
+  .ef-pg-btn:hover:not(:disabled) {
+    border-color: var(--ef-brown);
+    color: var(--ef-brown);
+  }
+  .ef-pg-btn.active {
+    background: var(--ef-brown);
+    border-color: var(--ef-brown);
+    color: #fff;
+  }
+  .ef-pg-btn:disabled {
+    opacity: .35;
+    cursor: not-allowed;
+  }
+</style>
+
+<!-- ── Page Header ── -->
+<div class="ef-page-header">
+  <h1><i class="fas fa-star" style="color:var(--ef-warning);margin-right:.4rem;"></i>Today's Specials</h1>
+  <a href="{{ url_for('admin_menu') }}" class="btn-ef-outline">
+    <i class="fas fa-utensils"></i> View Full Menu
+  </a>
 </div>
 
-<div class="alert alert-info">
-    <i class="fas fa-info-circle"></i> Mark menu items as "Special" to display them in the Today's Specials section on the homepage.
+<!-- ── Info Banner ── -->
+<div class="ef-info-banner">
+  <i class="fas fa-info-circle"></i>
+  Toggle the <strong>Special</strong> button on any item to feature it in the Today's Specials section on the homepage.
 </div>
 
-<div class="card">
-    <div class="card-header">
-        <h5 class="mb-0">Menu Items</h5>
-    </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover datatable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Image</th>
-                        <th>Name</th>
-                        <th>Category</th>
-                        <th>Price</th>
-                        <th>Special</th>
-                        <th>Popular</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in items %}
-                    <tr>
-                        <td>{{ item.id }}</td>
-                        <td>
-                            {% if item.image_url %}
-                            <img src="{{ item.image_url }}" alt="{{ item.name }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
-                            {% else %}
-                            <div class="bg-secondary" style="width: 50px; height: 50px; border-radius: 5px;"></div>
-                            {% endif %}
-                        </td>
-                        <td>{{ item.name }}</td>
-                        <td>{{ item.category.name }}</td>
-                        <td>${{ "%.2f"|format(item.price) }}</td>
-                        <td>
-                            <form method="POST" action="{{ url_for('admin_toggle_special', item_id=item.id) }}" style="display: inline;">
-                                <button type="submit" class="btn btn-sm btn-{{ 'success' if item.is_special else 'outline-secondary' }}">
-                                    <i class="fas fa-{{ 'check-circle' if item.is_special else 'circle' }}"></i>
-                                </button>
-                            </form>
-                        </td>
-                        <td>
-                            <form method="POST" action="{{ url_for('admin_toggle_popular', item_id=item.id) }}" style="display: inline;">
-                                <button type="submit" class="btn btn-sm btn-{{ 'warning' if item.is_popular else 'outline-secondary' }}">
-                                    <i class="fas fa-fire"></i>
-                                </button>
-                            </form>
-                        </td>
-                        <td>
-                            {% if item.is_active %}
-                            <span class="badge bg-success">Active</span>
-                            {% else %}
-                            <span class="badge bg-secondary">Inactive</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <a href="{{ url_for('admin_edit_menu_item', item_id=item.id) }}" class="btn btn-sm btn-primary">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+<!-- ── Hidden Data Store ── -->
+<div id="ef-data" style="display:none;">
+  {% for item in items %}
+  <div class="ef-row-data"
+       data-id="{{ item.id }}"
+       data-name="{{ item.name | lower }}"
+       data-category="{{ item.category.name }}"
+       data-category-lower="{{ item.category.name | lower }}"
+       data-price="{{ '%.2f' | format(item.price) }}"
+       data-special="{{ 'yes' if item.is_special else 'no' }}"
+       data-popular="{{ 'yes' if item.is_popular else 'no' }}"
+       data-active="{{ 'yes' if item.is_active else 'no' }}"
+       data-image="{{ item.image_url or '' }}"
+       data-edit-url="{{ url_for('admin_edit_menu_item', item_id=item.id) }}"
+       data-toggle-special-url="{{ url_for('admin_toggle_special', item_id=item.id) }}"
+       data-toggle-popular-url="{{ url_for('admin_toggle_popular', item_id=item.id) }}">
+  </div>
+  {% endfor %}
 </div>
+
+<!-- ── Controls ── -->
+<div class="ef-controls">
+  <!-- Search -->
+  <div class="ef-control-group ef-search-group">
+    <label>Search</label>
+    <div class="ef-search-wrap">
+      <i class="fas fa-search"></i>
+      <input type="text" id="ef-search" placeholder="Search by name…">
+    </div>
+  </div>
+
+  <!-- Rows per page -->
+  <div class="ef-control-group">
+    <label>Rows per page</label>
+    <select id="ef-per-page">
+      <option value="10">10</option>
+      <option value="25">25</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+    </select>
+  </div>
+
+  <!-- Category -->
+  <div class="ef-control-group">
+    <label>Category</label>
+    <select id="ef-filter-category">
+      <option value="">All Categories</option>
+      {% set seen = [] %}
+      {% for item in items %}
+        {% if item.category.name not in seen %}
+          {% set _ = seen.append(item.category.name) %}
+          <option value="{{ item.category.name | lower }}">{{ item.category.name }}</option>
+        {% endif %}
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Status -->
+  <div class="ef-control-group">
+    <label>Status</label>
+    <select id="ef-filter-status">
+      <option value="">All Statuses</option>
+      <option value="yes">Active</option>
+      <option value="no">Inactive</option>
+    </select>
+  </div>
+
+  <!-- Type -->
+  <div class="ef-control-group">
+    <label>Type</label>
+    <select id="ef-filter-type">
+      <option value="">All Types</option>
+      <option value="special">Special</option>
+      <option value="popular">Popular</option>
+      <option value="neither">Neither</option>
+    </select>
+  </div>
+
+  <button class="btn-ef-reset" id="ef-reset" title="Reset all filters">
+    <i class="fas fa-times"></i> Reset
+  </button>
+</div>
+
+<!-- ── Result Summary ── -->
+<div class="ef-result-bar">
+  <span id="ef-summary">Showing <strong>—</strong> of <strong>—</strong> items</span>
+</div>
+
+<!-- ── Table Card ── -->
+<div class="ef-card">
+  <div style="overflow-x:auto;">
+    <table class="ef-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Image</th>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Special</th>
+          <th>Popular</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="ef-tbody">
+        <!-- Rendered by JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Empty State -->
+  <div id="ef-empty" class="ef-empty" style="display:none;">
+    <i class="fas fa-search"></i>
+    <p>No items match your filters. Try adjusting your search or filters.</p>
+  </div>
+
+  <!-- Pagination -->
+  <div id="ef-pagination" class="ef-pagination"></div>
+</div>
+
+<script>
+(function () {
+  /* ── State ── */
+  const allRows = Array.from(document.querySelectorAll('.ef-row-data')).map(el => ({
+    id:           el.dataset.id,
+    name:         el.dataset.name,           // lowercase
+    namePretty:   el.dataset.name.replace(/\b\w/g, c => c.toUpperCase()),
+    category:     el.dataset.category,
+    categoryLow:  el.dataset.categoryLower,
+    price:        el.dataset.price,
+    special:      el.dataset.special,
+    popular:      el.dataset.popular,
+    active:       el.dataset.active,
+    image:        el.dataset.image,
+    editUrl:      el.dataset.editUrl,
+    toggleSpecialUrl: el.dataset.toggleSpecialUrl,
+    togglePopularUrl: el.dataset.togglePopularUrl,
+  }));
+
+  let currentPage = 1;
+
+  /* ── DOM refs ── */
+  const searchEl   = document.getElementById('ef-search');
+  const perPageEl  = document.getElementById('ef-per-page');
+  const catEl      = document.getElementById('ef-filter-category');
+  const statusEl   = document.getElementById('ef-filter-status');
+  const typeEl     = document.getElementById('ef-filter-type');
+  const resetBtn   = document.getElementById('ef-reset');
+  const tbody      = document.getElementById('ef-tbody');
+  const emptyEl    = document.getElementById('ef-empty');
+  const pgEl       = document.getElementById('ef-pagination');
+  const summaryEl  = document.getElementById('ef-summary');
+
+  /* ── Filter ── */
+  function getFiltered() {
+    const q      = searchEl.value.trim().toLowerCase();
+    const cat    = catEl.value;
+    const status = statusEl.value;
+    const type   = typeEl.value;
+
+    return allRows.filter(r => {
+      if (q && !r.name.includes(q) && !r.category.toLowerCase().includes(q)) return false;
+      if (cat && r.categoryLow !== cat) return false;
+      if (status && r.active !== status) return false;
+      if (type === 'special'  && r.special !== 'yes') return false;
+      if (type === 'popular'  && r.popular !== 'yes') return false;
+      if (type === 'neither'  && (r.special === 'yes' || r.popular === 'yes')) return false;
+      return true;
+    });
+  }
+
+  /* ── Render Table ── */
+  function renderTable() {
+    const filtered  = getFiltered();
+    const perPage   = parseInt(perPageEl.value);
+    const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const start = (currentPage - 1) * perPage;
+    const page  = filtered.slice(start, start + perPage);
+
+    /* Summary */
+    const from = filtered.length ? start + 1 : 0;
+    const to   = Math.min(start + perPage, filtered.length);
+    summaryEl.innerHTML = `Showing <strong>${from}–${to}</strong> of <strong>${filtered.length}</strong> items`;
+
+    /* Rows */
+    tbody.innerHTML = '';
+    if (!page.length) {
+      emptyEl.style.display = 'block';
+      pgEl.innerHTML = '';
+      return;
+    }
+    emptyEl.style.display = 'none';
+
+    page.forEach((r, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="color:var(--ef-muted);font-size:.78rem;">${start + i + 1}</td>
+        <td>${r.image
+          ? `<img src="${r.image}" alt="${r.namePretty}" class="ef-thumb">`
+          : `<div class="ef-thumb-placeholder"><i class="fas fa-image"></i></div>`}</td>
+        <td><span class="ef-item-name">${r.namePretty}</span></td>
+        <td style="color:var(--ef-muted);">${r.category}</td>
+        <td><span class="ef-price">$${r.price}</span></td>
+        <td>
+          <form method="POST" action="${r.toggleSpecialUrl}" style="display:inline;">
+            <button type="submit" class="btn-toggle ${r.special === 'yes' ? 'is-on-special' : 'is-off-special'}" title="${r.special === 'yes' ? 'Remove Special' : 'Mark as Special'}">
+              <i class="fas fa-${r.special === 'yes' ? 'check-circle' : 'circle'}"></i>
+              ${r.special === 'yes' ? ' On' : ' Off'}
+            </button>
+          </form>
+        </td>
+        <td>
+          <form method="POST" action="${r.togglePopularUrl}" style="display:inline;">
+            <button type="submit" class="btn-toggle ${r.popular === 'yes' ? 'is-on-popular' : 'is-off-popular'}" title="${r.popular === 'yes' ? 'Remove Popular' : 'Mark as Popular'}">
+              <i class="fas fa-fire"></i>
+              ${r.popular === 'yes' ? ' On' : ' Off'}
+            </button>
+          </form>
+        </td>
+        <td><span class="ef-badge ${r.active === 'yes' ? 'active' : 'inactive'}">${r.active === 'yes' ? 'Active' : 'Inactive'}</span></td>
+        <td><a href="${r.editUrl}" class="btn-ef-edit"><i class="fas fa-edit"></i> Edit</a></td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    renderPagination(totalPages, filtered.length);
+  }
+
+  /* ── Render Pagination ── */
+  function renderPagination(totalPages, total) {
+    pgEl.innerHTML = '';
+    if (totalPages <= 1) return;
+
+    const btn = (label, page, disabled, active) => {
+      const b = document.createElement('button');
+      b.className = 'ef-pg-btn' + (active ? ' active' : '');
+      b.innerHTML = label;
+      b.disabled = disabled;
+      if (!disabled && !active) b.addEventListener('click', () => { currentPage = page; renderTable(); });
+      return b;
+    };
+
+    pgEl.appendChild(btn('<i class="fas fa-angle-double-left"></i>', 1, currentPage === 1));
+    pgEl.appendChild(btn('<i class="fas fa-angle-left"></i>', currentPage - 1, currentPage === 1));
+
+    /* Page number buttons — show up to 5 around current */
+    let rangeStart = Math.max(1, currentPage - 2);
+    let rangeEnd   = Math.min(totalPages, rangeStart + 4);
+    if (rangeEnd - rangeStart < 4) rangeStart = Math.max(1, rangeEnd - 4);
+
+    if (rangeStart > 1) {
+      pgEl.appendChild(btn('1', 1, false, currentPage === 1));
+      if (rangeStart > 2) {
+        const dots = document.createElement('span');
+        dots.textContent = '…';
+        dots.style.cssText = 'padding:0 .3rem;color:var(--ef-muted);align-self:center;';
+        pgEl.appendChild(dots);
+      }
+    }
+
+    for (let p = rangeStart; p <= rangeEnd; p++) {
+      pgEl.appendChild(btn(p, p, false, p === currentPage));
+    }
+
+    if (rangeEnd < totalPages) {
+      if (rangeEnd < totalPages - 1) {
+        const dots = document.createElement('span');
+        dots.textContent = '…';
+        dots.style.cssText = 'padding:0 .3rem;color:var(--ef-muted);align-self:center;';
+        pgEl.appendChild(dots);
+      }
+      pgEl.appendChild(btn(totalPages, totalPages, false, currentPage === totalPages));
+    }
+
+    pgEl.appendChild(btn('<i class="fas fa-angle-right"></i>', currentPage + 1, currentPage === totalPages));
+    pgEl.appendChild(btn('<i class="fas fa-angle-double-right"></i>', totalPages, currentPage === totalPages));
+  }
+
+  /* ── Event Listeners ── */
+  [searchEl, perPageEl, catEl, statusEl, typeEl].forEach(el => {
+    el.addEventListener('input', () => { currentPage = 1; renderTable(); });
+    el.addEventListener('change', () => { currentPage = 1; renderTable(); });
+  });
+
+  resetBtn.addEventListener('click', () => {
+    searchEl.value = '';
+    perPageEl.value = '10';
+    catEl.value = '';
+    statusEl.value = '';
+    typeEl.value = '';
+    currentPage = 1;
+    renderTable();
+  });
+
+  /* ── Init ── */
+  renderTable();
+})();
+</script>
+
 {% endblock %}

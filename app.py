@@ -14,7 +14,6 @@ from werkzeug.utils import secure_filename
 from urllib.parse import urlparse
 from dotenv import load_dotenv
 import secrets
-from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from email_validator import validate_email, EmailNotValidError
 import boto3
@@ -63,13 +62,6 @@ r2_client = boto3.client(
     aws_secret_access_key=R2_SECRET_KEY,
     region_name='auto',
     config=Config(s3={'addressing_style': 'virtual'})
-)
-
-# Limiter for rate limiting
-limiter = Limiter(
-    key_func=get_remote_address,
-    app=app,
-    default_limits=["10 per day"]
 )
 
 # blocked main domain
@@ -1015,7 +1007,7 @@ def gallery():
     return render_template('public/gallery.html', images=images)
 
 # ==================== ADMIN ROUTES ====================
-@app.route('/admin/login', methods=['GET', 'POST'])
+@app.route('/effoi/effoi', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
         username = request.form.get('username')

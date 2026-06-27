@@ -1,102 +1,417 @@
 {% extends "admin/base_admin.html" %}
 
-{% block title %}Manage Menu Items - EFFOI Admin{% endblock %}
+{% block title %}Menu Items - EFFOI Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page { padding: 1.5rem 0; }
+
+  /* Top bar */
+  .topbar-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap; }
+  .topbar-left { display: flex; flex-direction: column; gap: 2px; }
+  .page-title { font-size: 20px; font-weight: 600; color: #1a1a1a; margin: 0; }
+  .page-sub { font-size: 13px; color: #888; margin: 0; }
+  .btn-add { display: inline-flex; align-items: center; gap: 6px; background: #8B1E1E; color: #fff; border: none; border-radius: 8px; padding: 9px 18px; font-size: 14px; font-weight: 500; cursor: pointer; text-decoration: none; transition: opacity .15s; }
+  .btn-add:hover { opacity: .88; color: #fff; text-decoration: none; }
+
+  /* Stats */
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .stat-card { background: #f9f7f4; border: 1px solid rgba(0,0,0,0.08); border-radius: 10px; padding: 12px 16px; }
+  .stat-label { font-size: 11px; color: #999; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
+  .stat-value { font-size: 22px; font-weight: 600; color: #1a1210; }
+  .stat-value.crimson { color: #8B1E1E; }
+  .stat-value.success { color: #3B6D11; }
+  .stat-value.gold { color: #9a7520; }
+
+  /* Table card */
+  .table-card { background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 14px; overflow: hidden; }
+
+  /* Toolbar */
+  .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,0.06); flex-wrap: wrap; }
+  .toolbar-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .search-wrap { position: relative; }
+  .search-wrap i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #bbb; font-size: 12px; pointer-events: none; }
+  .search-input { padding: 7px 12px 7px 30px; font-size: 13px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; background: #f9f7f4; color: #1a1210; outline: none; width: 220px; font-family: 'Epilogue', sans-serif; transition: border-color .15s; }
+  .search-input:focus { border-color: rgba(139,30,30,0.35); background: #fff; }
+  .filter-select { padding: 7px 10px; font-size: 13px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; background: #f9f7f4; color: #1a1210; outline: none; cursor: pointer; font-family: 'Epilogue', sans-serif; transition: border-color .15s; }
+  .filter-select:focus { border-color: rgba(139,30,30,0.35); }
+  .per-page-wrap { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #888; }
+
+  /* Table */
+  .menu-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .menu-table thead tr { background: #f9f7f4; border-bottom: 1px solid rgba(0,0,0,0.07); }
+  .menu-table th { padding: 10px 14px; font-size: 11px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: .06em; text-align: left; white-space: nowrap; }
+  .menu-table th.col-no    { width: 48px; }
+  .menu-table th.col-price { width: 80px; }
+  .menu-table th.col-flag  { width: 72px; text-align: center; }
+  .menu-table th.col-status  { width: 84px; }
+  .menu-table th.col-actions { width: 130px; text-align: right; }
+  .menu-table tbody tr { border-bottom: 1px solid rgba(0,0,0,0.05); transition: background .1s; }
+  .menu-table tbody tr:last-child { border-bottom: none; }
+  .menu-table tbody tr:hover { background: rgba(139,30,30,0.025); }
+  .menu-table td { padding: 11px 14px; color: #444; vertical-align: middle; }
+  .col-no-val { font-size: 11px; color: #ccc; font-weight: 600; }
+  .item-name { font-weight: 500; color: #1a1210; }
+  .item-cat { font-size: 12px; color: #888; margin-top: 2px; }
+  .price-val { font-weight: 600; color: #1a1210; font-variant-numeric: tabular-nums; }
+  .flag-cell { text-align: center; }
+  .flag-yes { color: #3B6D11; font-size: 14px; }
+  .flag-no  { color: #ddd; font-size: 14px; }
+
+  /* Status badge */
+  .badge-status { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
+  .badge-status.active   { background: #EAF3DE; color: #3B6D11; }
+  .badge-status.inactive { background: #f0f0f0; color: #999; border: 1px solid #e5e5e5; }
+
+  /* Row actions */
+  .row-actions { display: flex; gap: 5px; justify-content: flex-end; }
+  .action-btn { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 500; padding: 5px 10px; border-radius: 6px; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); background: #fff; color: #444; text-decoration: none; transition: background .12s; white-space: nowrap; font-family: 'Epilogue', sans-serif; }
+  .action-btn:hover { background: #f5f5f5; text-decoration: none; color: #444; }
+  .action-btn.danger { color: #8B1E1E; border-color: rgba(139,30,30,0.25); }
+  .action-btn.danger:hover { background: rgba(139,30,30,0.06); }
+
+  /* Empty state */
+  .empty-row td { padding: 3rem 1rem; text-align: center; color: #bbb; }
+  .empty-row i { font-size: 32px; display: block; margin-bottom: 10px; }
+  .empty-row p { font-size: 14px; margin: 0; color: #aaa; }
+
+  /* Pagination */
+  .pagination-bar { display: flex; align-items: center; justify-content: space-between; padding: 11px 16px; border-top: 1px solid rgba(0,0,0,0.06); flex-wrap: wrap; gap: 8px; }
+  .pagination-info { font-size: 12px; color: #aaa; }
+  .pagination-btns { display: flex; gap: 3px; align-items: center; }
+  .page-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 30px; height: 30px; padding: 0 6px; border-radius: 7px; border: 1px solid rgba(0,0,0,0.1); background: #fff; font-size: 12px; color: #555; cursor: pointer; transition: background .12s; font-weight: 500; font-family: 'Epilogue', sans-serif; }
+  .page-btn:hover:not(:disabled) { background: #f5f5f5; }
+  .page-btn.active { background: #8B1E1E; color: #fff; border-color: #8B1E1E; }
+  .page-btn:disabled { opacity: .35; cursor: not-allowed; }
+  .page-ellipsis { font-size: 12px; color: #ccc; padding: 0 3px; }
+
+  /* Delete modal */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); align-items: center; justify-content: center; z-index: 1050; }
+  .modal-overlay.open { display: flex; }
+  .modal-box { background: #fff; border-radius: 14px; padding: 24px; max-width: 390px; width: 90%; box-shadow: 0 8px 32px rgba(0,0,0,.15); }
+  .modal-title { font-size: 16px; font-weight: 600; color: #1a1210; margin-bottom: 8px; }
+  .modal-body-text { font-size: 14px; color: #666; line-height: 1.6; margin-bottom: 20px; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
+  .modal-cancel { padding: 8px 16px; font-size: 13px; border-radius: 7px; border: 1px solid rgba(0,0,0,0.12); background: #fff; color: #444; cursor: pointer; font-family: 'Epilogue', sans-serif; }
+  .modal-cancel:hover { background: #f5f5f5; }
+  .modal-confirm { padding: 8px 16px; font-size: 13px; border-radius: 7px; border: none; background: #8B1E1E; color: #fff; cursor: pointer; font-weight: 600; font-family: 'Epilogue', sans-serif; }
+  .modal-confirm:hover { background: #b52b2b; }
+
+  /* Toast */
+  .toast-msg { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(60px); background: #1a1210; color: #fff; font-size: 13px; padding: 9px 20px; border-radius: 20px; opacity: 0; transition: opacity .2s, transform .25s; z-index: 2000; white-space: nowrap; pointer-events: none; }
+  .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Menu Items</h1>
-    <a href="{{ url_for('admin_add_menu_item') }}" class="btn btn-primary">
-        <i class="fas fa-plus"></i> Add Menu Item
+<div class="page">
+
+  <!-- Top bar -->
+  <div class="topbar-row">
+    <div class="topbar-left">
+      <h1 class="page-title">Menu items</h1>
+      <p class="page-sub">Manage your dishes, prices, and availability</p>
+    </div>
+    <a href="{{ url_for('admin_add_menu_item') }}" class="btn-add">
+      <i class="fas fa-plus"></i> Add item
     </a>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Total items</div>
+      <div class="stat-value">{{ items | length }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Active</div>
+      <div class="stat-value success">{{ items | selectattr('is_active') | list | length }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Specials</div>
+      <div class="stat-value crimson">{{ items | selectattr('is_special') | list | length }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Popular</div>
+      <div class="stat-value gold">{{ items | selectattr('is_popular') | list | length }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Inactive</div>
+      <div class="stat-value">{{ items | rejectattr('is_active') | list | length }}</div>
+    </div>
+  </div>
+
+  <!-- Table card -->
+  <div class="table-card">
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <div class="search-wrap">
+          <i class="fas fa-search"></i>
+          <input type="text" class="search-input" id="searchInput" placeholder="Search items…" oninput="applyFilters()">
+        </div>
+        <select class="filter-select" id="categoryFilter" onchange="applyFilters()">
+          <option value="">All categories</option>
+          {% set seen = [] %}
+          {% for item in items %}
+            {% if item.category.name not in seen %}
+              <option value="{{ item.category.name | lower }}">{{ item.category.name }}</option>
+              {% if seen.append(item.category.name) %}{% endif %}
+            {% endif %}
+          {% endfor %}
+        </select>
+        <select class="filter-select" id="statusFilter" onchange="applyFilters()">
+          <option value="">All statuses</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+        <select class="filter-select" id="flagFilter" onchange="applyFilters()">
+          <option value="">All types</option>
+          <option value="special">Specials</option>
+          <option value="popular">Popular</option>
+        </select>
+      </div>
+      <div class="per-page-wrap">
+        <span>Show</span>
+        <select class="filter-select" id="perPageSelect" onchange="applyFilters()">
+          <option value="10" selected>10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+        <span>per page</span>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div style="overflow-x: auto;">
+      <table class="menu-table">
+        <thead>
+          <tr>
+            <th class="col-no">#</th>
+            <th>Name</th>
+            <th class="col-price">Price</th>
+            <th class="col-flag">Special</th>
+            <th class="col-flag">Popular</th>
+            <th class="col-status">Status</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          {% for item in items %}
+          <tr
+            data-name="{{ item.name | lower }}"
+            data-category="{{ item.category.name | lower }}"
+            data-status="{{ 'active' if item.is_active else 'inactive' }}"
+            data-special="{{ '1' if item.is_special else '0' }}"
+            data-popular="{{ '1' if item.is_popular else '0' }}"
+            data-itemname="{{ item.name | e }}"
+            data-catname="{{ item.category.name | e }}"
+            data-price="{{ '%.2f' | format(item.price) }}"
+            data-isactive="{{ '1' if item.is_active else '0' }}"
+            data-editurl="{{ url_for('admin_edit_menu_item', item_id=item.id) }}"
+            data-deleteurl="{{ url_for('admin_delete_menu_item', item_id=item.id) }}"
+          ></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-bar" id="paginationBar">
+      <span class="pagination-info" id="paginationInfo"></span>
+      <div class="pagination-btns" id="paginationBtns"></div>
+    </div>
+
+  </div>
 </div>
 
-<div class="card">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Category</th>
-                        <th>Price</th>
-                        <th>Special</th>
-                        <th>Popular</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in items %}
-                    <tr>
-                        <td>{{ item.id }}</td>
-                        <td>{{ item.name }}</td>
-                        <td>{{ item.category.name }}</td>
-                        <td>${{ "%.2f"|format(item.price) }}</td>
-                        <td>
-                            {% if item.is_special %}
-                            <i class="fas fa-check-circle text-success"></i>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if item.is_popular %}
-                            <i class="fas fa-check-circle text-success"></i>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if item.is_active %}
-                            <span class="badge bg-success">Active</span>
-                            {% else %}
-                            <span class="badge bg-secondary">Inactive</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <a href="{{ url_for('admin_edit_menu_item', item_id=item.id) }}" class="btn btn-sm btn-primary">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                            <button class="btn btn-sm btn-danger" onclick="confirmDelete({{ item.id }})">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="8" class="text-center">No menu items found</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<!-- Delete modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-box">
+    <p class="modal-title">Delete this item?</p>
+    <p class="modal-body-text">
+      "<strong id="deleteItemName"></strong>" will be permanently removed from the menu. You can't undo this.
+    </p>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeDeleteModal()">Cancel</button>
+      <form id="deleteForm" method="POST" style="display:inline;">
+        <button type="submit" class="modal-confirm">Delete item</button>
+      </form>
     </div>
+  </div>
 </div>
 
-<!-- Delete Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirm Delete</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete this menu item?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form id="deleteForm" method="POST" style="display: inline;">
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Toast -->
+<div class="toast-msg" id="toastMsg"></div>
+
 {% endblock %}
 
 {% block extra_js %}
 <script>
-function confirmDelete(id) {
-    document.getElementById('deleteForm').action = "{{ url_for('admin_delete_menu_item', item_id=0) }}".replace('0', id);
-    new bootstrap.Modal(document.getElementById('deleteModal')).show();
-}
+  /* ── Pull all row data from Jinja-rendered attributes ── */
+  const allRows = Array.from(document.querySelectorAll('#tableBody tr[data-name]')).map(tr => ({
+    name:      tr.dataset.name,
+    category:  tr.dataset.category,
+    status:    tr.dataset.status,
+    special:   tr.dataset.special === '1',
+    popular:   tr.dataset.popular === '1',
+    isActive:  tr.dataset.isactive === '1',
+    itemname:  tr.dataset.itemname,
+    catname:   tr.dataset.catname,
+    price:     tr.dataset.price,
+    editUrl:   tr.dataset.editurl,
+    deleteUrl: tr.dataset.deleteurl,
+  }));
+
+  /* Remove placeholder rows — JS renders everything */
+  document.querySelectorAll('#tableBody tr').forEach(r => r.remove());
+
+  let currentPage = 1;
+  let filtered    = [...allRows];
+
+  function applyFilters() {
+    const q      = document.getElementById('searchInput').value.toLowerCase().trim();
+    const cat    = document.getElementById('categoryFilter').value;
+    const status = document.getElementById('statusFilter').value;
+    const flag   = document.getElementById('flagFilter').value;
+
+    filtered = allRows.filter(r => {
+      if (q      && !r.name.includes(q) && !r.catname.toLowerCase().includes(q)) return false;
+      if (cat    && r.category !== cat)   return false;
+      if (status && r.status   !== status) return false;
+      if (flag === 'special' && !r.special) return false;
+      if (flag === 'popular' && !r.popular) return false;
+      return true;
+    });
+
+    currentPage = 1;
+    render();
+  }
+
+  function render() {
+    const perPage = parseInt(document.getElementById('perPageSelect').value);
+    const total   = filtered.length;
+    const pages   = Math.max(1, Math.ceil(total / perPage));
+    if (currentPage > pages) currentPage = pages;
+
+    const start = (currentPage - 1) * perPage;
+    const slice = filtered.slice(start, start + perPage);
+    const tbody = document.getElementById('tableBody');
+
+    if (!total) {
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="7"><i class="fas fa-utensils"></i><p>No items match your filters.</p></td></tr>`;
+      document.getElementById('paginationInfo').textContent = '';
+      document.getElementById('paginationBtns').innerHTML  = '';
+      return;
+    }
+
+    tbody.innerHTML = slice.map((r, i) => `
+      <tr>
+        <td class="col-no-val">${start + i + 1}</td>
+        <td>
+          <div class="item-name">${escHtml(r.itemname)}</div>
+          <div class="item-cat">${escHtml(r.catname)}</div>
+        </td>
+        <td><span class="price-val">$${r.price}</span></td>
+        <td class="flag-cell">
+          <i class="fas fa-${r.special ? 'check-circle flag-yes' : 'minus flag-no'}"></i>
+        </td>
+        <td class="flag-cell">
+          <i class="fas fa-${r.popular ? 'check-circle flag-yes' : 'minus flag-no'}"></i>
+        </td>
+        <td><span class="badge-status ${r.isActive ? 'active' : 'inactive'}">${r.isActive ? 'Active' : 'Inactive'}</span></td>
+        <td>
+          <div class="row-actions">
+            <a href="${r.editUrl}" class="action-btn"><i class="fas fa-pencil-alt"></i> Edit</a>
+            <button type="button" class="action-btn danger" onclick="openDeleteModal('${escAttr(r.itemname)}','${escAttr(r.deleteUrl)}')">
+              <i class="fas fa-trash-alt"></i> Delete
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+
+    const from = start + 1, to = Math.min(start + perPage, total);
+    document.getElementById('paginationInfo').textContent =
+      `Showing ${from}–${to} of ${total} item${total === 1 ? '' : 's'}`;
+
+    renderPagination(pages);
+  }
+
+  function renderPagination(pages) {
+    const c = document.getElementById('paginationBtns');
+    if (pages <= 1) { c.innerHTML = ''; return; }
+
+    const p = currentPage;
+    let btns = [];
+
+    btns.push(`<button class="page-btn" onclick="goPage(${p-1})" ${p===1?'disabled':''} title="Previous"><i class="fas fa-chevron-left" style="font-size:10px;"></i></button>`);
+
+    const range = pageRange(p, pages);
+    let prev = null;
+    range.forEach(n => {
+      if (prev !== null && n - prev > 1) btns.push(`<span class="page-ellipsis">…</span>`);
+      btns.push(`<button class="page-btn ${n===p?'active':''}" onclick="goPage(${n})">${n}</button>`);
+      prev = n;
+    });
+
+    btns.push(`<button class="page-btn" onclick="goPage(${p+1})" ${p===pages?'disabled':''} title="Next"><i class="fas fa-chevron-right" style="font-size:10px;"></i></button>`);
+    c.innerHTML = btns.join('');
+  }
+
+  function pageRange(current, total) {
+    const delta = 2, range = new Set();
+    range.add(1); range.add(total);
+    for (let i = Math.max(2, current - delta); i <= Math.min(total - 1, current + delta); i++) range.add(i);
+    return Array.from(range).sort((a, b) => a - b);
+  }
+
+  function goPage(n) {
+    const perPage = parseInt(document.getElementById('perPageSelect').value);
+    const pages   = Math.ceil(filtered.length / perPage);
+    currentPage   = Math.max(1, Math.min(n, pages));
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ── Delete modal ── */
+  function openDeleteModal(name, deleteUrl) {
+    document.getElementById('deleteItemName').textContent = name;
+    document.getElementById('deleteForm').action = deleteUrl;
+    document.getElementById('deleteModal').classList.add('open');
+  }
+  function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.remove('open');
+  }
+  document.getElementById('deleteModal').addEventListener('click', function(e) {
+    if (e.target === this) closeDeleteModal();
+  });
+
+  /* ── Toast ── */
+  function showToast(msg) {
+    const t = document.getElementById('toastMsg');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2400);
+  }
+
+  /* ── Helpers ── */
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function escAttr(s) {
+    return String(s).replace(/'/g, "\\'");
+  }
+
+  /* ── Flash messages ── */
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      showToast("{{ message | e }}");
+    {% endfor %}
+  {% endwith %}
+
+  /* ── Init ── */
+  render();
 </script>
 {% endblock %}

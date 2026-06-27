@@ -8,7 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
     <style>
     :root {
@@ -596,41 +595,6 @@
 
     .stat-card:hover { transform: translateY(-3px); border-color: var(--border-g); box-shadow: 0 6px 20px rgba(139,30,30,0.08); }
 
-    /* DataTables overrides */
-    .dataTables_wrapper .dataTables_length select,
-    .dataTables_wrapper .dataTables_filter input {
-        background: var(--bg-3);
-        border: 1px solid var(--border);
-        border-radius: var(--r-sm);
-        color: var(--text);
-        padding: 0.3rem 0.6rem;
-        font-size: 0.8rem;
-    }
-
-    .dataTables_wrapper .dataTables_info,
-    .dataTables_wrapper .dataTables_length,
-    .dataTables_wrapper .dataTables_filter { color: var(--text-3); font-size: 0.8rem; }
-
-    .dataTables_wrapper .dataTables_paginate .paginate_button {
-        border-radius: 7px !important;
-        color: var(--text-2) !important;
-        font-size: 0.8rem;
-        padding: 0.25rem 0.6rem !important;
-    }
-
-    .dataTables_wrapper .dataTables_paginate .paginate_button.current,
-    .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-        background: rgba(139,30,30,0.08) !important;
-        border-color: rgba(139,30,30,0.2) !important;
-        color: var(--crimson) !important;
-    }
-
-    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-        background: var(--surface-h) !important;
-        border-color: var(--border) !important;
-        color: var(--text) !important;
-    }
-
     /* Alert (Bootstrap compat) */
     .alert { border-radius: var(--r); font-size: 0.85rem; border: 1px solid; }
     .alert-success  { background: rgba(46,125,50,0.08); border-color: rgba(46,125,50,0.2); color: #2e7d32; }
@@ -750,7 +714,7 @@
         <div class="nav-section">Events</div>
         <a href="{{ url_for('admin_events') }}"
            class="nav-link {% if request.endpoint in ['admin_events','admin_add_event','admin_edit_event'] %}active{% endif %}">
-            <i class="fas fa-calendar-star"></i>
+            <i class="fas fa-calendar-check"></i>
             <span class="nav-text">Club Events</span>
         </a>
 
@@ -839,10 +803,6 @@
             <span class="page-title">{% block page_title %}Dashboard{% endblock %}</span>
         </div>
         <div class="topbar-right">
-            <div class="topbar-search">
-                <i class="fas fa-magnifying-glass"></i>
-                <input type="text" placeholder="Search…">
-            </div>
 
             <a href="{{ url_for('admin_reservations') }}" class="topbar-notif" title="Pending reservations">
                 <i class="fas fa-bell"></i>
@@ -889,13 +849,11 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
 <script>
-    const sidebar   = document.getElementById('sidebar');
-    const overlay   = document.getElementById('overlay');
-    const toggle    = document.getElementById('mobileToggle');
+    const sidebar    = document.getElementById('sidebar');
+    const overlay    = document.getElementById('overlay');
+    const toggle     = document.getElementById('mobileToggle');
     const toggleIcon = document.getElementById('toggleIcon');
 
     function openSidebar() {
@@ -923,21 +881,6 @@
             el.style.opacity = '0';
             setTimeout(() => el.remove(), 400);
         }, 5000);
-    });
-
-    // DataTables init
-    $(document).ready(function () {
-        if ($('.datatable').length) {
-            $('.datatable').DataTable({
-                pageLength: 25,
-                language: {
-                    search: '',
-                    searchPlaceholder: 'Filter records…',
-                    lengthMenu: 'Show _MENU_',
-                    info: '_START_–_END_ of _TOTAL_',
-                }
-            });
-        }
     });
 
     // Image preview helper

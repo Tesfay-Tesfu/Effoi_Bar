@@ -1,88 +1,356 @@
 {% extends "admin/base_admin.html" %}
 
-{% block title %}Manage Categories - EFFOI Admin{% endblock %}
+{% block title %}Menu Categories - EFFOI Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page { padding: 1.5rem 0; }
+
+  /* Top bar */
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap; }
+  .topbar-left { display: flex; flex-direction: column; gap: 2px; }
+  .page-title { font-size: 20px; font-weight: 600; color: #1a1a1a; margin: 0; }
+  .page-sub { font-size: 13px; color: #888; margin: 0; }
+  .btn-add { display: inline-flex; align-items: center; gap: 6px; background: #185FA5; color: #fff; border: none; border-radius: 8px; padding: 9px 18px; font-size: 14px; font-weight: 500; cursor: pointer; text-decoration: none; transition: opacity .15s; }
+  .btn-add:hover { opacity: .88; color: #fff; text-decoration: none; }
+
+  /* Stats row */
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .stat-card { background: #f5f5f5; border-radius: 8px; padding: 12px 16px; }
+  .stat-label { font-size: 12px; color: #888; margin-bottom: 4px; }
+  .stat-value { font-size: 24px; font-weight: 600; color: #1a1a1a; }
+  .stat-value.accent { color: #185FA5; }
+  .stat-value.success { color: #3B6D11; }
+
+  /* Toolbar */
+  .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+  .search-wrap { position: relative; flex: 1; min-width: 180px; max-width: 320px; }
+  .search-wrap i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #aaa; font-size: 13px; pointer-events: none; }
+  .search-input { width: 100%; padding: 8px 12px 8px 32px; font-size: 13px; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #1a1a1a; outline: none; transition: border-color .15s; }
+  .search-input:focus { border-color: #185FA5; }
+  .per-page-wrap { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #666; }
+  .per-page-select { padding: 7px 10px; font-size: 13px; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #1a1a1a; outline: none; cursor: pointer; }
+
+  /* Table card */
+  .table-card { background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; overflow: hidden; }
+  .cat-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .cat-table thead tr { background: #fafafa; border-bottom: 1px solid #e5e5e5; }
+  .cat-table th { padding: 11px 16px; font-size: 12px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: .04em; text-align: left; white-space: nowrap; }
+  .cat-table th.col-no { width: 52px; }
+  .cat-table th.col-order { width: 72px; }
+  .cat-table th.col-status { width: 90px; }
+  .cat-table th.col-actions { width: 140px; text-align: right; }
+  .cat-table tbody tr { border-bottom: 1px solid #f0f0f0; transition: background .1s; }
+  .cat-table tbody tr:last-child { border-bottom: none; }
+  .cat-table tbody tr:hover { background: #fafafa; }
+  .cat-table td { padding: 12px 16px; color: #333; vertical-align: middle; }
+  .cat-table td.col-no { font-size: 12px; color: #aaa; font-weight: 600; }
+  .cat-name { font-weight: 500; color: #1a1a1a; }
+  .col-order-val { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: #555; background: #f0f0f0; padding: 2px 8px; border-radius: 20px; }
+  .badge-status { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
+  .badge-status.active { background: #EAF3DE; color: #3B6D11; }
+  .badge-status.inactive { background: #f0f0f0; color: #888; border: 1px solid #ddd; }
+
+  /* Row actions */
+  .row-actions { display: flex; gap: 6px; justify-content: flex-end; }
+  .action-btn { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 500; padding: 5px 10px; border-radius: 6px; cursor: pointer; border: 1px solid #ddd; background: #fff; color: #333; text-decoration: none; transition: background .12s, border-color .12s; white-space: nowrap; }
+  .action-btn:hover { background: #f5f5f5; text-decoration: none; color: #333; }
+  .action-btn.danger { color: #A32D2D; border-color: #F09595; }
+  .action-btn.danger:hover { background: #FCEBEB; }
+
+  /* Empty state */
+  .empty-row td { padding: 3rem 1rem; text-align: center; color: #aaa; }
+  .empty-row i { font-size: 32px; display: block; margin-bottom: 10px; }
+  .empty-row p { font-size: 14px; margin: 0; }
+
+  /* Pagination */
+  .pagination-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-top: 1px solid #f0f0f0; flex-wrap: wrap; gap: 10px; }
+  .pagination-info { font-size: 13px; color: #888; }
+  .pagination-btns { display: flex; gap: 4px; align-items: center; }
+  .page-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; height: 32px; padding: 0 6px; border-radius: 7px; border: 1px solid #ddd; background: #fff; font-size: 13px; color: #333; cursor: pointer; transition: background .12s, border-color .12s; font-weight: 500; }
+  .page-btn:hover:not(:disabled) { background: #f5f5f5; }
+  .page-btn.active { background: #185FA5; color: #fff; border-color: #185FA5; }
+  .page-btn:disabled { opacity: .4; cursor: not-allowed; }
+  .page-ellipsis { font-size: 13px; color: #aaa; padding: 0 4px; }
+
+  /* Delete modal */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); align-items: center; justify-content: center; z-index: 1050; }
+  .modal-overlay.open { display: flex; }
+  .modal-box { background: #fff; border-radius: 12px; padding: 24px; max-width: 380px; width: 90%; box-shadow: 0 8px 32px rgba(0,0,0,.15); }
+  .modal-title { font-size: 16px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
+  .modal-body-text { font-size: 14px; color: #555; line-height: 1.6; margin-bottom: 20px; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
+  .modal-cancel { padding: 8px 16px; font-size: 13px; border-radius: 7px; border: 1px solid #ddd; background: #fff; color: #333; cursor: pointer; }
+  .modal-cancel:hover { background: #f5f5f5; }
+  .modal-confirm { padding: 8px 16px; font-size: 13px; border-radius: 7px; border: none; background: #E24B4A; color: #fff; cursor: pointer; font-weight: 600; }
+  .modal-confirm:hover { background: #c93b3a; }
+
+  /* Toast */
+  .toast-msg { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(60px); background: #1a1a1a; color: #fff; font-size: 13px; padding: 9px 20px; border-radius: 20px; opacity: 0; transition: opacity .2s, transform .25s; z-index: 2000; white-space: nowrap; pointer-events: none; }
+  .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Menu Categories</h1>
-    <a href="{{ url_for('admin_add_category') }}" class="btn btn-primary">
-        <i class="fas fa-plus"></i> Add Category
+<div class="page">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1 class="page-title">Menu categories</h1>
+      <p class="page-sub">Manage the categories that organise your menu items</p>
+    </div>
+    <a href="{{ url_for('admin_add_category') }}" class="btn-add">
+      <i class="fas fa-plus"></i> Add category
     </a>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Total categories</div>
+      <div class="stat-value">{{ categories | length }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Active</div>
+      <div class="stat-value success">{{ categories | selectattr('is_active') | list | length }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Inactive</div>
+      <div class="stat-value">{{ categories | rejectattr('is_active') | list | length }}</div>
+    </div>
+  </div>
+
+  <!-- Table card -->
+  <div class="table-card">
+
+    <!-- Toolbar -->
+    <div class="toolbar" style="padding: 12px 16px; border-bottom: 1px solid #f0f0f0;">
+      <div class="search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search categories…" oninput="applyFilters()">
+      </div>
+      <div class="per-page-wrap">
+        <span>Show</span>
+        <select class="per-page-select" id="perPageSelect" onchange="applyFilters()">
+          <option value="10" selected>10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+        <span>per page</span>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div style="overflow-x:auto;">
+      <table class="cat-table">
+        <thead>
+          <tr>
+            <th class="col-no">#</th>
+            <th>Name</th>
+            <th class="col-order">Order</th>
+            <th class="col-status">Status</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          {% for category in categories %}
+          <tr
+            data-name="{{ category.name | lower }}"
+            data-active="{{ 'active' if category.is_active else 'inactive' }}"
+            data-id="{{ category.id }}"
+            data-catname="{{ category.name | e }}"
+            data-editurl="{{ url_for('admin_edit_category', category_id=category.id) }}"
+            data-deleteurl="{{ url_for('admin_delete_category', category_id=category.id) }}"
+            data-order="{{ category.display_order }}"
+            data-isactive="{{ '1' if category.is_active else '0' }}"
+          >
+          </tr>
+          {% else %}
+          <tr class="empty-row">
+            <td colspan="5">
+              <i class="fas fa-layer-group"></i>
+              <p>No categories yet. Add your first category to get started.</p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-bar" id="paginationBar">
+      <span class="pagination-info" id="paginationInfo"></span>
+      <div class="pagination-btns" id="paginationBtns"></div>
+    </div>
+
+  </div>
 </div>
 
-<div class="card">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Order</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for category in categories %}
-                    <tr>
-                        <td>{{ category.id }}</td>
-                        <td>{{ category.name }}</td>
-                        <td>{{ category.display_order }}</td>
-                        <td>
-                            {% if category.is_active %}
-                            <span class="badge bg-success">Active</span>
-                            {% else %}
-                            <span class="badge bg-secondary">Inactive</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <a href="{{ url_for('admin_edit_category', category_id=category.id) }}" class="btn btn-sm btn-primary">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                            <button class="btn btn-sm btn-danger" onclick="confirmDelete({{ category.id }})">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="5" class="text-center">No categories found</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<!-- Delete modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-box">
+    <p class="modal-title">Delete this category?</p>
+    <p class="modal-body-text">
+      "<strong id="deleteCatName"></strong>" will be permanently removed. Menu items linked to it may be affected. You can't undo this.
+    </p>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeDeleteModal()">Cancel</button>
+      <form id="deleteForm" method="POST" style="display:inline;">
+        <button type="submit" class="modal-confirm">Delete category</button>
+      </form>
     </div>
+  </div>
 </div>
 
-<!-- Delete Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirm Delete</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete this category?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form id="deleteForm" method="POST" style="display: inline;">
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Toast -->
+<div class="toast-msg" id="toastMsg"></div>
+
 {% endblock %}
 
 {% block extra_js %}
 <script>
-function confirmDelete(id) {
-    document.getElementById('deleteForm').action = "{{ url_for('admin_delete_category', category_id=0) }}".replace('0', id);
-    new bootstrap.Modal(document.getElementById('deleteModal')).show();
-}
+  /* ── Data from Jinja ── */
+  const allRows = Array.from(document.querySelectorAll('#tableBody tr[data-id]')).map(tr => ({
+    id:        tr.dataset.id,
+    name:      tr.dataset.name,
+    catname:   tr.dataset.catname,
+    editUrl:   tr.dataset.editurl,
+    deleteUrl: tr.dataset.deleteurl,
+    order:     parseInt(tr.dataset.order) || 0,
+    isActive:  tr.dataset.isactive === '1',
+  }));
+
+  /* Remove the Jinja-rendered placeholder rows — JS will render everything */
+  document.querySelectorAll('#tableBody tr').forEach(r => r.remove());
+
+  let currentPage = 1;
+  let filtered = [...allRows];
+
+  function applyFilters() {
+    const q = document.getElementById('searchInput').value.toLowerCase().trim();
+    filtered = allRows.filter(r => !q || r.name.includes(q));
+    currentPage = 1;
+    render();
+  }
+
+  function render() {
+    const perPage = parseInt(document.getElementById('perPageSelect').value);
+    const total   = filtered.length;
+    const pages   = Math.max(1, Math.ceil(total / perPage));
+    if (currentPage > pages) currentPage = pages;
+
+    const start = (currentPage - 1) * perPage;
+    const slice = filtered.slice(start, start + perPage);
+
+    const tbody = document.getElementById('tableBody');
+    if (!total) {
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="5"><i class="fas fa-layer-group"></i><p>No categories match your search.</p></td></tr>`;
+      document.getElementById('paginationInfo').textContent = '';
+      document.getElementById('paginationBtns').innerHTML = '';
+      return;
+    }
+
+    tbody.innerHTML = slice.map((r, i) => `
+      <tr>
+        <td class="col-no">${start + i + 1}</td>
+        <td><span class="cat-name">${escHtml(r.catname)}</span></td>
+        <td><span class="col-order-val"><i class="fas fa-sort" style="font-size:10px;color:#aaa;"></i>${r.order}</span></td>
+        <td><span class="badge-status ${r.isActive ? 'active' : 'inactive'}">${r.isActive ? 'Active' : 'Inactive'}</span></td>
+        <td>
+          <div class="row-actions">
+            <a href="${r.editUrl}" class="action-btn"><i class="fas fa-pencil-alt"></i> Edit</a>
+            <button type="button" class="action-btn danger" onclick="openDeleteModal('${r.id}','${escAttr(r.catname)}','${escAttr(r.deleteUrl)}')">
+              <i class="fas fa-trash-alt"></i> Delete
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+
+    /* Pagination info */
+    const from = start + 1, to = Math.min(start + perPage, total);
+    document.getElementById('paginationInfo').textContent =
+      `Showing ${from}–${to} of ${total} categor${total === 1 ? 'y' : 'ies'}`;
+
+    /* Pagination buttons */
+    renderPagination(pages);
+  }
+
+  function renderPagination(pages) {
+    const c = document.getElementById('paginationBtns');
+    if (pages <= 1) { c.innerHTML = ''; return; }
+
+    let btns = [];
+    const p = currentPage;
+
+    btns.push(`<button class="page-btn" onclick="goPage(${p-1})" ${p===1?'disabled':''} title="Previous"><i class="fas fa-chevron-left" style="font-size:11px;"></i></button>`);
+
+    const range = pageRange(p, pages);
+    let prev = null;
+    range.forEach(n => {
+      if (prev !== null && n - prev > 1) btns.push(`<span class="page-ellipsis">…</span>`);
+      btns.push(`<button class="page-btn ${n===p?'active':''}" onclick="goPage(${n})">${n}</button>`);
+      prev = n;
+    });
+
+    btns.push(`<button class="page-btn" onclick="goPage(${p+1})" ${p===pages?'disabled':''} title="Next"><i class="fas fa-chevron-right" style="font-size:11px;"></i></button>`);
+
+    c.innerHTML = btns.join('');
+  }
+
+  function pageRange(current, total) {
+    const delta = 2, range = new Set();
+    range.add(1); range.add(total);
+    for (let i = Math.max(2, current - delta); i <= Math.min(total - 1, current + delta); i++) range.add(i);
+    return Array.from(range).sort((a,b) => a-b);
+  }
+
+  function goPage(n) {
+    const perPage = parseInt(document.getElementById('perPageSelect').value);
+    const pages = Math.ceil(filtered.length / perPage);
+    currentPage = Math.max(1, Math.min(n, pages));
+    render();
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  /* ── Delete modal ── */
+  function openDeleteModal(id, name, deleteUrl) {
+    document.getElementById('deleteCatName').textContent = name;
+    document.getElementById('deleteForm').action = deleteUrl;
+    document.getElementById('deleteModal').classList.add('open');
+  }
+  function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.remove('open');
+  }
+  document.getElementById('deleteModal').addEventListener('click', function(e) {
+    if (e.target === this) closeDeleteModal();
+  });
+
+  /* ── Toast ── */
+  function showToast(msg) {
+    const t = document.getElementById('toastMsg');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2400);
+  }
+
+  /* ── Helpers ── */
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function escAttr(s) {
+    return s.replace(/'/g,"\\'");
+  }
+
+  /* ── Flash messages ── */
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      showToast("{{ message | e }}");
+    {% endfor %}
+  {% endwith %}
+
+  /* ── Init ── */
+  render();
 </script>
 {% endblock %}

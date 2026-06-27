@@ -3,95 +3,681 @@
 {% block title %}Manage Reservations - EFFOI Admin{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Reservations</h1>
-    <div>
-        <select class="form-select" onchange="window.location.href='?status='+this.value" style="width: 200px;">
-            <option value="all" {% if status == 'all' %}selected{% endif %}>All Reservations</option>
-            <option value="pending" {% if status == 'pending' %}selected{% endif %}>Pending</option>
-            <option value="confirmed" {% if status == 'confirmed' %}selected{% endif %}>Confirmed</option>
-            <option value="cancelled" {% if status == 'cancelled' %}selected{% endif %}>Cancelled</option>
-        </select>
-    </div>
+
+<style>
+  :root {
+    --ef-brown:       #6B3F1F;
+    --ef-brown-light: #8B5A2B;
+    --ef-cream:       #FDF8F3;
+    --ef-sand:        #F0E6D8;
+    --ef-border:      #E2D0BC;
+    --ef-text:        #2C1A0E;
+    --ef-muted:       #7A6252;
+    --ef-radius:      10px;
+    --ef-shadow:      0 2px 10px rgba(107,63,31,.10);
+
+    --c-confirmed-bg: #D4EDDA; --c-confirmed: #155724;
+    --c-pending-bg:   #FFF3CD; --c-pending:   #856404;
+    --c-cancelled-bg: #F8D7DA; --c-cancelled: #721C24;
+  }
+
+  /* ── Header ── */
+  .ef-page-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.5rem; flex-wrap: wrap; gap: .75rem;
+  }
+  .ef-page-header h1 { font-size: 1.6rem; font-weight: 700; color: var(--ef-brown); margin: 0; }
+
+  /* ── Stats ── */
+  .ef-stats { display: flex; gap: .75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .ef-stat-card {
+    background: #fff; border: 1px solid var(--ef-border); border-radius: var(--ef-radius);
+    padding: .65rem 1.1rem; display: flex; align-items: center; gap: .65rem;
+    box-shadow: var(--ef-shadow); flex: 1; min-width: 110px; cursor: pointer;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .ef-stat-card:hover          { border-color: var(--ef-brown-light); }
+  .ef-stat-card.filter-active  { border-color: var(--ef-brown); box-shadow: 0 0 0 3px rgba(107,63,31,.12); }
+  .ef-stat-icon {
+    width: 34px; height: 34px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; font-size: .9rem; flex-shrink: 0;
+  }
+  .ef-stat-icon.total     { background: var(--ef-sand);        color: var(--ef-brown); }
+  .ef-stat-icon.confirmed { background: var(--c-confirmed-bg); color: var(--c-confirmed); }
+  .ef-stat-icon.pending   { background: var(--c-pending-bg);   color: var(--c-pending); }
+  .ef-stat-icon.cancelled { background: var(--c-cancelled-bg); color: var(--c-cancelled); }
+  .ef-stat-num  { font-size: 1.25rem; font-weight: 700; color: var(--ef-text); }
+  .ef-stat-lbl  { font-size: .7rem; color: var(--ef-muted); text-transform: uppercase; letter-spacing: .04em; }
+  .ef-stat-hint { font-size: .68rem; color: var(--ef-brown-light); margin-top: .1rem; display: none; }
+  .ef-stat-card.filter-active .ef-stat-hint { display: block; }
+
+  /* ── Pending Alert ── */
+  .ef-pending-alert {
+    background: var(--c-pending-bg); border: 1px solid #FFDEAD;
+    border-radius: var(--ef-radius); padding: .7rem 1rem;
+    font-size: .875rem; color: var(--c-pending);
+    display: flex; align-items: center; gap: .5rem; margin-bottom: 1.25rem;
+  }
+
+  /* ── Controls ── */
+  .ef-controls {
+    background: var(--ef-cream); border: 1px solid var(--ef-border);
+    border-radius: var(--ef-radius); padding: 1rem 1.25rem;
+    margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: .75rem; align-items: flex-end;
+  }
+  .ef-control-group { display: flex; flex-direction: column; gap: .3rem; min-width: 130px; }
+  .ef-control-group label {
+    font-size: .7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .05em; color: var(--ef-muted);
+  }
+  .ef-control-group select,
+  .ef-control-group input {
+    border: 1.5px solid var(--ef-border); border-radius: 7px;
+    padding: .42rem .7rem; font-size: .875rem; color: var(--ef-text);
+    background: #fff; outline: none; transition: border-color .15s;
+  }
+  .ef-control-group select:focus,
+  .ef-control-group input:focus { border-color: var(--ef-brown-light); }
+  .ef-search-group { flex: 1; min-width: 200px; }
+  .ef-search-wrap { position: relative; }
+  .ef-search-wrap .si {
+    position: absolute; left: .7rem; top: 50%;
+    transform: translateY(-50%); color: var(--ef-muted); font-size: .85rem; pointer-events: none;
+  }
+  .ef-clear-btn {
+    position: absolute; right: .6rem; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: var(--ef-muted);
+    cursor: pointer; font-size: .8rem; padding: 0; display: none;
+  }
+  .ef-search-wrap input { padding-left: 2.1rem !important; padding-right: 1.8rem !important; width: 100%; }
+  .btn-ef-reset {
+    border: 1.5px solid var(--ef-border); background: #fff; color: var(--ef-muted);
+    border-radius: 7px; padding: .42rem .9rem; font-size: .875rem;
+    cursor: pointer; align-self: flex-end; transition: border-color .15s, color .15s;
+  }
+  .btn-ef-reset:hover { border-color: var(--ef-brown); color: var(--ef-brown); }
+
+  /* ── Result Bar ── */
+  .ef-result-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: .82rem; color: var(--ef-muted); margin-bottom: .6rem; flex-wrap: wrap; gap: .5rem;
+  }
+  .ef-result-bar strong { color: var(--ef-text); }
+
+  /* ── Card / Table ── */
+  .ef-card {
+    background: #fff; border: 1px solid var(--ef-border);
+    border-radius: var(--ef-radius); box-shadow: var(--ef-shadow); overflow: hidden;
+  }
+  .ef-table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+  .ef-table thead tr { background: var(--ef-sand); border-bottom: 2px solid var(--ef-border); }
+  .ef-table thead th {
+    padding: .75rem 1rem; font-size: .7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .05em; color: var(--ef-brown); white-space: nowrap;
+  }
+  .ef-table tbody tr { border-bottom: 1px solid var(--ef-border); transition: background .12s; }
+  .ef-table tbody tr:last-child { border-bottom: none; }
+  .ef-table tbody tr:hover { background: var(--ef-cream); }
+  .ef-table td { padding: .75rem 1rem; color: var(--ef-text); vertical-align: middle; }
+
+  /* ── Guest cell ── */
+  .ef-guest-name  { font-weight: 600; color: var(--ef-text); }
+  .ef-guest-contact { font-size: .75rem; color: var(--ef-muted); margin-top: .1rem; }
+
+  /* ── Date/time cell ── */
+  .ef-datetime { white-space: nowrap; }
+  .ef-datetime .dt-date { font-weight: 600; color: var(--ef-text); font-size: .85rem; }
+  .ef-datetime .dt-time { font-size: .75rem; color: var(--ef-muted); margin-top: .1rem; }
+
+  /* ── Party size ── */
+  .ef-party {
+    display: inline-flex; align-items: center; gap: .3rem;
+    background: var(--ef-sand); border-radius: 20px;
+    padding: .2rem .65rem; font-size: .8rem; font-weight: 600; color: var(--ef-brown);
+  }
+
+  /* ── Status Badge ── */
+  .ef-badge {
+    display: inline-flex; align-items: center; gap: .3rem;
+    padding: .25rem .7rem; border-radius: 20px;
+    font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+  }
+  .ef-badge.confirmed { background: var(--c-confirmed-bg); color: var(--c-confirmed); }
+  .ef-badge.pending   { background: var(--c-pending-bg);   color: var(--c-pending);   }
+  .ef-badge.cancelled { background: var(--c-cancelled-bg); color: var(--c-cancelled); }
+
+  /* ── Past row dim ── */
+  .ef-row-past { opacity: .65; }
+
+  /* ── Actions ── */
+  .ef-actions { display: flex; gap: .3rem; align-items: center; flex-wrap: nowrap; }
+  .btn-ef-icon {
+    width: 30px; height: 30px; border-radius: 7px; border: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: .78rem; cursor: pointer; transition: opacity .15s, transform .1s;
+    text-decoration: none; flex-shrink: 0;
+  }
+  .btn-ef-icon:active { transform: scale(.9); }
+  .btn-ef-icon.confirm  { background: var(--c-confirmed-bg); color: var(--c-confirmed); }
+  .btn-ef-icon.confirm:hover { background: #b8ddc4; }
+  .btn-ef-icon.pend     { background: var(--c-pending-bg);   color: var(--c-pending); }
+  .btn-ef-icon.pend:hover { background: #ffd98a; }
+  .btn-ef-icon.cancel   { background: #E9ECEF; color: #555; }
+  .btn-ef-icon.cancel:hover { background: #d9d9d9; }
+  .btn-ef-icon.del      { background: var(--c-cancelled-bg); color: var(--c-cancelled); }
+  .btn-ef-icon.del:hover { background: #f1b0b7; }
+
+  /* ── Empty ── */
+  .ef-empty { text-align: center; padding: 3.5rem 1rem; color: var(--ef-muted); }
+  .ef-empty i { font-size: 2.8rem; margin-bottom: .75rem; display: block; opacity: .35; }
+  .ef-empty p { margin: .2rem 0 0; font-size: .92rem; }
+
+  /* ── Pagination ── */
+  .ef-pagination {
+    display: flex; align-items: center; justify-content: center;
+    gap: .35rem; padding: 1rem; border-top: 1px solid var(--ef-border); flex-wrap: wrap;
+  }
+  .ef-pg-btn {
+    min-width: 34px; height: 34px; border: 1.5px solid var(--ef-border);
+    background: #fff; border-radius: 7px; font-size: .82rem; font-weight: 600;
+    color: var(--ef-text); cursor: pointer;
+    transition: background .15s, border-color .15s, color .15s;
+    display: inline-flex; align-items: center; justify-content: center; padding: 0 .5rem;
+  }
+  .ef-pg-btn:hover:not(:disabled) { border-color: var(--ef-brown); color: var(--ef-brown); }
+  .ef-pg-btn.active { background: var(--ef-brown); border-color: var(--ef-brown); color: #fff; }
+  .ef-pg-btn:disabled { opacity: .3; cursor: not-allowed; }
+
+  /* ── Modals ── */
+  .ef-modal-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.45); z-index: 1050;
+    align-items: center; justify-content: center;
+  }
+  .ef-modal-backdrop.open { display: flex; }
+  .ef-modal {
+    background: #fff; border-radius: 14px; padding: 2rem;
+    max-width: 440px; width: 92%; box-shadow: 0 8px 32px rgba(0,0,0,.18);
+    animation: efIn .18s ease;
+  }
+  @keyframes efIn { from { transform: translateY(-14px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .ef-modal-icon {
+    width: 42px; height: 42px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; margin-bottom: .85rem;
+  }
+  .ef-modal-icon.confirm  { background: var(--c-confirmed-bg); color: var(--c-confirmed); }
+  .ef-modal-icon.warning  { background: var(--c-pending-bg);   color: var(--c-pending); }
+  .ef-modal-icon.del      { background: var(--c-cancelled-bg); color: var(--c-cancelled); }
+  .ef-modal h5 { font-size: 1.05rem; font-weight: 700; color: var(--ef-text); margin: 0 0 .4rem; }
+  .ef-modal .ef-modal-meta {
+    background: var(--ef-cream); border: 1px solid var(--ef-border);
+    border-radius: 8px; padding: .65rem .9rem; margin-bottom: 1rem; font-size: .85rem;
+  }
+  .ef-modal .ef-modal-meta span { display: block; color: var(--ef-muted); font-size: .78rem; margin-top: .15rem; }
+  .ef-modal p  { font-size: .875rem; color: var(--ef-muted); margin: 0 0 1.25rem; line-height: 1.55; }
+  .ef-modal-actions { display: flex; gap: .6rem; justify-content: flex-end; }
+  .btn-m-cancel {
+    border: 1.5px solid var(--ef-border); background: #fff; color: var(--ef-muted);
+    border-radius: 8px; padding: .45rem 1rem; font-size: .875rem; cursor: pointer;
+    transition: border-color .15s;
+  }
+  .btn-m-cancel:hover { border-color: var(--ef-brown); color: var(--ef-brown); }
+  .btn-m-confirm {
+    border: none; border-radius: 8px; padding: .45rem 1.15rem;
+    font-size: .875rem; font-weight: 600; cursor: pointer; color: #fff;
+    display: inline-flex; align-items: center; gap: .35rem; transition: opacity .15s;
+  }
+  .btn-m-confirm:hover { opacity: .88; }
+  .btn-m-confirm.green  { background: #28A745; }
+  .btn-m-confirm.amber  { background: #FFC107; color: #212529; }
+  .btn-m-confirm.red    { background: #DC3545; }
+  .btn-m-confirm.grey   { background: #6C757D; }
+</style>
+
+<!-- ── Header ── -->
+<div class="ef-page-header">
+  <h1><i class="fas fa-calendar-check" style="color:var(--ef-brown-light);margin-right:.4rem;"></i>Reservations</h1>
 </div>
 
-<div class="card">
-    <div class="card-body">
-        {% if reservations %}
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Party</th>
-                        <th>Phone</th>
-                        <th>Email</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for res in reservations %}
-                    <tr>
-                        <td>{{ res.id }}</td>
-                        <td>{{ res.customer_name }}</td>
-                        <td>{{ res.reservation_date.strftime('%Y-%m-%d') }}</td>
-                        <td>{{ res.reservation_time }}</td>
-                        <td>{{ res.party_size }}</td>
-                        <td>{{ res.customer_phone }}</td>
-                        <td>{{ res.customer_email }}</td>
-                        <td>
-                            <span class="badge bg-{% if res.status == 'confirmed' %}success{% elif res.status == 'pending' %}warning{% else %}danger{% endif %}">
-                                {{ res.status }}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown">
-                                    Update Status
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <form method="POST" action="{{ url_for('admin_update_reservation', reservation_id=res.id) }}">
-                                            <input type="hidden" name="status" value="confirmed">
-                                            <button type="submit" class="dropdown-item">Confirm</button>
-                                        </form>
-                                    </li>
-                                    <li>
-                                        <form method="POST" action="{{ url_for('admin_update_reservation', reservation_id=res.id) }}">
-                                            <input type="hidden" name="status" value="cancelled">
-                                            <button type="submit" class="dropdown-item">Cancel</button>
-                                        </form>
-                                    </li>
-                                    <li>
-                                        <form method="POST" action="{{ url_for('admin_update_reservation', reservation_id=res.id) }}">
-                                            <input type="hidden" name="status" value="pending">
-                                            <button type="submit" class="dropdown-item">Mark Pending</button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>
-                            <form method="POST" action="{{ url_for('admin_delete_reservation', reservation_id=res.id) }}" style="display: inline;" onsubmit="return confirm('Delete this reservation? This action cannot be undone.')">
-                                <button type="submit" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-trash"></i> Delete
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <div class="text-center py-5">
-            <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
-            <h4>No Reservations Found</h4>
-            <p class="text-muted">Reservations will appear here when customers book.</p>
-        </div>
-        {% endif %}
+<!-- ── Clickable Stats ── -->
+<div class="ef-stats" id="ef-stats">
+  <div class="ef-stat-card filter-active" data-filter="" id="stat-all">
+    <div class="ef-stat-icon total"><i class="fas fa-list"></i></div>
+    <div>
+      <div class="ef-stat-num">{{ reservations|length }}</div>
+      <div class="ef-stat-lbl">Total</div>
+      <div class="ef-stat-hint">Showing all</div>
     </div>
+  </div>
+  <div class="ef-stat-card" data-filter="confirmed" id="stat-confirmed">
+    <div class="ef-stat-icon confirmed"><i class="fas fa-check-circle"></i></div>
+    <div>
+      <div class="ef-stat-num">{{ reservations|selectattr('status','eq','confirmed')|list|length }}</div>
+      <div class="ef-stat-lbl">Confirmed</div>
+      <div class="ef-stat-hint">Filtered</div>
+    </div>
+  </div>
+  <div class="ef-stat-card" data-filter="pending" id="stat-pending">
+    <div class="ef-stat-icon pending"><i class="fas fa-clock"></i></div>
+    <div>
+      <div class="ef-stat-num">{{ reservations|selectattr('status','eq','pending')|list|length }}</div>
+      <div class="ef-stat-lbl">Pending</div>
+      <div class="ef-stat-hint">Filtered</div>
+    </div>
+  </div>
+  <div class="ef-stat-card" data-filter="cancelled" id="stat-cancelled">
+    <div class="ef-stat-icon cancelled"><i class="fas fa-times-circle"></i></div>
+    <div>
+      <div class="ef-stat-num">{{ reservations|selectattr('status','eq','cancelled')|list|length }}</div>
+      <div class="ef-stat-lbl">Cancelled</div>
+      <div class="ef-stat-hint">Filtered</div>
+    </div>
+  </div>
 </div>
+
+<!-- ── Pending Alert ── -->
+{% set pending_count = reservations|selectattr('status','eq','pending')|list|length %}
+{% if pending_count > 0 %}
+<div class="ef-pending-alert">
+  <i class="fas fa-exclamation-circle"></i>
+  <span>You have <strong>{{ pending_count }} pending reservation{{ 's' if pending_count != 1 }}</strong> awaiting confirmation. Click the Pending card above to filter.</span>
+</div>
+{% endif %}
+
+<!-- ── Hidden Data ── -->
+<div id="ef-data" style="display:none;">
+  {% for res in reservations %}
+  <div class="ef-row-data"
+       data-id="{{ res.id }}"
+       data-name="{{ res.customer_name }}"
+       data-name-low="{{ res.customer_name | lower }}"
+       data-phone="{{ res.customer_phone }}"
+       data-email="{{ res.customer_email }}"
+       data-email-low="{{ res.customer_email | lower }}"
+       data-date="{{ res.reservation_date.strftime('%Y-%m-%d') }}"
+       data-date-display="{{ res.reservation_date.strftime('%b %d, %Y') }}"
+       data-time="{{ res.reservation_time }}"
+       data-party="{{ res.party_size }}"
+       data-status="{{ res.status }}"
+       data-update-url="{{ url_for('admin_update_reservation', reservation_id=res.id) }}"
+       data-delete-url="{{ url_for('admin_delete_reservation', reservation_id=res.id) }}">
+  </div>
+  {% endfor %}
+</div>
+
+<!-- ── Controls ── -->
+<div class="ef-controls">
+  <div class="ef-control-group ef-search-group">
+    <label>Search</label>
+    <div class="ef-search-wrap">
+      <i class="fas fa-search si"></i>
+      <input type="text" id="ef-search" placeholder="Name, email, or phone…">
+      <button class="ef-clear-btn" id="ef-clear"><i class="fas fa-times"></i></button>
+    </div>
+  </div>
+
+  <div class="ef-control-group">
+    <label>Rows per page</label>
+    <select id="ef-per-page">
+      <option value="10">10</option>
+      <option value="25">25</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+    </select>
+  </div>
+
+  <div class="ef-control-group">
+    <label>Status</label>
+    <select id="ef-filter-status">
+      <option value="">All Statuses</option>
+      <option value="confirmed">Confirmed</option>
+      <option value="pending">Pending</option>
+      <option value="cancelled">Cancelled</option>
+    </select>
+  </div>
+
+  <div class="ef-control-group">
+    <label>Date Range</label>
+    <select id="ef-filter-date">
+      <option value="">All Dates</option>
+      <option value="upcoming">Upcoming</option>
+      <option value="past">Past</option>
+      <option value="today">Today</option>
+    </select>
+  </div>
+
+  <div class="ef-control-group">
+    <label>Sort by</label>
+    <select id="ef-sort">
+      <option value="date-asc">Date ↑ (Soonest)</option>
+      <option value="date-desc">Date ↓ (Latest)</option>
+      <option value="party-desc">Party Size ↓</option>
+      <option value="name-asc">Name A–Z</option>
+    </select>
+  </div>
+
+  <button class="btn-ef-reset" id="ef-reset"><i class="fas fa-times"></i> Reset</button>
+</div>
+
+<!-- ── Result Bar ── -->
+<div class="ef-result-bar">
+  <span id="ef-summary">Showing <strong>—</strong> of <strong>—</strong> reservations</span>
+</div>
+
+<!-- ── Table ── -->
+<div class="ef-card">
+  <div style="overflow-x:auto;">
+    <table class="ef-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Guest</th>
+          <th>Date & Time</th>
+          <th>Party</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="ef-tbody"></tbody>
+    </table>
+  </div>
+  <div id="ef-empty" class="ef-empty" style="display:none;">
+    <i class="fas fa-calendar-times"></i>
+    <p>No reservations match your filters.</p>
+    <p style="font-size:.8rem;">Try a different search or reset the filters.</p>
+  </div>
+  <div id="ef-pagination" class="ef-pagination"></div>
+</div>
+
+<!-- ── Status Update Modal ── -->
+<div class="ef-modal-backdrop" id="modal-status">
+  <div class="ef-modal">
+    <div class="ef-modal-icon" id="status-modal-icon"><i id="status-modal-icon-i" class="fas fa-sync"></i></div>
+    <h5 id="status-modal-title">Update Reservation</h5>
+    <div class="ef-modal-meta" id="status-modal-meta"></div>
+    <p id="status-modal-desc"></p>
+    <div class="ef-modal-actions">
+      <button class="btn-m-cancel" id="status-modal-cancel">Cancel</button>
+      <form id="status-form" method="POST" style="display:inline;">
+        <input type="hidden" id="status-input" name="status">
+        <button type="submit" class="btn-m-confirm" id="status-modal-btn">Confirm</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── Delete Modal ── -->
+<div class="ef-modal-backdrop" id="modal-delete">
+  <div class="ef-modal">
+    <div class="ef-modal-icon del"><i class="fas fa-trash"></i></div>
+    <h5>Delete Reservation</h5>
+    <div class="ef-modal-meta" id="del-modal-meta"></div>
+    <p>This action is permanent and cannot be undone.</p>
+    <div class="ef-modal-actions">
+      <button class="btn-m-cancel" id="del-modal-cancel">Cancel</button>
+      <form id="del-form" method="POST" style="display:inline;">
+        <button type="submit" class="btn-m-confirm red"><i class="fas fa-trash"></i> Delete</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const todayStr = new Date().toISOString().slice(0,10);
+  const today = new Date(todayStr);
+
+  /* ── Data ── */
+  const allRows = Array.from(document.querySelectorAll('.ef-row-data')).map(el => ({
+    id:          el.dataset.id,
+    name:        el.dataset.name,
+    nameLow:     el.dataset.nameLow,
+    phone:       el.dataset.phone,
+    email:       el.dataset.email,
+    emailLow:    el.dataset.emailLow,
+    date:        el.dataset.date,
+    dateDsp:     el.dataset.dateDisplay,
+    dateObj:     new Date(el.dataset.date),
+    time:        el.dataset.time,
+    party:       parseInt(el.dataset.party),
+    status:      el.dataset.status,
+    updateUrl:   el.dataset.updateUrl,
+    deleteUrl:   el.dataset.deleteUrl,
+  }));
+
+  let currentPage = 1;
+  let activeStatFilter = '';
+
+  /* ── DOM ── */
+  const searchEl  = document.getElementById('ef-search');
+  const clearBtn  = document.getElementById('ef-clear');
+  const perPageEl = document.getElementById('ef-per-page');
+  const statusEl  = document.getElementById('ef-filter-status');
+  const dateEl    = document.getElementById('ef-filter-date');
+  const sortEl    = document.getElementById('ef-sort');
+  const resetBtn  = document.getElementById('ef-reset');
+  const tbody     = document.getElementById('ef-tbody');
+  const emptyEl   = document.getElementById('ef-empty');
+  const pgEl      = document.getElementById('ef-pagination');
+  const summaryEl = document.getElementById('ef-summary');
+
+  /* ── Stat card clicks ── */
+  document.querySelectorAll('.ef-stat-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const f = card.dataset.filter;
+      activeStatFilter = f;
+      statusEl.value = f;
+      document.querySelectorAll('.ef-stat-card').forEach(c => c.classList.remove('filter-active'));
+      card.classList.add('filter-active');
+      currentPage = 1;
+      render();
+    });
+  });
+
+  /* Sync stat card highlight when status select changes manually */
+  statusEl.addEventListener('change', () => {
+    activeStatFilter = statusEl.value;
+    document.querySelectorAll('.ef-stat-card').forEach(c => {
+      c.classList.toggle('filter-active', c.dataset.filter === activeStatFilter);
+    });
+  });
+
+  /* ── Filter + Sort ── */
+  function getFiltered() {
+    const q      = searchEl.value.trim().toLowerCase();
+    const status = statusEl.value;
+    const date   = dateEl.value;
+    const sort   = sortEl.value;
+
+    let rows = allRows.filter(r => {
+      if (q && !r.nameLow.includes(q) && !r.emailLow.includes(q) && !r.phone.includes(q)) return false;
+      if (status && r.status !== status) return false;
+      if (date === 'upcoming' && r.dateObj <  today)  return false;
+      if (date === 'past'     && r.dateObj >= today)  return false;
+      if (date === 'today'    && r.date    !== todayStr) return false;
+      return true;
+    });
+
+    rows.sort((a, b) => {
+      if (sort === 'date-asc')   return a.date.localeCompare(b.date);
+      if (sort === 'date-desc')  return b.date.localeCompare(a.date);
+      if (sort === 'party-desc') return b.party - a.party;
+      if (sort === 'name-asc')   return a.nameLow.localeCompare(b.nameLow);
+      return 0;
+    });
+
+    return rows;
+  }
+
+  /* ── Status config ── */
+  const S = {
+    confirmed: { cls: 'confirmed', icon: 'fa-check-circle',  label: 'Confirmed' },
+    pending:   { cls: 'pending',   icon: 'fa-clock',         label: 'Pending'   },
+    cancelled: { cls: 'cancelled', icon: 'fa-times-circle',  label: 'Cancelled' },
+  };
+
+  /* ── Render ── */
+  function render() {
+    const filtered   = getFiltered();
+    const perPage    = parseInt(perPageEl.value);
+    const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+    if (currentPage > totalPages) currentPage = totalPages;
+    const start = (currentPage - 1) * perPage;
+    const page  = filtered.slice(start, start + perPage);
+
+    const from = filtered.length ? start + 1 : 0;
+    const to   = Math.min(start + perPage, filtered.length);
+    summaryEl.innerHTML = `Showing <strong>${from}–${to}</strong> of <strong>${filtered.length}</strong> reservations`;
+    clearBtn.style.display = searchEl.value ? 'block' : 'none';
+
+    tbody.innerHTML = '';
+    if (!page.length) { emptyEl.style.display = 'block'; pgEl.innerHTML = ''; return; }
+    emptyEl.style.display = 'none';
+
+    const isPast    = r => r.dateObj < today;
+    const isToday   = r => r.date === todayStr;
+
+    page.forEach((r, i) => {
+      const st = S[r.status] || S.pending;
+      const tr = document.createElement('tr');
+      if (isPast(r) && r.status !== 'confirmed') tr.classList.add('ef-row-past');
+
+      /* Only show action buttons that make sense for current status */
+      const actions = [];
+      if (r.status !== 'confirmed')
+        actions.push(`<button class="btn-ef-icon confirm" title="Confirm"
+          onclick="openStatus('${r.updateUrl}','confirmed','${esc(r.name)}','${r.dateDsp}','${r.time}',${r.party})">
+          <i class="fas fa-check"></i></button>`);
+      if (r.status !== 'pending')
+        actions.push(`<button class="btn-ef-icon pend" title="Mark Pending"
+          onclick="openStatus('${r.updateUrl}','pending','${esc(r.name)}','${r.dateDsp}','${r.time}',${r.party})">
+          <i class="fas fa-clock"></i></button>`);
+      if (r.status !== 'cancelled')
+        actions.push(`<button class="btn-ef-icon cancel" title="Cancel"
+          onclick="openStatus('${r.updateUrl}','cancelled','${esc(r.name)}','${r.dateDsp}','${r.time}',${r.party})">
+          <i class="fas fa-ban"></i></button>`);
+      actions.push(`<button class="btn-ef-icon del" title="Delete"
+        onclick="openDelete('${r.deleteUrl}','${esc(r.name)}','${r.dateDsp}','${r.time}',${r.party})">
+        <i class="fas fa-trash"></i></button>`);
+
+      const todayTag = isToday(r)
+        ? `<span style="font-size:.67rem;background:var(--ef-brown);color:#fff;border-radius:4px;padding:.05rem .35rem;margin-left:.35rem;font-weight:700;vertical-align:middle;">TODAY</span>`
+        : '';
+
+      tr.innerHTML = `
+        <td style="color:var(--ef-muted);font-size:.78rem;">${start + i + 1}</td>
+        <td>
+          <div class="ef-guest-name">${r.name}</div>
+          <div class="ef-guest-contact">
+            <i class="fas fa-phone" style="font-size:.65rem;margin-right:.25rem;"></i>${r.phone}
+            &nbsp;·&nbsp;
+            <i class="fas fa-envelope" style="font-size:.65rem;margin-right:.25rem;"></i>${r.email}
+          </div>
+        </td>
+        <td class="ef-datetime">
+          <div class="dt-date">
+            <i class="fas fa-calendar" style="color:var(--ef-brown-light);font-size:.75rem;margin-right:.3rem;"></i>${r.dateDsp}${todayTag}
+          </div>
+          <div class="dt-time">
+            <i class="fas fa-clock" style="font-size:.65rem;margin-right:.25rem;"></i>${r.time}
+          </div>
+        </td>
+        <td><span class="ef-party"><i class="fas fa-users" style="font-size:.75rem;"></i>${r.party}</span></td>
+        <td><span class="ef-badge ${st.cls}"><i class="fas ${st.icon}"></i>${st.label}</span></td>
+        <td><div class="ef-actions">${actions.join('')}</div></td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    renderPagination(totalPages);
+  }
+
+  /* ── Pagination ── */
+  function renderPagination(totalPages) {
+    pgEl.innerHTML = '';
+    if (totalPages <= 1) return;
+    const btn = (html, page, disabled, active) => {
+      const b = document.createElement('button');
+      b.className = 'ef-pg-btn' + (active ? ' active' : '');
+      b.innerHTML = html; b.disabled = disabled;
+      if (!disabled && !active) b.onclick = () => { currentPage = page; render(); window.scrollTo({top:0,behavior:'smooth'}); };
+      return b;
+    };
+    const dots = () => { const d = document.createElement('span'); d.textContent='…'; d.style.cssText='padding:0 .3rem;color:var(--ef-muted);align-self:center;'; return d; };
+
+    pgEl.appendChild(btn('<i class="fas fa-angle-double-left"></i>', 1, currentPage===1));
+    pgEl.appendChild(btn('<i class="fas fa-angle-left"></i>', currentPage-1, currentPage===1));
+
+    let s = Math.max(1, currentPage-2), e = Math.min(totalPages, s+4);
+    if (e-s < 4) s = Math.max(1, e-4);
+    if (s > 1) { pgEl.appendChild(btn('1',1,false,currentPage===1)); if(s>2) pgEl.appendChild(dots()); }
+    for (let p=s; p<=e; p++) pgEl.appendChild(btn(p,p,false,p===currentPage));
+    if (e < totalPages) { if(e<totalPages-1) pgEl.appendChild(dots()); pgEl.appendChild(btn(totalPages,totalPages,false,currentPage===totalPages)); }
+
+    pgEl.appendChild(btn('<i class="fas fa-angle-right"></i>', currentPage+1, currentPage===totalPages));
+    pgEl.appendChild(btn('<i class="fas fa-angle-double-right"></i>', totalPages, currentPage===totalPages));
+  }
+
+  /* ── Status Modal ── */
+  const STATUS_MODAL = {
+    confirmed: { iconCls:'confirm',  iconI:'fa-check',  title:'Confirm Reservation', desc:'This reservation will be marked as confirmed. Consider notifying the guest.', btnCls:'green', btnLabel:'<i class="fas fa-check"></i> Confirm' },
+    pending:   { iconCls:'warning',  iconI:'fa-clock',  title:'Mark as Pending',      desc:'This reservation will be set back to pending status.',                          btnCls:'amber', btnLabel:'<i class="fas fa-clock"></i> Mark Pending' },
+    cancelled: { iconCls:'warning',  iconI:'fa-ban',    title:'Cancel Reservation',   desc:'This reservation will be marked as cancelled.',                                 btnCls:'grey',  btnLabel:'<i class="fas fa-ban"></i> Cancel' },
+  };
+
+  window.openStatus = (url, newStatus, name, date, time, party) => {
+    const cfg = STATUS_MODAL[newStatus];
+    document.getElementById('status-modal-icon').className = `ef-modal-icon ${cfg.iconCls}`;
+    document.getElementById('status-modal-icon-i').className = `fas ${cfg.iconI}`;
+    document.getElementById('status-modal-title').textContent = cfg.title;
+    document.getElementById('status-modal-desc').textContent  = cfg.desc;
+    document.getElementById('status-modal-meta').innerHTML =
+      `<strong>${name}</strong><span>${date} &nbsp;·&nbsp; ${time} &nbsp;·&nbsp; ${party} guest${party!==1?'s':''}</span>`;
+    document.getElementById('status-input').value = newStatus;
+    document.getElementById('status-form').action = url;
+    const btn = document.getElementById('status-modal-btn');
+    btn.className = `btn-m-confirm ${cfg.btnCls}`;
+    btn.innerHTML = cfg.btnLabel;
+    openModal('modal-status');
+  };
+
+  window.openDelete = (url, name, date, time, party) => {
+    document.getElementById('del-modal-meta').innerHTML =
+      `<strong>${name}</strong><span>${date} &nbsp;·&nbsp; ${time} &nbsp;·&nbsp; ${party} guest${party!==1?'s':''}</span>`;
+    document.getElementById('del-form').action = url;
+    openModal('modal-delete');
+  };
+
+  /* ── Modal helpers ── */
+  function openModal(id)  { document.getElementById(id).classList.add('open'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  document.querySelectorAll('.ef-modal-backdrop').forEach(m =>
+    m.addEventListener('click', e => { if (e.target===m) m.classList.remove('open'); })
+  );
+  document.getElementById('status-modal-cancel').onclick = () => closeModal('modal-status');
+  document.getElementById('del-modal-cancel').onclick    = () => closeModal('modal-delete');
+
+  /* ── Escape helper ── */
+  function esc(s) { return (s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+
+  /* ── Events ── */
+  [searchEl, perPageEl, statusEl, dateEl, sortEl].forEach(el => {
+    el.addEventListener('input',  () => { currentPage=1; render(); });
+    el.addEventListener('change', () => { currentPage=1; render(); });
+  });
+  clearBtn.addEventListener('click', () => { searchEl.value=''; currentPage=1; render(); searchEl.focus(); });
+  resetBtn.addEventListener('click', () => {
+    searchEl.value=''; perPageEl.value='10'; statusEl.value='';
+    dateEl.value=''; sortEl.value='date-asc';
+    activeStatFilter = '';
+    document.querySelectorAll('.ef-stat-card').forEach(c => c.classList.toggle('filter-active', c.dataset.filter===''));
+    currentPage=1; render();
+  });
+
+  render();
+})();
+</script>
+
 {% endblock %}

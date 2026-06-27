@@ -3,122 +3,643 @@
 {% block title %}Manage Events - EFFOI Admin{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Club Events</h1>
-    <a href="{{ url_for('admin_add_event') }}" class="btn btn-primary">
-        <i class="fas fa-plus"></i> Add New Event
-    </a>
+
+<style>
+  :root {
+    --ef-brown:       #6B3F1F;
+    --ef-brown-light: #8B5A2B;
+    --ef-cream:       #FDF8F3;
+    --ef-sand:        #F0E6D8;
+    --ef-border:      #E2D0BC;
+    --ef-text:        #2C1A0E;
+    --ef-muted:       #7A6252;
+    --ef-success:     #155724;
+    --ef-success-bg:  #D4EDDA;
+    --ef-danger:      #721C24;
+    --ef-danger-bg:   #F8D7DA;
+    --ef-warning-bg:  #FFF3CD;
+    --ef-warning:     #856404;
+    --ef-info-bg:     #D1ECF1;
+    --ef-info:        #0C5460;
+    --ef-radius:      10px;
+    --ef-shadow:      0 2px 10px rgba(107,63,31,.10);
+  }
+
+  /* ── Page Header ── */
+  .ef-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: .75rem;
+  }
+  .ef-page-header h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--ef-brown);
+    margin: 0;
+  }
+  .btn-ef-primary {
+    background: var(--ef-brown);
+    color: #fff;
+    border: none;
+    border-radius: var(--ef-radius);
+    padding: .5rem 1.1rem;
+    font-weight: 600;
+    font-size: .875rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    transition: background .18s;
+    cursor: pointer;
+  }
+  .btn-ef-primary:hover { background: var(--ef-brown-light); color: #fff; }
+
+  /* ── Stats Strip ── */
+  .ef-stats {
+    display: flex;
+    gap: .75rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+  }
+  .ef-stat-card {
+    background: #fff;
+    border: 1px solid var(--ef-border);
+    border-radius: var(--ef-radius);
+    padding: .65rem 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    box-shadow: var(--ef-shadow);
+    flex: 1;
+    min-width: 120px;
+  }
+  .ef-stat-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .9rem;
+    flex-shrink: 0;
+  }
+  .ef-stat-icon.total   { background: var(--ef-sand);       color: var(--ef-brown); }
+  .ef-stat-icon.active  { background: var(--ef-success-bg); color: var(--ef-success); }
+  .ef-stat-icon.free    { background: var(--ef-info-bg);    color: var(--ef-info); }
+  .ef-stat-icon.paid    { background: var(--ef-warning-bg); color: var(--ef-warning); }
+  .ef-stat-info { line-height: 1.25; }
+  .ef-stat-num  { font-size: 1.2rem; font-weight: 700; color: var(--ef-text); }
+  .ef-stat-lbl  { font-size: .7rem;  color: var(--ef-muted); text-transform: uppercase; letter-spacing: .04em; }
+
+  /* ── Controls ── */
+  .ef-controls {
+    background: var(--ef-cream);
+    border: 1px solid var(--ef-border);
+    border-radius: var(--ef-radius);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    align-items: flex-end;
+  }
+  .ef-control-group { display: flex; flex-direction: column; gap: .3rem; min-width: 140px; }
+  .ef-control-group label {
+    font-size: .7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .05em; color: var(--ef-muted);
+  }
+  .ef-control-group select,
+  .ef-control-group input {
+    border: 1.5px solid var(--ef-border);
+    border-radius: 7px;
+    padding: .42rem .7rem;
+    font-size: .875rem;
+    color: var(--ef-text);
+    background: #fff;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .ef-control-group select:focus,
+  .ef-control-group input:focus { border-color: var(--ef-brown-light); }
+  .ef-search-group { flex: 1; min-width: 210px; }
+  .ef-search-wrap { position: relative; }
+  .ef-search-wrap i {
+    position: absolute; left: .7rem; top: 50%;
+    transform: translateY(-50%); color: var(--ef-muted); font-size: .85rem;
+  }
+  .ef-search-wrap .ef-clear-search {
+    position: absolute; right: .6rem; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: var(--ef-muted); cursor: pointer;
+    font-size: .8rem; padding: 0; display: none;
+  }
+  .ef-search-wrap input { padding-left: 2.1rem !important; padding-right: 1.8rem !important; width: 100%; }
+  .btn-ef-reset {
+    border: 1.5px solid var(--ef-border); background: #fff; color: var(--ef-muted);
+    border-radius: 7px; padding: .42rem .9rem; font-size: .875rem; cursor: pointer;
+    align-self: flex-end; transition: border-color .15s, color .15s;
+  }
+  .btn-ef-reset:hover { border-color: var(--ef-brown); color: var(--ef-brown); }
+
+  /* ── Result Bar ── */
+  .ef-result-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: .82rem; color: var(--ef-muted); margin-bottom: .6rem;
+    flex-wrap: wrap; gap: .5rem;
+  }
+  .ef-result-bar strong { color: var(--ef-text); }
+
+  /* ── Card ── */
+  .ef-card {
+    background: #fff; border: 1px solid var(--ef-border);
+    border-radius: var(--ef-radius); box-shadow: var(--ef-shadow); overflow: hidden;
+  }
+  .ef-table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+  .ef-table thead tr { background: var(--ef-sand); border-bottom: 2px solid var(--ef-border); }
+  .ef-table thead th {
+    padding: .75rem 1rem; font-size: .7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .05em; color: var(--ef-brown); white-space: nowrap;
+  }
+  .ef-table tbody tr { border-bottom: 1px solid var(--ef-border); transition: background .12s; }
+  .ef-table tbody tr:last-child { border-bottom: none; }
+  .ef-table tbody tr:hover { background: var(--ef-cream); }
+  .ef-table td { padding: .7rem 1rem; color: var(--ef-text); vertical-align: middle; }
+
+  .ef-thumb {
+    width: 46px; height: 46px; object-fit: cover;
+    border-radius: 7px; border: 1px solid var(--ef-border);
+  }
+  .ef-thumb-placeholder {
+    width: 46px; height: 46px; background: var(--ef-sand);
+    border-radius: 7px; border: 1px solid var(--ef-border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ef-muted); font-size: .75rem;
+  }
+  .ef-item-name  { font-weight: 600; color: var(--ef-text); }
+  .ef-date-cell  { white-space: nowrap; color: var(--ef-muted); font-size: .82rem; }
+  .ef-location   { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ef-muted); font-size: .82rem; }
+  .ef-price-free { color: var(--ef-info); font-weight: 600; font-size: .8rem; }
+  .ef-price-paid { color: var(--ef-brown); font-weight: 600; }
+
+  .ef-badge {
+    display: inline-block; padding: .22rem .65rem; border-radius: 20px;
+    font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+  }
+  .ef-badge.active   { background: var(--ef-success-bg); color: var(--ef-success); }
+  .ef-badge.inactive { background: #E9ECEF; color: #6C757D; }
+
+  .ef-gallery-btn {
+    background: var(--ef-info-bg); color: var(--ef-info); border: none;
+    border-radius: 7px; padding: .3rem .65rem; font-size: .8rem;
+    text-decoration: none; display: inline-flex; align-items: center; gap: .3rem;
+    transition: background .15s;
+  }
+  .ef-gallery-btn:hover { background: #b8e0e7; color: var(--ef-info); }
+  .ef-gallery-count {
+    background: var(--ef-info); color: #fff; border-radius: 20px;
+    padding: .05rem .4rem; font-size: .68rem; font-weight: 700;
+  }
+
+  /* ── Action Buttons ── */
+  .ef-actions { display: flex; gap: .35rem; align-items: center; flex-wrap: nowrap; }
+  .btn-ef-icon {
+    width: 30px; height: 30px; border-radius: 7px; border: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: .8rem; cursor: pointer; transition: opacity .15s, transform .1s;
+    text-decoration: none;
+  }
+  .btn-ef-icon:active { transform: scale(.9); }
+  .btn-ef-icon.edit     { background: var(--ef-brown); color: #fff; }
+  .btn-ef-icon.edit:hover { background: var(--ef-brown-light); color: #fff; }
+  .btn-ef-icon.toggle-on  { background: var(--ef-warning-bg); color: var(--ef-warning); }
+  .btn-ef-icon.toggle-off { background: var(--ef-success-bg); color: var(--ef-success); }
+  .btn-ef-icon.delete   { background: var(--ef-danger-bg); color: var(--ef-danger); }
+  .btn-ef-icon.delete:hover { background: #f1b0b7; color: var(--ef-danger); }
+
+  /* ── Empty State ── */
+  .ef-empty {
+    text-align: center; padding: 3.5rem 1rem; color: var(--ef-muted);
+  }
+  .ef-empty i { font-size: 2.8rem; margin-bottom: .75rem; display: block; opacity: .35; }
+  .ef-empty p { margin: .25rem 0 0; font-size: .95rem; }
+
+  /* ── Pagination ── */
+  .ef-pagination {
+    display: flex; align-items: center; justify-content: center;
+    gap: .35rem; padding: 1rem; border-top: 1px solid var(--ef-border); flex-wrap: wrap;
+  }
+  .ef-pg-btn {
+    min-width: 34px; height: 34px; border: 1.5px solid var(--ef-border);
+    background: #fff; border-radius: 7px; font-size: .82rem; font-weight: 600;
+    color: var(--ef-text); cursor: pointer;
+    transition: background .15s, border-color .15s, color .15s;
+    display: inline-flex; align-items: center; justify-content: center; padding: 0 .5rem;
+  }
+  .ef-pg-btn:hover:not(:disabled) { border-color: var(--ef-brown); color: var(--ef-brown); }
+  .ef-pg-btn.active { background: var(--ef-brown); border-color: var(--ef-brown); color: #fff; }
+  .ef-pg-btn:disabled { opacity: .3; cursor: not-allowed; }
+
+  /* ── Delete Modal ── */
+  .ef-modal-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.45); z-index: 1050;
+    align-items: center; justify-content: center;
+  }
+  .ef-modal-backdrop.open { display: flex; }
+  .ef-modal {
+    background: #fff; border-radius: 14px; padding: 2rem;
+    max-width: 420px; width: 90%; box-shadow: 0 8px 32px rgba(0,0,0,.18);
+    animation: efModalIn .18s ease;
+  }
+  @keyframes efModalIn { from { transform: translateY(-16px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .ef-modal h5 { font-size: 1.1rem; font-weight: 700; color: var(--ef-brown); margin: 0 0 .75rem; }
+  .ef-modal p  { font-size: .9rem; color: var(--ef-muted); margin: 0 0 1.25rem; }
+  .ef-modal-actions { display: flex; gap: .6rem; justify-content: flex-end; }
+  .btn-ef-cancel {
+    border: 1.5px solid var(--ef-border); background: #fff; color: var(--ef-muted);
+    border-radius: 8px; padding: .45rem 1rem; font-size: .875rem; cursor: pointer;
+    transition: border-color .15s;
+  }
+  .btn-ef-cancel:hover { border-color: var(--ef-brown); color: var(--ef-brown); }
+  .btn-ef-danger {
+    background: #DC3545; color: #fff; border: none;
+    border-radius: 8px; padding: .45rem 1.1rem; font-size: .875rem;
+    font-weight: 600; cursor: pointer; transition: background .15s;
+  }
+  .btn-ef-danger:hover { background: #b02a37; }
+</style>
+
+<!-- ── Page Header ── -->
+<div class="ef-page-header">
+  <h1><i class="fas fa-calendar-star" style="color:var(--ef-brown-light);margin-right:.4rem;"></i>Club Events</h1>
+  <a href="{{ url_for('admin_add_event') }}" class="btn-ef-primary">
+    <i class="fas fa-plus"></i> Add New Event
+  </a>
 </div>
 
-<div class="card">
-    <div class="card-body">
-        {% if events %}
-        <div class="table-responsive">
-            <table class="table table-hover datatable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Image</th>
-                        <th>Title</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Location</th>
-                        <th>Price</th>
-                        <th>Status</th>
-                        <th>Gallery</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for event in events %}
-                    <tr>
-                        <td>{{ event.id }}</td>
-                        <td>
-                            {% if event.image_url %}
-                            <img src="{{ event.image_url }}" alt="{{ event.title }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
-                            {% else %}
-                            <div class="bg-secondary" style="width: 50px; height: 50px; border-radius: 5px; display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-image text-white-50"></i>
-                            </div>
-                            {% endif %}
-                        </td>
-                        <td>{{ event.title }}</td>
-                        <td>{{ event.event_date.strftime('%Y-%m-%d') }}</td>
-                        <td>{{ event.event_time }}</td>
-                        <td>{{ event.location }}</td>
-                        <td>${{ "%.2f"|format(event.price) if event.price > 0 else 'Free' }}</td>
-                        <td>
-                            {% if event.is_active %}
-                            <span class="badge bg-success">Active</span>
-                            {% else %}
-                            <span class="badge bg-secondary">Inactive</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <a href="{{ url_for('admin_event_gallery', event_id=event.id) }}" 
-                               class="btn btn-sm btn-info" 
-                               title="Manage Gallery ({{ event.gallery_images|length }} images)">
-                                <i class="fas fa-images"></i>
-                                <span class="badge bg-light text-dark ms-1">{{ event.gallery_images|length }}</span>
-                            </a>
-                        </td>
-                        <td>
-                            <div class="btn-group" role="group">
-                                <a href="{{ url_for('admin_edit_event', event_id=event.id) }}" class="btn btn-sm btn-primary" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form method="POST" action="{{ url_for('admin_toggle_event', event_id=event.id) }}" style="display: inline;">
-                                    <button type="submit" class="btn btn-sm btn-{{ 'warning' if event.is_active else 'success' }}" title="{{ 'Deactivate' if event.is_active else 'Activate' }}">
-                                        <i class="fas fa-{{ 'eye-slash' if event.is_active else 'eye' }}"></i>
-                                    </button>
-                                </form>
-                                <button class="btn btn-sm btn-danger" onclick="confirmDelete({{ event.id }})" title="Delete">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <div class="text-center py-5">
-            <i class="fas fa-calendar-alt fa-4x text-muted mb-3"></i>
-            <h4>No Events Found</h4>
-            <p class="text-muted">Click "Add New Event" to create your first event.</p>
-        </div>
-        {% endif %}
+<!-- ── Stats Strip ── -->
+<div class="ef-stats" id="ef-stats">
+  <div class="ef-stat-card">
+    <div class="ef-stat-icon total"><i class="fas fa-calendar-alt"></i></div>
+    <div class="ef-stat-info">
+      <div class="ef-stat-num" id="stat-total">{{ events|length }}</div>
+      <div class="ef-stat-lbl">Total</div>
     </div>
-</div>
-
-<!-- Delete Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirm Delete</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete this event? This action cannot be undone.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form id="deleteForm" method="POST" style="display: inline;">
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-            </div>
-        </div>
+  </div>
+  <div class="ef-stat-card">
+    <div class="ef-stat-icon active"><i class="fas fa-check-circle"></i></div>
+    <div class="ef-stat-info">
+      <div class="ef-stat-num" id="stat-active">{{ events|selectattr('is_active')|list|length }}</div>
+      <div class="ef-stat-lbl">Active</div>
     </div>
+  </div>
+  <div class="ef-stat-card">
+    <div class="ef-stat-icon free"><i class="fas fa-ticket-alt"></i></div>
+    <div class="ef-stat-info">
+      <div class="ef-stat-num" id="stat-free">{{ events|selectattr('price','eq',0)|list|length }}</div>
+      <div class="ef-stat-lbl">Free</div>
+    </div>
+  </div>
+  <div class="ef-stat-card">
+    <div class="ef-stat-icon paid"><i class="fas fa-dollar-sign"></i></div>
+    <div class="ef-stat-info">
+      <div class="ef-stat-num" id="stat-paid">{{ events|rejectattr('price','eq',0)|list|length }}</div>
+      <div class="ef-stat-lbl">Paid</div>
+    </div>
+  </div>
 </div>
-{% endblock %}
 
-{% block extra_js %}
+<!-- ── Hidden Data ── -->
+<div id="ef-data" style="display:none;">
+  {% for event in events %}
+  <div class="ef-row-data"
+       data-id="{{ event.id }}"
+       data-title="{{ event.title }}"
+       data-title-lower="{{ event.title | lower }}"
+       data-date="{{ event.event_date.strftime('%Y-%m-%d') }}"
+       data-date-display="{{ event.event_date.strftime('%b %d, %Y') }}"
+       data-time="{{ event.event_time }}"
+       data-location="{{ event.location }}"
+       data-price-raw="{{ event.price }}"
+       data-price-display="{{ '$%.2f'|format(event.price) if event.price > 0 else 'Free' }}"
+       data-active="{{ 'yes' if event.is_active else 'no' }}"
+       data-gallery="{{ event.gallery_images|length }}"
+       data-image="{{ event.image_url or '' }}"
+       data-edit-url="{{ url_for('admin_edit_event', event_id=event.id) }}"
+       data-gallery-url="{{ url_for('admin_event_gallery', event_id=event.id) }}"
+       data-toggle-url="{{ url_for('admin_toggle_event', event_id=event.id) }}"
+       data-delete-url="{{ url_for('admin_delete_event', event_id=event.id) }}">
+  </div>
+  {% endfor %}
+</div>
+
+<!-- ── Controls ── -->
+<div class="ef-controls">
+  <div class="ef-control-group ef-search-group">
+    <label>Search</label>
+    <div class="ef-search-wrap">
+      <i class="fas fa-search"></i>
+      <input type="text" id="ef-search" placeholder="Search by title or location…">
+      <button class="ef-clear-search" id="ef-clear-search" title="Clear"><i class="fas fa-times"></i></button>
+    </div>
+  </div>
+
+  <div class="ef-control-group">
+    <label>Rows per page</label>
+    <select id="ef-per-page">
+      <option value="10">10</option>
+      <option value="25">25</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+    </select>
+  </div>
+
+  <div class="ef-control-group">
+    <label>Status</label>
+    <select id="ef-filter-status">
+      <option value="">All Statuses</option>
+      <option value="yes">Active</option>
+      <option value="no">Inactive</option>
+    </select>
+  </div>
+
+  <div class="ef-control-group">
+    <label>Pricing</label>
+    <select id="ef-filter-price">
+      <option value="">All Pricing</option>
+      <option value="free">Free</option>
+      <option value="paid">Paid</option>
+    </select>
+  </div>
+
+  <div class="ef-control-group">
+    <label>Date Range</label>
+    <select id="ef-filter-date">
+      <option value="">All Dates</option>
+      <option value="upcoming">Upcoming</option>
+      <option value="past">Past</option>
+    </select>
+  </div>
+
+  <button class="btn-ef-reset" id="ef-reset" title="Reset all filters">
+    <i class="fas fa-times"></i> Reset
+  </button>
+</div>
+
+<!-- ── Result Bar ── -->
+<div class="ef-result-bar">
+  <span id="ef-summary">Showing <strong>—</strong> of <strong>—</strong> events</span>
+</div>
+
+<!-- ── Table Card ── -->
+<div class="ef-card">
+  <div style="overflow-x:auto;">
+    <table class="ef-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Image</th>
+          <th>Title</th>
+          <th>Date & Time</th>
+          <th>Location</th>
+          <th>Price</th>
+          <th>Status</th>
+          <th>Gallery</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="ef-tbody"></tbody>
+    </table>
+  </div>
+
+  <div id="ef-empty" class="ef-empty" style="display:none;">
+    <i class="fas fa-calendar-times"></i>
+    <p>No events match your filters.</p>
+    <p style="font-size:.82rem;">Try adjusting your search or reset the filters.</p>
+  </div>
+
+  <div id="ef-pagination" class="ef-pagination"></div>
+</div>
+
+<!-- ── Custom Delete Modal ── -->
+<div class="ef-modal-backdrop" id="ef-delete-modal">
+  <div class="ef-modal">
+    <h5><i class="fas fa-exclamation-triangle" style="color:#DC3545;margin-right:.4rem;"></i>Delete Event</h5>
+    <p>Are you sure you want to delete <strong id="ef-delete-title"></strong>? This action cannot be undone and will also remove all gallery images.</p>
+    <div class="ef-modal-actions">
+      <button class="btn-ef-cancel" id="ef-modal-cancel">Cancel</button>
+      <form id="ef-delete-form" method="POST" style="display:inline;">
+        <button type="submit" class="btn-ef-danger"><i class="fas fa-trash"></i> Delete</button>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script>
-function confirmDelete(id) {
-    document.getElementById('deleteForm').action = "{{ url_for('admin_delete_event', event_id=0) }}".replace('0', id);
-    new bootstrap.Modal(document.getElementById('deleteModal')).show();
-}
+(function () {
+  /* ── Data ── */
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  const allRows = Array.from(document.querySelectorAll('.ef-row-data')).map(el => ({
+    id:           el.dataset.id,
+    title:        el.dataset.title,
+    titleLow:     el.dataset.titleLower,
+    date:         el.dataset.date,
+    dateDisplay:  el.dataset.dateDisplay,
+    dateObj:      new Date(el.dataset.date),
+    time:         el.dataset.time,
+    location:     el.dataset.location,
+    locationLow:  el.dataset.location.toLowerCase(),
+    priceRaw:     parseFloat(el.dataset.priceRaw),
+    priceDisplay: el.dataset.priceDisplay,
+    active:       el.dataset.active,
+    gallery:      parseInt(el.dataset.gallery),
+    image:        el.dataset.image,
+    editUrl:      el.dataset.editUrl,
+    galleryUrl:   el.dataset.galleryUrl,
+    toggleUrl:    el.dataset.toggleUrl,
+    deleteUrl:    el.dataset.deleteUrl,
+  }));
+
+  let currentPage = 1;
+
+  /* ── DOM ── */
+  const searchEl  = document.getElementById('ef-search');
+  const clearBtn  = document.getElementById('ef-clear-search');
+  const perPageEl = document.getElementById('ef-per-page');
+  const statusEl  = document.getElementById('ef-filter-status');
+  const priceEl   = document.getElementById('ef-filter-price');
+  const dateEl    = document.getElementById('ef-filter-date');
+  const resetBtn  = document.getElementById('ef-reset');
+  const tbody     = document.getElementById('ef-tbody');
+  const emptyEl   = document.getElementById('ef-empty');
+  const pgEl      = document.getElementById('ef-pagination');
+  const summaryEl = document.getElementById('ef-summary');
+
+  /* Delete modal */
+  const modal       = document.getElementById('ef-delete-modal');
+  const modalTitle  = document.getElementById('ef-delete-title');
+  const modalForm   = document.getElementById('ef-delete-form');
+  const modalCancel = document.getElementById('ef-modal-cancel');
+
+  modalCancel.addEventListener('click', () => modal.classList.remove('open'));
+  modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
+
+  /* ── Filter ── */
+  function getFiltered() {
+    const q      = searchEl.value.trim().toLowerCase();
+    const status = statusEl.value;
+    const price  = priceEl.value;
+    const date   = dateEl.value;
+
+    return allRows.filter(r => {
+      if (q && !r.titleLow.includes(q) && !r.locationLow.includes(q)) return false;
+      if (status && r.active !== status) return false;
+      if (price === 'free' && r.priceRaw !== 0) return false;
+      if (price === 'paid' && r.priceRaw === 0) return false;
+      if (date === 'upcoming' && r.dateObj < today) return false;
+      if (date === 'past'     && r.dateObj >= today) return false;
+      return true;
+    });
+  }
+
+  /* ── Render ── */
+  function render() {
+    const filtered   = getFiltered();
+    const perPage    = parseInt(perPageEl.value);
+    const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const start = (currentPage - 1) * perPage;
+    const page  = filtered.slice(start, start + perPage);
+
+    const from = filtered.length ? start + 1 : 0;
+    const to   = Math.min(start + perPage, filtered.length);
+    summaryEl.innerHTML = `Showing <strong>${from}–${to}</strong> of <strong>${filtered.length}</strong> events`;
+
+    clearBtn.style.display = searchEl.value ? 'block' : 'none';
+
+    tbody.innerHTML = '';
+    if (!page.length) {
+      emptyEl.style.display = 'block';
+      pgEl.innerHTML = '';
+      return;
+    }
+    emptyEl.style.display = 'none';
+
+    const isPast = r => r.dateObj < today;
+
+    page.forEach((r, i) => {
+      const tr = document.createElement('tr');
+      if (isPast(r)) tr.style.opacity = '.75';
+
+      tr.innerHTML = `
+        <td style="color:var(--ef-muted);font-size:.78rem;">${start + i + 1}</td>
+        <td>${r.image
+          ? `<img src="${r.image}" alt="${r.title}" class="ef-thumb">`
+          : `<div class="ef-thumb-placeholder"><i class="fas fa-image"></i></div>`}</td>
+        <td>
+          <span class="ef-item-name">${r.title}</span>
+          ${isPast(r) ? '<br><span style="font-size:.68rem;color:var(--ef-muted);font-weight:600;text-transform:uppercase;">Past</span>' : ''}
+        </td>
+        <td class="ef-date-cell">
+          <i class="fas fa-calendar" style="color:var(--ef-brown-light);margin-right:.3rem;font-size:.75rem;"></i>${r.dateDisplay}<br>
+          <i class="fas fa-clock" style="color:var(--ef-muted);margin-right:.3rem;font-size:.75rem;"></i><span style="color:var(--ef-muted);">${r.time}</span>
+        </td>
+        <td><div class="ef-location" title="${r.location}">
+          <i class="fas fa-map-marker-alt" style="color:var(--ef-brown-light);margin-right:.3rem;font-size:.75rem;"></i>${r.location}
+        </div></td>
+        <td>${r.priceRaw === 0
+          ? `<span class="ef-price-free"><i class="fas fa-ticket-alt"></i> Free</span>`
+          : `<span class="ef-price-paid">${r.priceDisplay}</span>`}</td>
+        <td><span class="ef-badge ${r.active === 'yes' ? 'active' : 'inactive'}">${r.active === 'yes' ? 'Active' : 'Inactive'}</span></td>
+        <td>
+          <a href="${r.galleryUrl}" class="ef-gallery-btn" title="Manage Gallery">
+            <i class="fas fa-images"></i>
+            <span class="ef-gallery-count">${r.gallery}</span>
+          </a>
+        </td>
+        <td>
+          <div class="ef-actions">
+            <a href="${r.editUrl}" class="btn-ef-icon edit" title="Edit"><i class="fas fa-edit"></i></a>
+            <form method="POST" action="${r.toggleUrl}" style="display:inline;">
+              <button type="submit" class="btn-ef-icon ${r.active === 'yes' ? 'toggle-on' : 'toggle-off'}"
+                title="${r.active === 'yes' ? 'Deactivate' : 'Activate'}">
+                <i class="fas fa-${r.active === 'yes' ? 'eye-slash' : 'eye'}"></i>
+              </button>
+            </form>
+            <button class="btn-ef-icon delete" title="Delete"
+              onclick="openDelete('${r.id}','${r.title.replace(/'/g,"\\'")}','${r.deleteUrl}')">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    renderPagination(totalPages);
+  }
+
+  /* ── Pagination ── */
+  function renderPagination(totalPages) {
+    pgEl.innerHTML = '';
+    if (totalPages <= 1) return;
+
+    const btn = (html, page, disabled, active) => {
+      const b = document.createElement('button');
+      b.className = 'ef-pg-btn' + (active ? ' active' : '');
+      b.innerHTML = html;
+      b.disabled = disabled;
+      if (!disabled && !active) b.onclick = () => { currentPage = page; render(); window.scrollTo({top:0,behavior:'smooth'}); };
+      return b;
+    };
+
+    pgEl.appendChild(btn('<i class="fas fa-angle-double-left"></i>', 1, currentPage===1));
+    pgEl.appendChild(btn('<i class="fas fa-angle-left"></i>', currentPage-1, currentPage===1));
+
+    let s = Math.max(1, currentPage-2), e = Math.min(totalPages, s+4);
+    if (e-s < 4) s = Math.max(1, e-4);
+
+    if (s > 1) {
+      pgEl.appendChild(btn('1', 1, false, currentPage===1));
+      if (s > 2) { const d = document.createElement('span'); d.textContent='…'; d.style.cssText='padding:0 .3rem;color:var(--ef-muted);align-self:center;'; pgEl.appendChild(d); }
+    }
+    for (let p=s; p<=e; p++) pgEl.appendChild(btn(p, p, false, p===currentPage));
+    if (e < totalPages) {
+      if (e < totalPages-1) { const d = document.createElement('span'); d.textContent='…'; d.style.cssText='padding:0 .3rem;color:var(--ef-muted);align-self:center;'; pgEl.appendChild(d); }
+      pgEl.appendChild(btn(totalPages, totalPages, false, currentPage===totalPages));
+    }
+
+    pgEl.appendChild(btn('<i class="fas fa-angle-right"></i>', currentPage+1, currentPage===totalPages));
+    pgEl.appendChild(btn('<i class="fas fa-angle-double-right"></i>', totalPages, currentPage===totalPages));
+  }
+
+  /* ── Delete Modal ── */
+  window.openDelete = (id, title, url) => {
+    modalTitle.textContent = title;
+    modalForm.action = url;
+    modal.classList.add('open');
+  };
+
+  /* ── Events ── */
+  [searchEl, perPageEl, statusEl, priceEl, dateEl].forEach(el => {
+    el.addEventListener('input',  () => { currentPage=1; render(); });
+    el.addEventListener('change', () => { currentPage=1; render(); });
+  });
+  clearBtn.addEventListener('click', () => { searchEl.value=''; currentPage=1; render(); searchEl.focus(); });
+  resetBtn.addEventListener('click', () => {
+    searchEl.value=''; perPageEl.value='10';
+    statusEl.value=''; priceEl.value=''; dateEl.value='';
+    currentPage=1; render();
+  });
+
+  render();
+})();
 </script>
+
 {% endblock %}
+
+{% block extra_js %}{% endblock %}
