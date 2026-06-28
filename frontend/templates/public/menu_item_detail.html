@@ -1,93 +1,477 @@
 {% extends "base.html" %}
 
-{% block title %}{{ item.name }} - EFFOI Menu{% endblock %}
+{% block title %}{{ item.name }} — EFFOI Menu{% endblock %}
+{% block meta_description %}{% if item.description %}{{ item.description|striptags|truncate(155, True, '...') }}{% else %}Discover {{ item.name }} at EFFOI Restaurant & Bar, authentic Ethiopian cuisine in Silver Spring, MD.{% endif %}{% endblock %}
+{% block og_title %}{{ item.name }} — EFFOI Menu{% endblock %}
+{% block og_description %}{% if item.description %}{{ item.description|striptags|truncate(155, True, '...') }}{% else %}Discover {{ item.name }} at EFFOI Restaurant & Bar, authentic Ethiopian cuisine in Silver Spring, MD.{% endif %}{% endblock %}
+{% block twitter_title %}{{ item.name }} — EFFOI Menu{% endblock %}
+{% block twitter_description %}{% if item.description %}{{ item.description|striptags|truncate(155, True, '...') }}{% else %}Discover {{ item.name }} at EFFOI Restaurant & Bar, authentic Ethiopian cuisine in Silver Spring, MD.{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ── Design tokens ── */
+  :root {
+    --crimson:       #8B1E1E;
+    --crimson-hover: #a82525;
+    --crimson-pale:  #FAF0F0;
+    --gold:          #C8940A;
+    --gold-pale:     #FEF8E8;
+    --cream:         #faf7f2;
+    --ink:           #1a1a1a;
+    --muted:         #6B5B4E;
+    --border-warm:   #EDE0D0;
+    --white:         #ffffff;
+  }
+
+  /* ── Layout ── */
+  .md-page { padding: 2.5rem 0 5rem; }
+
+  /* Breadcrumb */
+  .md-crumb {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--muted);
+    margin-bottom: 2.25rem; flex-wrap: wrap;
+  }
+  .md-crumb a { color: var(--muted); text-decoration: none; transition: color .15s; }
+  .md-crumb a:hover { color: var(--crimson); }
+  .md-crumb-sep { font-size: 11px; opacity: .45; }
+  .md-crumb-current { color: var(--ink); font-weight: 500; }
+
+  /* Hero grid */
+  .md-hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+    margin-bottom: 4rem;
+  }
+
+  /* ── Image panel ── */
+  .md-img-panel { position: relative; }
+
+  .md-img-main {
+    width: 100%; aspect-ratio: 4/3; object-fit: cover;
+    border-radius: 20px; display: block;
+    box-shadow: 0 16px 48px rgba(139,30,30,.12);
+    transition: transform .35s ease;
+  }
+  .md-img-main:hover { transform: scale(1.01); }
+
+  .md-img-placeholder {
+    width: 100%; aspect-ratio: 4/3; border-radius: 20px;
+    background: var(--border-warm);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .md-img-placeholder i { font-size: 64px; color: #C8B0A0; }
+
+  /* Thumbnail strip */
+  .md-thumbs {
+    display: flex; gap: 8px; margin-top: 10px;
+    overflow-x: auto; padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+  .md-thumbs::-webkit-scrollbar { display: none; }
+
+  .md-thumb {
+    width: 72px; height: 54px; border-radius: 10px;
+    object-fit: cover; flex-shrink: 0; cursor: pointer;
+    border: 2.5px solid transparent;
+    transition: border-color .15s, opacity .15s;
+    opacity: .72;
+  }
+  .md-thumb:hover { opacity: 1; }
+  .md-thumb.active { border-color: var(--crimson); opacity: 1; }
+  .md-thumb-placeholder {
+    width: 72px; height: 54px; border-radius: 10px;
+    background: var(--border-warm); flex-shrink: 0;
+    cursor: pointer; border: 2.5px solid transparent;
+    opacity: .72; transition: border-color .15s, opacity .15s;
+  }
+  .md-thumb-placeholder.active { border-color: var(--crimson); opacity: 1; }
+
+  /* Badges (absolute over image) */
+  .md-badges {
+    position: absolute; top: 14px; left: 14px;
+    display: flex; flex-direction: column; gap: 7px;
+    pointer-events: none;
+  }
+  .md-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 600; padding: 5px 13px;
+    border-radius: 99px; white-space: nowrap; backdrop-filter: blur(4px);
+  }
+  .md-badge-popular {
+    background: rgba(254,248,232,.9); color: #7A5C08;
+    border: 1px solid rgba(200,148,10,.4);
+  }
+  .md-badge-special {
+    background: rgba(250,240,240,.9); color: var(--crimson);
+    border: 1px solid rgba(139,30,30,.3);
+  }
+
+  /* ── Info panel ── */
+  .md-info { display: flex; flex-direction: column; gap: 1.25rem; }
+
+  .md-category-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--crimson);
+    background: var(--crimson-pale); padding: 4px 13px;
+    border-radius: 99px; border: 1px solid rgba(139,30,30,.2);
+    width: fit-content;
+  }
+
+  .md-item-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.9rem, 4vw, 2.6rem);
+    font-weight: 700; color: var(--ink); line-height: 1.12; margin: 0;
+  }
+
+  /* Stars */
+  .md-rating { display: flex; align-items: center; gap: 9px; }
+  .md-stars { display: flex; gap: 2px; }
+  .md-stars i { font-size: 14px; color: var(--gold); }
+  .md-stars i.off { color: #DDD0C0; }
+  .md-rating-label { font-size: 13px; color: var(--muted); }
+
+  /* Price */
+  .md-price-row { display: flex; align-items: baseline; gap: 12px; }
+  .md-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.1rem; font-weight: 700; color: var(--crimson);
+  }
+  .md-price-note { font-size: 13px; color: var(--muted); }
+
+  .md-desc { font-size: 15px; color: #3D2B1A; line-height: 1.8; }
+
+  /* Attribute chips */
+  .md-attrs { display: flex; flex-wrap: wrap; gap: 8px; }
+  .md-attr {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; padding: 5px 12px; border-radius: 8px;
+    background: var(--white); border: 1px solid var(--border-warm); color: var(--muted);
+  }
+  .md-attr i { color: var(--crimson); font-size: 13px; }
+
+  /* Divider */
+  .md-divider { border: none; border-top: 1px solid var(--border-warm); }
+
+  /* Section label */
+  .md-section-label {
+    font-size: 11px; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: .6rem;
+  }
+
+  /* Ingredient chips */
+  .md-ingredients { display: flex; flex-wrap: wrap; gap: 7px; }
+  .md-ingredient {
+    font-size: 13px; padding: 5px 12px; border-radius: 7px;
+    background: var(--white); border: 1px solid var(--border-warm); color: #4A3020;
+  }
+
+  /* CTA buttons */
+  .md-cta-group { display: flex; flex-direction: column; gap: 10px; }
+  .md-btn-primary {
+    display: flex; align-items: center; justify-content: center; gap: 9px;
+    padding: 15px 28px; border-radius: 12px;
+    background: var(--crimson); color: var(--white);
+    font-size: 15px; font-weight: 600; text-decoration: none;
+    border: none; transition: background .15s, transform .12s;
+  }
+  .md-btn-primary:hover {
+    background: var(--crimson-hover); color: var(--white);
+    transform: translateY(-2px);
+  }
+  .md-btn-secondary {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 13px 28px; border-radius: 12px;
+    background: var(--white); color: var(--muted);
+    font-size: 14px; font-weight: 500; text-decoration: none;
+    border: 1px solid var(--border-warm); transition: border-color .15s, color .15s;
+  }
+  .md-btn-secondary:hover { border-color: var(--crimson); color: var(--crimson); }
+
+  /* ── Related items section ── */
+  .md-related { margin-top: 1.5rem; }
+
+  .md-related-header {
+    display: flex; align-items: center; gap: 1.25rem;
+    margin-bottom: 1.75rem;
+  }
+  .md-related-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.55rem; font-weight: 700; color: var(--ink); white-space: nowrap;
+  }
+  .md-related-line { flex: 1; height: 1px; background: var(--border-warm); }
+
+  .md-related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+
+  .md-related-card {
+    background: var(--white); border-radius: 16px; overflow: hidden;
+    border: 1px solid var(--border-warm); text-decoration: none; color: inherit;
+    display: block; transition: transform .25s ease, box-shadow .25s ease;
+  }
+  .md-related-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 14px 40px rgba(139,30,30,.1);
+    color: inherit;
+  }
+  .md-related-img { width: 100%; height: 165px; object-fit: cover; display: block; }
+  .md-related-img-placeholder {
+    width: 100%; height: 165px; background: var(--border-warm);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .md-related-img-placeholder i { font-size: 36px; color: #C8B0A0; }
+  .md-related-body { padding: 14px 16px 16px; }
+  .md-related-name { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+  .md-related-desc { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 10px; }
+  .md-related-footer { display: flex; align-items: center; justify-content: space-between; }
+  .md-related-price { font-size: 16px; font-weight: 700; color: var(--crimson); }
+  .md-related-cta {
+    font-size: 12px; font-weight: 600; padding: 5px 13px; border-radius: 8px;
+    border: 1px solid var(--crimson); color: var(--crimson); background: var(--white);
+    transition: background .15s, color .15s;
+  }
+  .md-related-card:hover .md-related-cta { background: var(--crimson); color: var(--white); }
+
+  /* ── Responsive ── */
+  @media (max-width: 991px) {
+    .md-hero { grid-template-columns: 1fr; gap: 2rem; }
+    .md-related-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 575px) {
+    .md-related-grid { grid-template-columns: 1fr; }
+    .md-item-name { font-size: 1.75rem; }
+  }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="my-5">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('menu') }}" class="text-decoration-none">Menu</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('menu') }}#cat-{{ item.category.id }}" class="text-decoration-none">{{ item.category.name }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ item.name }}</li>
-        </ol>
-    </nav>
+<div class="md-page">
 
-    <div class="row g-5">
-        <div class="col-md-6">
-            <div class="position-relative">
-                {% if item.image_url %}
-                <img src="{{ item.image_url }}" class="img-fluid rounded-4 shadow-lg" alt="{{ item.name }}" style="width: 100%; max-height: 500px; object-fit: cover;">
-                {% else %}
-                <div class="bg-light rounded-4 d-flex align-items-center justify-content-center" style="height: 400px;">
-                    <i class="fas fa-utensils fa-5x text-muted"></i>
-                </div>
-                {% endif %}
-                {% if item.is_popular %}
-                <span class="position-absolute top-0 start-0 badge bg-warning text-dark m-3 px-3 py-2 rounded-pill">
-                    <i class="fas fa-fire me-1"></i> Popular
-                </span>
-                {% endif %}
-                {% if item.is_special %}
-                <span class="position-absolute top-0 end-0 badge bg-danger m-3 px-3 py-2 rounded-pill">
-                    <i class="fas fa-star me-1"></i> Special
-                </span>
-                {% endif %}
-            </div>
+  {# ── Breadcrumb ── #}
+  <nav class="md-crumb" aria-label="Breadcrumb">
+    <a href="{{ url_for('menu') }}">Menu</a>
+    <span class="md-crumb-sep" aria-hidden="true">›</span>
+    <a href="{{ url_for('menu') }}#cat-{{ item.category.id }}">{{ item.category.name }}</a>
+    <span class="md-crumb-sep" aria-hidden="true">›</span>
+    <span class="md-crumb-current" aria-current="page">{{ item.name }}</span>
+  </nav>
+
+  {# ── Hero: image + info ── #}
+  <div class="md-hero">
+
+    {# Left: image panel #}
+    <div class="md-img-panel">
+      {% if item.image_url %}
+        <img
+          src="{{ item.image_url }}"
+          class="md-img-main"
+          id="mdMainImg"
+          alt="{{ item.name }}"
+        >
+      {% else %}
+        <div class="md-img-placeholder" aria-hidden="true">
+          <i class="fas fa-utensils"></i>
         </div>
-        
-        <div class="col-md-6">
-            <div class="card border-0 shadow-lg rounded-4 p-4">
-                <div class="mb-4">
-                    <h1 class="display-5 mb-2">{{ item.name }}</h1>
-                    <p class="text-muted">{{ item.category.name }}</p>
-                </div>
-                
-                <div class="mb-4">
-                    <h3 class="text-danger mb-3">${{ "%.2f"|format(item.price) }}</h3>
-                    <p class="lead">{{ item.description }}</p>
-                </div>
-                
-                <div class="mb-4">
-                    <h5>Ingredients</h5>
-                    <p class="text-muted">Traditional Ethiopian spices and fresh ingredients prepared with care.</p>
-                </div>
-                
-                <div class="d-grid gap-3">
-                    <a href="{{ url_for('reserve') }}" class="btn btn-danger btn-lg rounded-pill py-3">
-                        <i class="fas fa-calendar-alt me-2"></i> Reserve a Table
-                    </a>
-                    <a href="{{ url_for('menu') }}" class="btn btn-outline-secondary btn-lg rounded-pill py-2">
-                        <i class="fas fa-arrow-left me-2"></i> Back to Menu
-                    </a>
-                </div>
-            </div>
+      {% endif %}
+
+      {# Badges #}
+      <div class="md-badges">
+        {% if item.is_popular %}
+          <span class="md-badge md-badge-popular">
+            <i class="fas fa-fire" aria-hidden="true"></i> Popular
+          </span>
+        {% endif %}
+        {% if item.is_special %}
+          <span class="md-badge md-badge-special">
+            <i class="fas fa-star" aria-hidden="true"></i> Chef's special
+          </span>
+        {% endif %}
+      </div>
+
+      {# Thumbnail strip — if the item has extra_images JSON list, iterate it #}
+      {% if item.image_url %}
+        <div class="md-thumbs" id="mdThumbs" role="list" aria-label="Item photos">
+          <img
+            src="{{ item.image_url }}"
+            class="md-thumb active"
+            data-src="{{ item.image_url }}"
+            alt="{{ item.name }}"
+            role="listitem"
+          >
+          {# Extend here if you have multiple images, e.g. item.extra_images #}
         </div>
+      {% endif %}
     </div>
-    
-    <!-- You Might Also Like -->
-    <section class="mt-5 pt-5">
-        <h2 class="text-center mb-4">You Might Also Like</h2>
-        <div class="row g-4">
-            {% for related in item.category.menu_items[:3] if related.id != item.id %}
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                    <a href="{{ url_for('menu_item_detail', item_id=related.id) }}" class="text-decoration-none">
-                        {% if related.image_url %}
-                        <img src="{{ related.image_url }}" class="card-img-top" alt="{{ related.name }}" style="height: 200px; object-fit: cover;">
-                        {% endif %}
-                        <div class="card-body">
-                            <h5 class="card-title text-dark">{{ related.name }}</h5>
-                            <p class="card-text text-muted small">{{ related.description[:60] }}...</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="h6 text-danger mb-0">${{ "%.2f"|format(related.price) }}</span>
-                                <span class="btn btn-sm btn-outline-danger rounded-pill">View</span>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-            {% endfor %}
+
+    {# Right: info panel #}
+    <div class="md-info">
+
+      {# Category pill #}
+      <span class="md-category-pill">
+        <i class="fas fa-tag" aria-hidden="true"></i>
+        {{ item.category.name }}
+      </span>
+
+      {# Item name #}
+      <h1 class="md-item-name">{{ item.name }}</h1>
+
+      {# Rating — if you have a reviews relationship, swap the literals below #}
+      {% set avg_rating = item.average_rating if item.average_rating is defined else 5 %}
+      {% set review_count = item.review_count if item.review_count is defined else 0 %}
+      <div class="md-rating">
+        <div class="md-stars" aria-label="{{ avg_rating }} out of 5 stars">
+          {% for i in range(1, 6) %}
+            <i class="fas fa-star{% if i > avg_rating %} off{% endif %}"></i>
+          {% endfor %}
         </div>
+        {% if review_count %}
+          <span class="md-rating-label">{{ "%.1f"|format(avg_rating) }} · {{ review_count }} reviews</span>
+        {% endif %}
+      </div>
+
+      {# Price #}
+      <div class="md-price-row">
+        <span class="md-price">${{ "%.2f"|format(item.price) }}</span>
+        <span class="md-price-note">served with injera</span>
+      </div>
+
+      {# Description #}
+      <p class="md-desc">{{ item.description }}</p>
+
+      {# Attribute chips #}
+      <div class="md-attrs">
+        {% if item.prep_time %}
+          <span class="md-attr"><i class="fas fa-clock" aria-hidden="true"></i> {{ item.prep_time }}</span>
+        {% endif %}
+        {% if item.spice_level %}
+          <span class="md-attr"><i class="fas fa-pepper-hot" aria-hidden="true"></i> {{ item.spice_level }}</span>
+        {% endif %}
+        {% if item.is_vegetarian %}
+          <span class="md-attr"><i class="fas fa-leaf" aria-hidden="true"></i> Vegetarian</span>
+        {% endif %}
+        {% if item.is_vegan %}
+          <span class="md-attr"><i class="fas fa-seedling" aria-hidden="true"></i> Vegan</span>
+        {% endif %}
+        {% if item.is_gluten_free %}
+          <span class="md-attr"><i class="fas fa-wheat-awn-circle-exclamation" aria-hidden="true"></i> Gluten-free</span>
+        {% endif %}
+        {% if item.serves %}
+          <span class="md-attr"><i class="fas fa-users" aria-hidden="true"></i> Serves {{ item.serves }}</span>
+        {% endif %}
+      </div>
+
+      <hr class="md-divider">
+
+      {# Ingredients — if item.ingredients is a comma-separated string or list #}
+      {% if item.ingredients %}
+        <div>
+          <p class="md-section-label">Key ingredients</p>
+          <div class="md-ingredients">
+            {% if item.ingredients is string %}
+              {% for ing in item.ingredients.split(',') %}
+                <span class="md-ingredient">{{ ing.strip() }}</span>
+              {% endfor %}
+            {% else %}
+              {% for ing in item.ingredients %}
+                <span class="md-ingredient">{{ ing }}</span>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+        <hr class="md-divider">
+      {% endif %}
+
+      {# CTA buttons #}
+      <div class="md-cta-group">
+        <a href="{{ url_for('reserve') }}" class="md-btn-primary">
+          <i class="fas fa-calendar-check" aria-hidden="true"></i>
+          Reserve a table
+        </a>
+        <a href="{{ url_for('menu') }}" class="md-btn-secondary">
+          <i class="fas fa-arrow-left" aria-hidden="true"></i>
+          Back to menu
+        </a>
+      </div>
+
+    </div>
+  </div>{# /md-hero #}
+
+  {# ── You might also like ── #}
+  {% set related_items = item.category.menu_items | selectattr('id', '!=', item.id) | list %}
+  {% if related_items %}
+    <section class="md-related" aria-label="You might also like">
+
+      <div class="md-related-header">
+        <h2 class="md-related-title">You might also like</h2>
+        <div class="md-related-line" aria-hidden="true"></div>
+      </div>
+
+      <div class="md-related-grid">
+        {% for related in related_items[:3] %}
+          <a
+            href="{{ url_for('menu_item_detail', item_id=related.id) }}"
+            class="md-related-card"
+            aria-label="{{ related.name }}, ${{ '%.2f'|format(related.price) }}"
+          >
+            {% if related.image_url %}
+              <img
+                src="{{ related.image_url }}"
+                class="md-related-img"
+                alt="{{ related.name }}"
+                loading="lazy"
+              >
+            {% else %}
+              <div class="md-related-img-placeholder" aria-hidden="true">
+                <i class="fas fa-utensils"></i>
+              </div>
+            {% endif %}
+
+            <div class="md-related-body">
+              <div class="md-related-name">{{ related.name }}</div>
+              <div class="md-related-desc">
+                {{ related.description[:80] }}{% if related.description|length > 80 %}…{% endif %}
+              </div>
+              <div class="md-related-footer">
+                <span class="md-related-price">${{ "%.2f"|format(related.price) }}</span>
+                <span class="md-related-cta">View</span>
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+
     </section>
-</div>
+  {% endif %}
+
+</div>{# /md-page #}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  'use strict';
+
+  /* ── Thumbnail switcher ── */
+  const thumbsWrap = document.getElementById('mdThumbs');
+  const mainImg    = document.getElementById('mdMainImg');
+
+  if (thumbsWrap && mainImg) {
+    thumbsWrap.addEventListener('click', function (e) {
+      const thumb = e.target.closest('.md-thumb');
+      if (!thumb || !thumb.dataset.src) return;
+
+      /* Update main image */
+      mainImg.src = thumb.dataset.src;
+
+      /* Update active state */
+      thumbsWrap.querySelectorAll('.md-thumb').forEach(t => t.classList.remove('active'));
+      thumb.classList.add('active');
+    });
+  }
+
+}());
+</script>
 {% endblock %}

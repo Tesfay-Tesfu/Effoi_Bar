@@ -1,73 +1,746 @@
 {% extends "admin/base_admin.html" %}
 
-{% block title %}Manage Reviews - EFFOI Admin{% endblock %}
+{% block title %}Customer Reviews - EFFOI Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --effoi-brown: #6B3F1F;
+    --effoi-brown-light: #8B5A3A;
+    --effoi-brown-pale: #EDD9C8;
+    --effoi-cream: #FDF8F3;
+    --effoi-sand: #F0E6D8;
+  }
+
+  /* ── Panel shell ── */
+  .rp-panel {
+    background: #fff;
+    border: 0.5px solid #E0D5CC;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  /* ── Header ── */
+  .rp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.125rem 1.5rem;
+    background: var(--effoi-cream);
+    border-bottom: 0.5px solid #E0D5CC;
+  }
+  .rp-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--effoi-brown);
+  }
+  .rp-title i { font-size: 20px; }
+  .rp-count-badge {
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--effoi-brown-pale);
+    color: var(--effoi-brown);
+    padding: 3px 11px;
+    border-radius: 99px;
+  }
+
+  /* ── Toolbar ── */
+  .rp-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 0.875rem 1.5rem;
+    background: var(--effoi-sand);
+    border-bottom: 0.5px solid #E0D5CC;
+  }
+  .rp-search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+  }
+  .rp-search-wrap .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #A08060;
+    font-size: 15px;
+    pointer-events: none;
+  }
+  .rp-search {
+    width: 100%;
+    padding: 7px 12px 7px 34px;
+    font-size: 14px;
+    border: 0.5px solid #C8B8A8;
+    border-radius: 8px;
+    background: #fff;
+    color: #3D2B1A;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .rp-search:focus {
+    border-color: var(--effoi-brown);
+    box-shadow: 0 0 0 3px rgba(107,63,31,0.12);
+  }
+  .rp-search::placeholder { color: #B0907A; }
+
+  /* Status filter pills */
+  .rp-filter-group { display: flex; gap: 6px; }
+  .rp-filter-btn {
+    font-size: 13px;
+    padding: 5px 14px;
+    border-radius: 99px;
+    border: 0.5px solid #C8B8A8;
+    background: #fff;
+    color: #7A5A40;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .rp-filter-btn:hover:not(.active) {
+    background: var(--effoi-cream);
+    border-color: var(--effoi-brown-light);
+  }
+  .rp-filter-btn.active {
+    background: var(--effoi-brown);
+    color: #fff;
+    border-color: var(--effoi-brown);
+  }
+
+  /* Rows-per-page select */
+  .rp-perpage-wrap {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .rp-perpage-label { font-size: 13px; color: #7A5A40; white-space: nowrap; }
+  .rp-perpage-select {
+    font-size: 13px;
+    padding: 5px 8px;
+    border: 0.5px solid #C8B8A8;
+    border-radius: 8px;
+    background: #fff;
+    color: #3D2B1A;
+    cursor: pointer;
+    outline: none;
+  }
+  .rp-perpage-select:focus { border-color: var(--effoi-brown); }
+
+  /* ── Table ── */
+  .rp-table-wrap { overflow-x: auto; }
+  .rp-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .rp-table thead th {
+    padding: 9px 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: #9A7A60;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    background: var(--effoi-cream);
+    border-bottom: 0.5px solid #E0D5CC;
+    white-space: nowrap;
+  }
+  .rp-table tbody tr {
+    border-bottom: 0.5px solid #EDE3D8;
+    transition: background 0.1s;
+  }
+  .rp-table tbody tr:last-child { border-bottom: none; }
+  .rp-table tbody tr:hover { background: #FAF4EE; }
+  .rp-table tbody td { padding: 11px 14px; vertical-align: middle; }
+
+  /* Customer cell */
+  .customer-cell { display: flex; align-items: center; gap: 10px; }
+  .customer-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--effoi-brown-pale);
+    color: var(--effoi-brown);
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+  .customer-name { font-weight: 500; font-size: 14px; color: #2D1A0E; }
+  .customer-date { font-size: 12px; color: #9A7A60; margin-top: 1px; }
+
+  /* Stars */
+  .stars-wrap { display: flex; gap: 2px; }
+  .star-full { color: #D4A017; font-size: 14px; }
+  .star-empty { color: #DDD0C0; font-size: 14px; }
+
+  /* Comment */
+  .comment-cell { max-width: 220px; }
+  .comment-text {
+    font-size: 13px;
+    color: #6B5040;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Status badges */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 99px;
+    white-space: nowrap;
+  }
+  .status-approved {
+    background: #EAF5EC;
+    color: #2A7A40;
+    border: 0.5px solid #B0DDB8;
+  }
+  .status-pending {
+    background: #FEF8E8;
+    color: #856A15;
+    border: 0.5px solid #F0D980;
+  }
+
+  /* Action buttons */
+  .action-btns { display: flex; gap: 6px; align-items: center; }
+  .btn-approve {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 0.5px solid #B0DDB8;
+    background: #EAF5EC;
+    color: #2A7A40;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    text-decoration: none;
+  }
+  .btn-approve:hover { opacity: 0.75; }
+  .btn-delete {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 0.5px solid #F0B8B8;
+    background: #FDECEC;
+    color: #B03030;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    text-decoration: none;
+  }
+  .btn-delete:hover { opacity: 0.75; }
+
+  /* ── Empty state ── */
+  .rp-empty {
+    text-align: center;
+    padding: 3.5rem 1rem;
+  }
+  .rp-empty i {
+    font-size: 44px;
+    color: #C8B8A8;
+    display: block;
+    margin-bottom: 12px;
+  }
+  .rp-empty strong { color: #7A5A40; font-size: 16px; font-weight: 500; }
+  .rp-empty p { color: #9A7A60; font-size: 14px; margin-top: 6px; }
+
+  /* ── Footer / Pagination ── */
+  .rp-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 11px 1.5rem;
+    background: var(--effoi-cream);
+    border-top: 0.5px solid #E0D5CC;
+  }
+  .rp-footer-info { font-size: 13px; color: #9A7A60; }
+
+  .rp-pagination { display: flex; gap: 4px; align-items: center; }
+  .page-btn {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    border-radius: 6px;
+    border: 0.5px solid #C8B8A8;
+    background: #fff;
+    color: #7A5A40;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.12s;
+  }
+  .page-btn:hover:not([disabled]):not(.active) {
+    border-color: var(--effoi-brown);
+    color: var(--effoi-brown);
+  }
+  .page-btn.active {
+    background: var(--effoi-brown);
+    color: #fff;
+    border-color: var(--effoi-brown);
+  }
+  .page-btn[disabled] { opacity: 0.4; cursor: default; pointer-events: none; }
+  .page-dots { color: #9A7A60; font-size: 13px; padding: 0 2px; line-height: 32px; }
+
+  /* ── Toast ── */
+  .rp-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1050;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0;
+    transition: opacity 0.25s;
+    pointer-events: none;
+  }
+  .rp-toast.show { opacity: 1; pointer-events: auto; }
+  .rp-toast-success {
+    background: #EAF5EC;
+    color: #2A7A40;
+    border: 0.5px solid #B0DDB8;
+  }
+  .rp-toast-danger {
+    background: #FDECEC;
+    color: #B03030;
+    border: 0.5px solid #F0B8B8;
+  }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Customer Reviews</h1>
+  <h1 class="h3 mb-0" style="color: var(--effoi-brown);">Customer Reviews</h1>
 </div>
 
-<div class="card">
-    <div class="card-body">
-        {% if reviews %}
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Customer</th>
-                        <th>Rating</th>
-                        <th>Comment</th>
-                        <th>Status</th>
-                        <th>Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for review in reviews %}
-                    <tr>
-                        <td>{{ review.id }}</td>
-                        <td>{{ review.customer_name }}</td>
-                        <td>
-                            {% for i in range(review.rating) %}
-                                <i class="fas fa-star text-warning"></i>
-                            {% endfor %}
-                        </td>
-                        <td>{{ review.comment[:100] }}{% if review.comment|length > 100 %}...{% endif %}</td>
-                        <td>
-                            {% if review.is_approved %}
-                                <span class="badge bg-success">Approved</span>
-                            {% else %}
-                                <span class="badge bg-warning">Pending</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ review.created_at.strftime('%Y-%m-%d') }}</td>
-                        <td>
-                            {% if not review.is_approved %}
-                            <form method="POST" action="{{ url_for('admin_approve_review', review_id=review.id) }}" style="display: inline;">
-                                <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Approve this review?')">
-                                    <i class="fas fa-check"></i> Approve
-                                </button>
-                            </form>
-                            {% endif %}
-                            <form method="POST" action="{{ url_for('admin_delete_review', review_id=review.id) }}" style="display: inline;" onsubmit="return confirm('Delete this review? This action cannot be undone.')">
-                                <button type="submit" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-trash"></i> Delete
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <div class="text-center py-5">
-            <i class="fas fa-star fa-4x text-muted mb-3"></i>
-            <h4>No Reviews Found</h4>
-            <p class="text-muted">Customer reviews will appear here when they are submitted.</p>
-        </div>
-        {% endif %}
+{# ── Flash messages ── #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show mb-3" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+{# ── Seed review data into JS from Jinja ── #}
+<script id="reviews-data" type="application/json">
+[
+  {% for r in reviews %}
+  {
+    "id": {{ r.id }},
+    "name": {{ r.customer_name | tojson }},
+    "comment": {{ r.comment | tojson }},
+    "rating": {{ r.rating }},
+    "status": "{{ 'approved' if r.is_approved else 'pending' }}",
+    "date": "{{ r.created_at.strftime('%Y-%m-%d') }}",
+    "approveUrl": "{{ url_for('admin_approve_review', review_id=r.id) }}",
+    "deleteUrl": "{{ url_for('admin_delete_review', review_id=r.id) }}"
+  }{% if not loop.last %},{% endif %}
+  {% endfor %}
+]
+</script>
+
+<div class="rp-panel">
+
+  {# Header #}
+  <div class="rp-header">
+    <div class="rp-title">
+      <i class="fas fa-star" aria-hidden="true"></i>
+      Customer Reviews
     </div>
+    <span class="rp-count-badge" id="total-badge">
+      {{ reviews | length }} total
+    </span>
+  </div>
+
+  {# Toolbar #}
+  <div class="rp-toolbar">
+    <div class="rp-search-wrap">
+      <i class="fas fa-search search-icon" aria-hidden="true"></i>
+      <input
+        type="search"
+        class="rp-search"
+        id="rp-search"
+        placeholder="Search by name or comment…"
+        aria-label="Search reviews"
+        autocomplete="off"
+      >
+    </div>
+
+    <div class="rp-filter-group" role="group" aria-label="Filter by status">
+      <button class="rp-filter-btn active" data-filter="all">All</button>
+      <button class="rp-filter-btn" data-filter="approved">
+        <i class="fas fa-check-circle fa-xs me-1" aria-hidden="true"></i>Approved
+      </button>
+      <button class="rp-filter-btn" data-filter="pending">
+        <i class="fas fa-clock fa-xs me-1" aria-hidden="true"></i>Pending
+      </button>
+    </div>
+
+    <div class="rp-perpage-wrap">
+      <label class="rp-perpage-label" for="rp-perpage">Rows</label>
+      <select class="rp-perpage-select" id="rp-perpage" aria-label="Rows per page">
+        <option value="10">10</option>
+        <option value="25">25</option>
+      </select>
+    </div>
+  </div>
+
+  {# Table #}
+  <div class="rp-table-wrap">
+    {% if reviews %}
+    <table class="rp-table" id="rp-table" aria-label="Customer reviews">
+      <thead>
+        <tr>
+          <th style="width:44px">#</th>
+          <th>Customer</th>
+          <th style="width:120px">Rating</th>
+          <th>Comment</th>
+          <th style="width:105px">Status</th>
+          <th style="width:130px">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="rp-tbody">
+        {# Rows rendered by JS — Jinja data is embedded above in #reviews-data #}
+      </tbody>
+    </table>
+    <div id="rp-empty" class="rp-empty" style="display:none" aria-live="polite">
+      <i class="fas fa-search" aria-hidden="true"></i>
+      <strong>No reviews match</strong>
+      <p>Try adjusting your search or filter.</p>
+    </div>
+    {% else %}
+    <div class="rp-empty">
+      <i class="fas fa-star" aria-hidden="true"></i>
+      <strong>No reviews yet</strong>
+      <p>Customer reviews will appear here once they are submitted.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  {# Footer #}
+  <div class="rp-footer">
+    <span class="rp-footer-info" id="rp-footer-info" aria-live="polite"></span>
+    <nav class="rp-pagination" id="rp-pagination" aria-label="Page navigation"></nav>
+  </div>
+
 </div>
+
+{# Toast notification #}
+<div id="rp-toast" class="rp-toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  'use strict';
+
+  /* ── State ── */
+  let reviews = [];
+  try {
+    reviews = JSON.parse(document.getElementById('reviews-data').textContent);
+  } catch(e) {}
+
+  let filterStatus = 'all';
+  let searchQuery  = '';
+  let currentPage  = 1;
+  let perPage      = 10;
+
+  /* ── Helpers ── */
+  function initials(name) {
+    return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+  }
+
+  function starsHTML(rating) {
+    return Array.from({ length: 5 }, (_, i) =>
+      `<span class="${i < rating ? 'star-full' : 'star-empty'}" aria-hidden="true">★</span>`
+    ).join('');
+  }
+
+  function fmtDate(d) {
+    return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function getFiltered() {
+    const q = searchQuery.toLowerCase();
+    return reviews.filter(r => {
+      const matchStatus = filterStatus === 'all' || r.status === filterStatus;
+      const matchQuery  = !q || r.name.toLowerCase().includes(q) || r.comment.toLowerCase().includes(q);
+      return matchStatus && matchQuery;
+    });
+  }
+
+  function showToast(msg, type) {
+    const t = document.getElementById('rp-toast');
+    t.className = `rp-toast rp-toast-${type} show`;
+    const icon = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle';
+    t.innerHTML = `<i class="${icon}" aria-hidden="true"></i>${msg}`;
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  /* ── Render ── */
+  function render() {
+    const list  = getFiltered();
+    const total = list.length;
+    const totalPages = Math.max(1, Math.ceil(total / perPage));
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const start = (currentPage - 1) * perPage;
+    const slice = list.slice(start, start + perPage);
+
+    /* badge */
+    document.getElementById('total-badge').textContent = `${reviews.length} total`;
+
+    /* table rows */
+    const tbody = document.getElementById('rp-tbody');
+    const empty = document.getElementById('rp-empty');
+
+    if (!tbody) return; /* no reviews at all — Jinja already showed static empty */
+
+    if (!slice.length) {
+      tbody.innerHTML = '';
+      empty.style.display = 'block';
+    } else {
+      empty.style.display = 'none';
+      tbody.innerHTML = slice.map((r, i) => `
+        <tr data-id="${r.id}">
+          <td style="color:#9A7A60;font-size:13px">${start + i + 1}</td>
+          <td>
+            <div class="customer-cell">
+              <div class="customer-avatar" aria-hidden="true">${initials(r.name)}</div>
+              <div>
+                <div class="customer-name">${escapeHTML(r.name)}</div>
+                <div class="customer-date">${fmtDate(r.date)}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="stars-wrap" aria-label="${r.rating} out of 5 stars">${starsHTML(r.rating)}</div>
+          </td>
+          <td class="comment-cell">
+            <div class="comment-text" title="${escapeAttr(r.comment)}">${escapeHTML(r.comment)}</div>
+          </td>
+          <td>
+            <span class="status-badge status-${r.status}">
+              <i class="fas fa-${r.status === 'approved' ? 'check-circle' : 'clock'}" aria-hidden="true"></i>
+              ${r.status === 'approved' ? 'Approved' : 'Pending'}
+            </span>
+          </td>
+          <td>
+            <div class="action-btns">
+              ${r.status === 'pending' ? `
+                <button
+                  class="btn-approve"
+                  data-approve="${r.id}"
+                  data-url="${escapeAttr(r.approveUrl)}"
+                  aria-label="Approve review by ${escapeAttr(r.name)}"
+                >
+                  <i class="fas fa-check" aria-hidden="true"></i>Approve
+                </button>
+              ` : ''}
+              <button
+                class="btn-delete"
+                data-delete="${r.id}"
+                data-url="${escapeAttr(r.deleteUrl)}"
+                data-name="${escapeAttr(r.name)}"
+                aria-label="Delete review by ${escapeAttr(r.name)}"
+              >
+                <i class="fas fa-trash" aria-hidden="true"></i>Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    /* footer info */
+    const endIdx = Math.min(start + perPage, total);
+    const infoEl = document.getElementById('rp-footer-info');
+    infoEl.textContent = total
+      ? `Showing ${start + 1}–${endIdx} of ${total} review${total !== 1 ? 's' : ''}`
+      : 'No reviews found';
+
+    renderPagination(totalPages);
+  }
+
+  function renderPagination(totalPages) {
+    const nav = document.getElementById('rp-pagination');
+    if (totalPages <= 1) { nav.innerHTML = ''; return; }
+
+    const prevDisabled = currentPage === 1 ? 'disabled' : '';
+    const nextDisabled = currentPage === totalPages ? 'disabled' : '';
+    let html = `
+      <button class="page-btn" id="pg-prev" ${prevDisabled} aria-label="Previous page">
+        <i class="fas fa-chevron-left" style="font-size:11px" aria-hidden="true"></i>
+      </button>
+    `;
+
+    const pages = buildPageList(currentPage, totalPages);
+    pages.forEach(p => {
+      if (p === '…') {
+        html += `<span class="page-dots">…</span>`;
+      } else {
+        html += `
+          <button
+            class="page-btn${p === currentPage ? ' active' : ''}"
+            data-pg="${p}"
+            aria-label="Page ${p}"
+            aria-current="${p === currentPage ? 'page' : 'false'}"
+          >${p}</button>`;
+      }
+    });
+
+    html += `
+      <button class="page-btn" id="pg-next" ${nextDisabled} aria-label="Next page">
+        <i class="fas fa-chevron-right" style="font-size:11px" aria-hidden="true"></i>
+      </button>
+    `;
+    nav.innerHTML = html;
+  }
+
+  function buildPageList(page, total) {
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+    const pages = [1];
+    if (page > 3) pages.push('…');
+    for (let i = Math.max(2, page - 1); i <= Math.min(total - 1, page + 1); i++) pages.push(i);
+    if (page < total - 2) pages.push('…');
+    pages.push(total);
+    return pages;
+  }
+
+  /* ── Escape helpers ── */
+  function escapeHTML(str) {
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function escapeAttr(str) { return escapeHTML(str); }
+
+  /* ── Event delegation ── */
+  document.addEventListener('click', function (e) {
+
+    /* pagination buttons */
+    if (e.target.closest('#pg-prev')) { currentPage--; render(); return; }
+    if (e.target.closest('#pg-next')) { currentPage++; render(); return; }
+    const pgBtn = e.target.closest('[data-pg]');
+    if (pgBtn) { currentPage = +pgBtn.dataset.pg; render(); return; }
+
+    /* filter pills */
+    const filterBtn = e.target.closest('[data-filter]');
+    if (filterBtn) {
+      filterStatus = filterBtn.dataset.filter;
+      currentPage  = 1;
+      document.querySelectorAll('.rp-filter-btn').forEach(b =>
+        b.classList.toggle('active', b === filterBtn)
+      );
+      render();
+      return;
+    }
+
+    /* approve */
+    const approveBtn = e.target.closest('[data-approve]');
+    if (approveBtn) {
+      const id  = +approveBtn.dataset.approve;
+      const url = approveBtn.dataset.url;
+      submitForm(url, 'POST', function(ok) {
+        if (ok) {
+          const r = reviews.find(r => r.id === id);
+          if (r) r.status = 'approved';
+          showToast('Review approved', 'success');
+          render();
+        }
+      });
+      return;
+    }
+
+    /* delete */
+    const deleteBtn = e.target.closest('[data-delete]');
+    if (deleteBtn) {
+      const id   = +deleteBtn.dataset.delete;
+      const name = deleteBtn.dataset.name;
+      const url  = deleteBtn.dataset.url;
+      if (!confirm(`Delete review by ${name}?\nThis action cannot be undone.`)) return;
+      submitForm(url, 'POST', function(ok) {
+        if (ok) {
+          reviews = reviews.filter(r => r.id !== id);
+          showToast('Review deleted', 'danger');
+          if (getFiltered().length === 0 && currentPage > 1) currentPage--;
+          render();
+        }
+      });
+    }
+  });
+
+  /* ── Form submit (AJAX-style via hidden form) ── */
+  function submitForm(url, method, callback) {
+    const form = document.createElement('form');
+    form.method = method;
+    form.action = url;
+    form.style.display = 'none';
+
+    /* Include CSRF token if Flask-WTF is in use */
+    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+    if (csrfMeta) {
+      const inp = document.createElement('input');
+      inp.type  = 'hidden';
+      inp.name  = 'csrf_token';
+      inp.value = csrfMeta.getAttribute('content');
+      form.appendChild(inp);
+    }
+
+    document.body.appendChild(form);
+
+    /* Use fetch to avoid full page reload */
+    const fd = new FormData(form);
+    form.remove();
+
+    fetch(url, { method: method, body: fd, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+      .then(res => callback(res.ok))
+      .catch(() => callback(false));
+  }
+
+  /* ── Search ── */
+  document.getElementById('rp-search').addEventListener('input', function () {
+    searchQuery = this.value;
+    currentPage = 1;
+    render();
+  });
+
+  /* ── Per-page selector ── */
+  document.getElementById('rp-perpage').addEventListener('change', function () {
+    perPage     = +this.value;
+    currentPage = 1;
+    render();
+  });
+
+  /* ── Init ── */
+  render();
+
+}());
+</script>
 {% endblock %}

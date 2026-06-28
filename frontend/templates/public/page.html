@@ -2,6 +2,13 @@
 
 {% block title %}{{ page.title if page else 'Page Not Found' }} - EFFOI Restaurant{% endblock %}
 
+{% block meta_description %}{% if page and page.meta_description %}{{ page.meta_description }}{% elif page %}{{ page.content|striptags|truncate(155, True, '...') }}{% else %}Find useful restaurant and bar policies for EFFOI Restaurant & Bar in Silver Spring, MD.{% endif %}{% endblock %}
+
+{% block og_title %}{{ page.title if page else 'Page Not Found' }} - EFFOI Restaurant{% endblock %}
+{% block og_description %}{% if page and page.meta_description %}{{ page.meta_description }}{% elif page %}{{ page.content|striptags|truncate(155, True, '...') }}{% else %}Find useful restaurant and bar policies for EFFOI Restaurant & Bar in Silver Spring, MD.{% endif %}{% endblock %}
+{% block twitter_title %}{{ page.title if page else 'Page Not Found' }} - EFFOI Restaurant{% endblock %}
+{% block twitter_description %}{% if page and page.meta_description %}{{ page.meta_description }}{% elif page %}{{ page.content|striptags|truncate(155, True, '...') }}{% else %}Find useful restaurant and bar policies for EFFOI Restaurant & Bar in Silver Spring, MD.{% endif %}{% endblock %}
+
 {% block content %}
 <div class="my-5">
     {% if page %}

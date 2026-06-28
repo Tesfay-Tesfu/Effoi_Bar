@@ -6,7 +6,7 @@ import json
 import time
 from datetime import datetime, timedelta
 from functools import wraps
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -490,6 +490,52 @@ def blog_post(post_id):
     else:
         flash('This post is not available.', 'warning')
         return redirect(url_for('blog'))
+
+@app.route('/robots.txt')
+def robots_txt():
+    base_url = app.config.get('BASE_URL', request.url_root.rstrip('/'))
+    content = f"User-agent: *\nAllow: /\nSitemap: {base_url}/sitemap.xml\n"
+    return Response(content, mimetype='text/plain')
+
+@app.route('/sitemap.xml')
+def sitemap():
+    base_url = app.config.get('BASE_URL', request.url_root.rstrip('/'))
+
+    urls = [
+        {'loc': url_for('index')},
+        {'loc': url_for('menu')},
+        {'loc': url_for('events')},
+        {'loc': url_for('blog')},
+        {'loc': url_for('about')},
+        {'loc': url_for('policy')},
+        {'loc': url_for('faq')},
+        {'loc': url_for('contact')}
+    ]
+
+    menu_items = MenuItem.query.filter_by(is_active=True).all()
+    posts = BlogPost.query.filter_by(status='approved').all()
+
+    url_entries = []
+    for page in urls:
+        url_entries.append(
+            f"<url><loc>{base_url}{page['loc']}</loc></url>"
+        )
+
+    for item in menu_items:
+        url_entries.append(
+            f"<url><loc>{base_url}{url_for('menu_item_detail', item_id=item.id)}</loc><lastmod>{item.created_at.date().isoformat()}</lastmod></url>"
+        )
+
+    for post in posts:
+        url_entries.append(
+            f"<url><loc>{base_url}{url_for('blog_post', post_id=post.id)}</loc><lastmod>{post.created_at.date().isoformat()}</lastmod></url>"
+        )
+
+    sitemap_xml = f"""<?xml version='1.0' encoding='UTF-8'?>
+<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
+{''.join(url_entries)}
+</urlset>"""
+    return Response(sitemap_xml, mimetype='application/xml')
 
 @app.route('/blog/submit', methods=['GET', 'POST'])
 def submit_blog():
