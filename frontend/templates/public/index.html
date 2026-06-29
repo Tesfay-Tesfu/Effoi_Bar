@@ -4,6 +4,43 @@
 
 {% block content %}
 
+<script>
+    (function () {
+    const strip = document.getElementById('galleryScroll');
+    const btnL  = document.getElementById('galleryScrollLeft');
+    const btnR  = document.getElementById('galleryScrollRight');
+    if (!strip) return;
+
+    const STEP = 300;
+    btnL?.addEventListener('click', () => strip.scrollBy({ left: -STEP, behavior: 'smooth' }));
+    btnR?.addEventListener('click', () => strip.scrollBy({ left:  STEP, behavior: 'smooth' }));
+
+    // Click-drag
+    let isDown = false, startX, scrollLeft;
+    strip.addEventListener('mousedown', e => {
+        isDown = true; strip.classList.add('is-dragging');
+        startX = e.pageX - strip.offsetLeft; scrollLeft = strip.scrollLeft;
+    });
+    ['mouseleave','mouseup'].forEach(ev => strip.addEventListener(ev, () => {
+        isDown = false; strip.classList.remove('is-dragging');
+    }));
+    strip.addEventListener('mousemove', e => {
+        if (!isDown) return;
+        e.preventDefault();
+        strip.scrollLeft = scrollLeft - (e.pageX - strip.offsetLeft - startX) * 1.5;
+    });
+
+    // Sync lightbox to clicked card
+    const lightboxEl = document.getElementById('galleryLightbox');
+    lightboxEl?.addEventListener('show.bs.modal', e => {
+        const idx = parseInt(e.relatedTarget?.dataset?.bsSlideTo ?? 0, 10);
+        bootstrap.Carousel.getOrCreateInstance(
+            document.getElementById('galleryCarousel'), { ride: false }
+        ).to(idx);
+    });
+})();
+</script>
+
 <!-- ===== SMART HERO SECTION ===== -->
 <section class="effoi-hero" id="effoiHero" aria-label="Welcome to EFFOI Restaurant">
 
@@ -598,6 +635,17 @@
 </section>
 
 <style>
+    /* ========== Image Gallery ==========*/
+    /* Gallery scroll strip */
+    #galleryScroll { scrollbar-width: thin; scrollbar-color: #dc3545 #f5f0e8; }
+    #galleryScroll::-webkit-scrollbar { height: 4px; }
+    #galleryScroll::-webkit-scrollbar-track { background: #f5f0e8; border-radius: 4px; }
+    #galleryScroll::-webkit-scrollbar-thumb { background: #dc3545; border-radius: 4px; }
+    #galleryScroll.is-dragging { cursor: grabbing; user-select: none; }
+
+    .effoi-gallery-card:hover .effoi-gallery-img { transform: scale(1.05); }
+    .effoi-gallery-card:hover .effoi-gallery-zoom { opacity: 1 !important; }
+
     /* ===== Catering GIF Gallery ===== */
     .ct-gallery-card {
         cursor: pointer;
