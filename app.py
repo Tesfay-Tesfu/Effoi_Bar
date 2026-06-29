@@ -454,7 +454,8 @@ def inject_about_us():
 def index():
     specials = MenuItem.query.filter_by(is_special=True, is_active=True).limit(6).all()
     events = Event.query.filter_by(is_active=True).order_by(Event.event_date).limit(3).all()
-    return render_template('public/index.html', specials=specials, events=events)
+    images = GalleryImage.query.order_by(GalleryImage.display_order).all()
+    return render_template('public/index.html', specials=specials, events=events, images=images)
 
 @app.route('/menu')
 def menu():

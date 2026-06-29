@@ -140,23 +140,8 @@
 
   <!-- ── Media ── -->
   <div class="ab-media">
-    {% if about and about.hero_video_url %}
-      {% if 'youtube' in about.hero_video_url or 'vimeo' in about.hero_video_url %}
-        <iframe src="{{ about.hero_video_url }}" allowfullscreen title="EFFOI Restaurant" loading="lazy"></iframe>
-      {% elif about.hero_video_url.endswith('.gif') %}
-        <img src="{{ about.hero_video_url }}" alt="EFFOI animation" loading="lazy">
-      {% elif about.hero_video_url.endswith(('.mp4', '.webm', '.ogg')) %}
-        <video autoplay loop muted playsinline preload="metadata">
-          <source src="{{ about.hero_video_url }}" type="video/mp4">
-          <source src="{{ about.hero_video_url }}" type="video/webm">
-        </video>
-      {% else %}
-        <img src="{{ about.hero_video_url }}" alt="EFFOI" loading="lazy">
-      {% endif %}
-    {% else %}
-      <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1400&q=80"
+     <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1400&q=80"
            alt="EFFOI restaurant ambiance" loading="lazy">
-    {% endif %}
   </div>
 
   <!-- ── Owners ── -->
