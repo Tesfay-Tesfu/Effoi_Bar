@@ -6,6 +6,12 @@
 <div class="container py-5">
     <div class="text-center mb-5 position-relative page-hero-header py-4" data-aos="fade-up">
         <h1 class="display-3 fw-bold text-gradient mb-2">Club Events at EFFOI</h1>
+
+        <div class="hero-image-wrapper mx-auto mb-4 rounded-4 overflow-hidden shadow-sm">
+            <img src="https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?q=80&w=2070"
+                 class="hero-image w-100" alt="EFFOI Club Events Hero">
+        </div>
+
         <p class="text-muted fs-5 mx-auto" style="max-width: 600px;">Experience unforgettable nights, exquisite flavors, and premium entertainment.</p>
         <div class="header-line mx-auto"></div>
     </div>
@@ -172,6 +178,21 @@
         border-radius: 3px;
     }
     .fs-7 { font-size: 0.8rem; }
+
+    /* Hero Image Styling */
+    .hero-image-wrapper {
+        max-width: 900px;
+        height: 320px;
+    }
+    .hero-image {
+        height: 100%;
+        object-fit: cover;
+    }
+    @media (max-width: 768px) {
+        .hero-image-wrapper {
+            height: 200px;
+        }
+    }
     
     /* Elegant Content Card Optimization Rules */
     .event-card {
