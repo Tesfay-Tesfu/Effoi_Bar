@@ -1448,7 +1448,7 @@
 
             <div class="top-bar-right">
                 <i class="fas fa-clock"></i>
-                <span>{{ settings.get('hours', 'Mon–Sun: 11:00 AM – 10:00 PM') }}</span>
+                <span>{{ settings.get('hours', 'Monday-Friday:11am-10pm,Saturday:11am-11pm,Sunday:11am-9pm') }}</span>
             </div>
         </div>
     </div>
@@ -1656,10 +1656,6 @@
                             <span class="ef-contact-icon" aria-hidden="true"><i class="fas fa-envelope"></i></span>
                             <a href="mailto:{{ settings.get('email', 'nigistme1277@gmail.com') }}">{{ settings.get('email', 'nigistme1277@gmail.com') }}</a>
                         </li>
-                        <li>
-                            <span class="ef-contact-icon" aria-hidden="true"><i class="fas fa-clock"></i></span>
-                            <span>{{ settings.get('hours', 'Mon–Sun: 11:00 AM – 10:00 PM') }}</span>
-                        </li>
                     </ul>
 
                     <!-- Reserve CTA -->
@@ -1670,9 +1666,9 @@
 
                 <!-- Col 4: Hours -->
                 <div class="ef-footer-col">
-                    <h3 class="ef-col-heading">Hours</h3>
+                    <h3 class="ef-col-heading">Working Hours</h3>
                     <ul class="ef-hours-list">
-                        {% set detailed_hours = settings.get('hours_detailed', 'Monday–Friday:11am–10pm,Saturday:11am–11pm,Sunday:11am–9pm') %}
+                        {% set detailed_hours = settings.get('hours_detailed', 'Monday–Thursday:10AM–2Am,Friday - Saturday:10AM-3Am,Sunday:10Am–2AM') %}
                         {% for hour in detailed_hours.split(',') %}
                             {% set parts = hour.split(':') %}
                             <li>
