@@ -212,6 +212,128 @@
         .blocked-time-item .time { color: #8B1E1E; font-weight: 500; font-size: 0.85rem; }
         .blocked-time-item .reason { color: #888; font-size: 0.8rem; font-style: italic; margin-top: 0.2rem; padding-left: 1.25rem; }
 
+        /* ---------- Smart Working Hours Badge ---------- */
+        .hours-badge {
+            background: rgba(255,215,0,0.15);
+            color: #FFD700;
+            padding: 0.2rem 0.75rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.82rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            border: 1px solid rgba(255,215,0,0.35);
+            position: relative;
+        }
+
+        .hours-badge.is-closed {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.85);
+            border-color: rgba(255,255,255,0.25);
+        }
+
+        .hours-badge:hover {
+            background: #FFD700;
+            color: #8B1E1E;
+            border-color: #FFD700;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255,215,0,0.3);
+        }
+
+        .hours-badge.is-closed:hover {
+            background: rgba(255,255,255,0.25);
+            color: white;
+        }
+
+        .hours-status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #4ade80; /* green = open */
+            flex-shrink: 0;
+            animation: pulse-dot 1.8s infinite;
+        }
+
+        .hours-badge.is-closed .hours-status-dot {
+            background: #f87171; /* red = closed */
+            animation: none;
+        }
+
+        .hours-popup {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+            padding: 1.25rem;
+            min-width: 300px;
+            max-width: 90vw;
+            z-index: 2000;
+            display: none;
+            border: 1px solid #f0f0f0;
+            animation: popup-in 0.2s ease;
+            text-align: left;
+        }
+
+        .hours-popup.show { display: block; }
+
+        .hours-popup h6 {
+            color: #8B1E1E;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 2px solid #FFD700;
+            font-size: 0.9rem;
+        }
+
+        .hours-day-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0.6rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            color: #444;
+        }
+
+        .hours-day-row.today {
+            background: rgba(139,30,30,0.06);
+            color: #8B1E1E;
+            font-weight: 700;
+        }
+
+        .hours-day-row .day-label { display: flex; align-items: center; gap: 0.5rem; }
+
+        .hours-day-row .today-pill {
+            font-size: 0.62rem;
+            background: #8B1E1E;
+            color: white;
+            padding: 0.1rem 0.5rem;
+            border-radius: 20px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+        }
+
+        .hours-day-row.closed-day {
+            color: #b8b8b8;
+        }
+
+        .hours-day-row.closed-day span:last-child {
+            font-style: italic;
+        }
+
+        .hours-day-row.closed-day.today {
+            background: rgba(139,30,30,0.04);
+            color: #a35a5a;
+        }
+
+        .hours-day-row.closed-day .today-pill {
+            background: #b8b8b8;
+        }
+
         /* ---------- Main Header ---------- */
         .main-header {
             background: rgba(255,255,255,0.97);
@@ -472,6 +594,9 @@
 
             .blocked-times-badge { font-size: 0.7rem; padding: 0.2rem 0.6rem; }
             .blocked-times-popup { min-width: 0; width: calc(100vw - 2rem); left: 50%; right: auto; transform: translateX(-50%); }
+
+            .hours-badge { font-size: 0.72rem; padding: 0.2rem 0.6rem; }
+            .hours-popup { min-width: 0; width: calc(100vw - 2rem); left: 50%; right: auto; transform: translateX(-50%); }
 
             .header-container { padding: 0 1rem; }
             .logo { height: 46px; }
@@ -1447,8 +1572,18 @@
             </div>
 
             <div class="top-bar-right">
-                <i class="fas fa-clock"></i>
-                <span>{{ settings.get('hours', 'Monday-Friday:11am-10pm,Saturday:11am-11pm,Sunday:11am-9pm') }}</span>
+                <!-- Smart Working Hours Badge -->
+                <div class="hours-badge" id="hoursBadge" style="position:relative;">
+                    <span class="hours-status-dot" id="hoursStatusDot"></span>
+                    <span id="hoursStatusText">Loading…</span>
+                    <i class="fas fa-chevron-down" style="font-size:0.65rem; margin-left:2px;"></i>
+
+                    <!-- Hours Popup -->
+                    <div class="hours-popup" id="hoursPopup">
+                        <h6><i class="fas fa-clock me-2"></i>Working Hours</h6>
+                        <div id="hoursPopupList"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1459,7 +1594,7 @@
 
             <!-- Logo -->
             <a href="{{ url_for('index') }}" class="logo-area" style="text-decoration:none;">
-                <img src="{{ settings.get('logo_url', 'https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Effoi_logo3.png') }}"
+                <img src="{{ settings.get('logo_url', 'https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Effoi_Logo.png') }}"
                      alt="{{ settings.get('restaurant_name', 'EFFOI') }}"
                      class="logo"
                      onerror="this.onerror=null; this.src='https://via.placeholder.com/62x62/8B1E1E/ffffff?text=EFFOI';">
@@ -1668,7 +1803,7 @@
                 <div class="ef-footer-col">
                     <h3 class="ef-col-heading">Working Hours</h3>
                     <ul class="ef-hours-list">
-                        {% set detailed_hours = settings.get('hours_detailed', 'Monday–Thursday:10AM–2Am,Friday - Saturday:10AM-3Am,Sunday:10Am–2AM') %}
+                        {% set detailed_hours = settings.get('hours_detailed', 'Monday–Tuesday:10AM–2AM,Wednesday:Closed,Thursday:10AM–2AM,Friday–Saturday:10AM–3AM,Sunday:10AM–2AM') %}
                         {% for hour in detailed_hours.split(',') %}
                             {% set parts = hour.split(':') %}
                             <li>
@@ -2213,7 +2348,738 @@
 
         loadBlockedTimes();
         setInterval(loadBlockedTimes, 30000);
+
+        /* ── Smart Working Hours Badge ──
+           Schedule: Mon–Tue 10AM–2AM, Wednesday CLOSED, Thu 10AM–2AM,
+           Fri–Sat 10AM–3AM, Sun 10AM–2AM.
+           Close times cross midnight, and there's now a closed day in the
+           middle of the week, so status is computed from real Date-based
+           open/close intervals rather than simple hour comparisons — that
+           correctly handles things like "still open" at 1am Wednesday
+           (Tuesday night's hours) followed by "closed all day Wednesday",
+           reopening Thursday at 10am. */
+        (function () {
+            const DAY_LABELS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+            function scheduleFor(dayIndex) {
+                if (dayIndex === 3) { // Wednesday — closed
+                    return { label: DAY_LABELS[dayIndex], closed: true };
+                }
+                // Fri = 5, Sat = 6 -> close at 3am. Everyone else closes at 2am.
+                const closeHour = (dayIndex === 5 || dayIndex === 6) ? 3 : 2;
+                return { label: DAY_LABELS[dayIndex], openHour: 10, closeHour };
+            }
+
+            // Format a plain hour number (used for the popup's day-by-day list)
+            function fmt(hour) {
+                const h12 = hour % 12 === 0 ? 12 : hour % 12;
+                const isAfterMidnight = hour <= 4; // 2am / 3am close times
+                const suffix = isAfterMidnight ? 'AM' : (hour < 12 ? 'AM' : 'PM');
+                return `${h12}:00 ${suffix}`;
+            }
+
+            // Format a Date's time-of-day (used for live open/close status)
+            function fmtDate(date) {
+                return fmt(date.getHours());
+            }
+
+            // Build real open→close Date intervals for a window around "now"
+            // so overnight and closed-day logic falls out naturally.
+            function buildIntervals(now) {
+                const intervals = [];
+                const base = new Date(now);
+                base.setHours(0, 0, 0, 0);
+
+                for (let offset = -2; offset <= 9; offset++) {
+                    const d = new Date(base);
+                    d.setDate(d.getDate() + offset);
+                    const sched = scheduleFor(d.getDay());
+                    if (sched.closed) continue;
+
+                    const start = new Date(d);
+                    start.setHours(sched.openHour, 0, 0, 0);
+
+                    const end = new Date(d);
+                    end.setDate(end.getDate() + 1); // close time is after midnight
+                    end.setHours(sched.closeHour, 0, 0, 0);
+
+                    intervals.push({ start, end });
+                }
+                return intervals.sort((a, b) => a.start - b.start);
+            }
+
+            function statusNow(now) {
+                const intervals = buildIntervals(now);
+
+                const current = intervals.find(iv => now >= iv.start && now < iv.end);
+                if (current) {
+                    return { open: true, closesAt: fmtDate(current.end) };
+                }
+
+                const next = intervals.find(iv => iv.start > now);
+                if (!next) return { open: false, opensAt: 'soon' };
+
+                const sameDay = next.start.toDateString() === now.toDateString();
+                const tomorrow = new Date(now);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const isTomorrow = next.start.toDateString() === tomorrow.toDateString();
+
+                let prefix = '';
+                if (!sameDay) prefix = isTomorrow ? 'Tomorrow ' : `${DAY_LABELS[next.start.getDay()]} `;
+
+                return { open: false, opensAt: `${prefix}${fmtDate(next.start)}` };
+            }
+
+            function renderBadge() {
+                const badgeEl = document.getElementById('hoursBadge');
+                const textEl = document.getElementById('hoursStatusText');
+                if (!badgeEl || !textEl) return;
+
+                const status = statusNow(new Date());
+                badgeEl.classList.toggle('is-closed', !status.open);
+                textEl.textContent = status.open
+                    ? `Open · Closes ${status.closesAt}`
+                    : `Closed · Opens ${status.opensAt}`;
+            }
+
+            function renderPopupList() {
+                const list = document.getElementById('hoursPopupList');
+                if (!list) return;
+                const todayIdx = new Date().getDay();
+
+                list.innerHTML = DAY_LABELS.map((label, i) => {
+                    const s = scheduleFor(i);
+                    const isToday = i === todayIdx;
+                    const timeStr = s.closed ? 'Closed' : `${fmt(s.openHour)} – ${fmt(s.closeHour)}`;
+                    return `
+                        <div class="hours-day-row ${isToday ? 'today' : ''} ${s.closed ? 'closed-day' : ''}">
+                            <span class="day-label">
+                                ${label}
+                                ${isToday ? '<span class="today-pill">Today</span>' : ''}
+                            </span>
+                            <span>${timeStr}</span>
+                        </div>`;
+                }).join('');
+            }
+
+            renderBadge();
+            renderPopupList();
+            setInterval(renderBadge, 60000); // refresh open/closed status every minute
+
+            const hoursBadgeEl = document.getElementById('hoursBadge');
+            const hoursPopupEl = document.getElementById('hoursPopup');
+
+            hoursBadgeEl?.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                hoursPopupEl.classList.toggle('show');
+            });
+
+            document.addEventListener('click', function (e) {
+                if (hoursBadgeEl && hoursPopupEl && !hoursBadgeEl.contains(e.target)) {
+                    hoursPopupEl.classList.remove('show');
+                }
+            });
+        })();
     </script>
+
+    <!-- ===== Sales agent runtime config, injected from Flask (.env value) ===== -->
+    <script>
+        window.EFFOI_SALES_AGENT = {
+            backendUrl: "{{ sales_agent_backend_url }}",
+            businessId: {{ sales_agent_business_id }}
+        };
+    </script>
+
+    <!-- ===== AI CHAT WIDGET ===== -->
+<div id="ef-chat-widget">
+    <button id="efChatToggle" aria-label="Chat with us">
+        <i class="fas fa-comment-dots" id="efChatIconOpen"></i>
+        <i class="fas fa-times" id="efChatIconClose" style="display:none;"></i>
+    </button>
+
+    <div id="efChatPanel">
+        <div id="efChatHeader">
+            <div class="ef-chat-header-info">
+                <div class="ef-chat-avatar"><i class="fas fa-utensils"></i></div>
+                <div>
+                    <div class="ef-chat-title">EFFOI Assistant</div>
+                    <div class="ef-chat-subtitle"><span class="ef-chat-dot"></span>Ask about menu, hours, events</div>
+                </div>
+            </div>
+            <button id="efChatClose" aria-label="Close chat"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div id="efChatMessages">
+            <div class="ef-msg ef-msg-bot">
+                Selam! 👋 I'm the EFFOI virtual host. Ask me about our menu, budget, order status, or how to compare dishes.
+            </div>
+            <div class="ef-chat-suggestions">
+                <button class="ef-suggestion">What's on the menu?</button>
+                <button class="ef-suggestion">Tibs under $30</button>
+                <button class="ef-suggestion">Compare Derek Tibs and Kitfo</button>
+            </div>
+        </div>
+
+        <div id="efChatInputRow">
+            <input type="text" id="efChatInput" placeholder="Type your question..." maxlength="1000">
+            <button id="efChatSend" aria-label="Send"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+</div>
+
+<style>
+#ef-chat-widget {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 3000;
+    font-family: 'Inter', sans-serif;
+}
+
+#efChatToggle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8B1E1E, #a82525);
+    color: white;
+    border: none;
+    box-shadow: 0 8px 24px rgba(139,30,30,0.4);
+    cursor: pointer;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+#efChatToggle:hover {
+    transform: scale(1.08);
+    box-shadow: 0 12px 32px rgba(139,30,30,0.5);
+}
+
+#efChatPanel {
+    position: absolute;
+    bottom: 76px;
+    right: 0;
+    width: 360px;
+    max-width: calc(100vw - 32px);
+    height: 520px;
+    max-height: calc(100vh - 140px);
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.06);
+    animation: ef-chat-in 0.25s ease;
+}
+
+#ef-chat-widget.open #efChatPanel { display: flex; }
+
+@keyframes ef-chat-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+#efChatHeader {
+    background: linear-gradient(135deg, #8B1E1E, #6d1515);
+    color: white;
+    padding: 1rem 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.ef-chat-header-info { display: flex; align-items: center; gap: 0.7rem; }
+
+.ef-chat-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.ef-chat-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1rem; }
+.ef-chat-subtitle { font-size: 0.72rem; color: rgba(255,255,255,0.75); display: flex; align-items: center; gap: 0.35rem; }
+
+.ef-chat-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #4ade80; display: inline-block;
+    animation: pulse-dot 1.8s infinite;
+}
+
+#efChatClose {
+    background: none; border: none; color: white;
+    font-size: 1rem; cursor: pointer; opacity: 0.8;
+    width: 30px; height: 30px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s ease;
+}
+#efChatClose:hover { background: rgba(255,255,255,0.15); opacity: 1; }
+
+#efChatMessages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.1rem;
+    background: #faf7f2;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.ef-msg {
+    max-width: 82%;
+    padding: 0.65rem 0.9rem;
+    border-radius: 16px;
+    font-size: 0.87rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.ef-msg-bot {
+    background: white;
+    color: #333;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.ef-msg-user {
+    background: linear-gradient(135deg, #8B1E1E, #a82525);
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+}
+
+.ef-msg-error { background: #fde8e8; color: #a82525; align-self: flex-start; }
+
+.ef-chat-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.ef-suggestion {
+    background: white;
+    border: 1px solid rgba(139,30,30,0.25);
+    color: #8B1E1E;
+    padding: 0.4rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.76rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.ef-suggestion:hover { background: #8B1E1E; color: white; }
+
+.ef-typing {
+    align-self: flex-start;
+    background: white;
+    padding: 0.7rem 1rem;
+    border-radius: 16px;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    display: flex;
+    gap: 4px;
+}
+.ef-typing span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #ccc; display: inline-block;
+    animation: ef-typing-bounce 1.2s infinite;
+}
+.ef-typing span:nth-child(2) { animation-delay: 0.15s; }
+.ef-typing span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes ef-typing-bounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+    30% { transform: translateY(-5px); opacity: 1; }
+}
+
+#efChatInputRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem;
+    border-top: 1px solid #f0ece5;
+    background: white;
+}
+
+#efChatInput {
+    flex: 1;
+    border: 1.5px solid #eee;
+    border-radius: 50px;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+#efChatInput:focus { border-color: #8B1E1E; }
+
+#efChatSend {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: #8B1E1E;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+#efChatSend:hover { background: #a82525; transform: scale(1.05); }
+#efChatSend:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* ── Product carousel (horizontal scroll) ── */
+.ef-chat-products {
+    display: flex;
+    gap: 0.65rem;
+    overflow-x: auto;
+    padding-bottom: 0.35rem;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.ef-chat-products::-webkit-scrollbar { display: none; }
+
+.ef-product-card {
+    background: white;
+    border: 1px solid rgba(139,30,30,0.12);
+    border-radius: 14px;
+    width: 128px;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    cursor: pointer;
+    overflow: hidden;
+    text-align: left;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    padding: 0;
+    font-family: inherit;
+}
+.ef-product-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(139,30,30,0.15);
+    border-color: #8B1E1E;
+}
+
+.ef-product-img {
+    width: 100%;
+    height: 88px;
+    object-fit: cover;
+    background: #f2ede6;
+    display: block;
+}
+
+.ef-product-info { padding: 0.55rem 0.6rem 0.65rem; }
+
+.ef-product-name {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: #2d2d2d;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 0.25rem;
+}
+
+.ef-product-price {
+    font-size: 0.83rem;
+    font-weight: 700;
+    color: #8B1E1E;
+}
+
+.ef-product-badge {
+    display: inline-block;
+    font-size: 0.62rem;
+    font-weight: 600;
+    color: #a68a00;
+    background: rgba(255,215,0,0.18);
+    padding: 0.1rem 0.4rem;
+    border-radius: 20px;
+    margin-top: 0.25rem;
+}
+
+/* Inline product detail card, shown after tapping a product */
+.ef-detail-card {
+    background: white;
+    border: 1px solid rgba(139,30,30,0.12);
+    border-radius: 16px;
+    overflow: hidden;
+    max-width: 220px;
+}
+.ef-detail-img {
+    width: 100%;
+    height: 130px;
+    object-fit: cover;
+    background: #f2ede6;
+    display: block;
+}
+.ef-detail-body { padding: 0.7rem 0.8rem; }
+.ef-detail-name { font-size: 0.85rem; font-weight: 700; color: #2d2d2d; margin-bottom: 0.3rem; }
+.ef-detail-desc { font-size: 0.76rem; color: #777; line-height: 1.5; margin-bottom: 0.5rem; }
+.ef-detail-price { font-size: 0.95rem; font-weight: 700; color: #8B1E1E; margin-bottom: 0.55rem; }
+.ef-detail-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: white;
+    background: #8B1E1E;
+    padding: 0.45rem 0.85rem;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: background 0.2s ease;
+}
+.ef-detail-link:hover { background: #a82525; color: white; }
+
+@media (max-width: 480px) {
+    #ef-chat-widget { bottom: 16px; right: 16px; }
+    #efChatPanel { width: calc(100vw - 24px); height: calc(100vh - 120px); bottom: 72px; }
+}
+</style>
+
+<script>
+(function () {
+    const widget    = document.getElementById('ef-chat-widget');
+    const toggle    = document.getElementById('efChatToggle');
+    const closeBtn  = document.getElementById('efChatClose');
+    const iconOpen  = document.getElementById('efChatIconOpen');
+    const iconClose = document.getElementById('efChatIconClose');
+    const messages  = document.getElementById('efChatMessages');
+    const input     = document.getElementById('efChatInput');
+    const sendBtn   = document.getElementById('efChatSend');
+
+    const BACKEND_URL = window.EFFOI_SALES_AGENT?.backendUrl;
+    const BUSINESS_ID = window.EFFOI_SALES_AGENT?.businessId;
+
+    // ── Debug: confirm config loaded correctly on page load ──
+    console.log('[EFFOI Sales Agent] Config loaded:', {
+        backendUrl: BACKEND_URL,
+        businessId: BUSINESS_ID,
+        fullChatEndpoint: `${BACKEND_URL}/api/chat`,
+    });
+
+    let sending = false;
+
+    function toggleChat() {
+        const isOpen = widget.classList.toggle('open');
+        iconOpen.style.display  = isOpen ? 'none' : 'inline';
+        iconClose.style.display = isOpen ? 'inline' : 'none';
+        if (isOpen) input.focus();
+    }
+
+    toggle.addEventListener('click', toggleChat);
+    closeBtn.addEventListener('click', toggleChat);
+
+    function scrollToBottom() {
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+    function addTextMessage(text, role) {
+        const div = document.createElement('div');
+        div.className = 'ef-msg ' + (role === 'user' ? 'ef-msg-user' : role === 'error' ? 'ef-msg-error' : 'ef-msg-bot');
+        div.textContent = text;
+        messages.appendChild(div);
+        scrollToBottom();
+    }
+
+    function addProductCarousel(text, products) {
+        if (text) addTextMessage(text, 'bot');
+
+        const track = document.createElement('div');
+        track.className = 'ef-chat-products';
+
+        products.forEach((p) => {
+            const card = document.createElement('button');
+            card.className = 'ef-product-card';
+            card.type = 'button';
+            card.addEventListener('click', () => handleProductSelect(p));
+
+            const img = document.createElement('img');
+            img.className = 'ef-product-img';
+            img.loading = 'lazy';
+            img.alt = p.name || '';
+            img.src = p.image || '';
+            img.onerror = () => { img.src = 'https://via.placeholder.com/128x88/8B1E1E/ffffff?text=EFFOI'; };
+
+            const info = document.createElement('div');
+            info.className = 'ef-product-info';
+
+            const name = document.createElement('div');
+            name.className = 'ef-product-name';
+            name.textContent = p.name || 'Menu item';
+
+            const price = document.createElement('div');
+            price.className = 'ef-product-price';
+            price.textContent = p.price != null ? `$${p.price}` : '';
+
+            info.appendChild(name);
+            info.appendChild(price);
+
+            if (p.is_special) {
+                const badge = document.createElement('span');
+                badge.className = 'ef-product-badge';
+                badge.textContent = 'Special';
+                info.appendChild(badge);
+            } else if (p.is_popular) {
+                const badge = document.createElement('span');
+                badge.className = 'ef-product-badge';
+                badge.textContent = 'Popular';
+                info.appendChild(badge);
+            }
+
+            card.appendChild(img);
+            card.appendChild(info);
+            track.appendChild(card);
+        });
+
+        messages.appendChild(track);
+        scrollToBottom();
+    }
+
+    function addDetailCard(text, product) {
+        if (text) addTextMessage(text, 'bot');
+
+        const card = document.createElement('div');
+        card.className = 'ef-detail-card';
+
+        const imgSrc = product.images?.[0]?.src || product.image || '';
+
+        card.innerHTML = `
+            <img class="ef-detail-img" src="${imgSrc}" alt="${product.name || ''}"
+                 onerror="this.src='https://via.placeholder.com/220x130/8B1E1E/ffffff?text=EFFOI';">
+            <div class="ef-detail-body">
+                <div class="ef-detail-name">${product.name || 'Menu item'}</div>
+                ${product.description ? `<div class="ef-detail-desc">${product.description}</div>` : ''}
+                <div class="ef-detail-price">${product.price != null ? '$' + product.price : ''}</div>
+                <a class="ef-detail-link" href="/menu/${product.id}">
+                    View in menu <i class="fas fa-arrow-right" style="font-size:.68rem;"></i>
+                </a>
+            </div>
+        `;
+
+        messages.appendChild(card);
+        scrollToBottom();
+    }
+
+    function showTyping() {
+        const div = document.createElement('div');
+        div.className = 'ef-typing';
+        div.id = 'efTypingIndicator';
+        div.innerHTML = '<span></span><span></span><span></span>';
+        messages.appendChild(div);
+        scrollToBottom();
+    }
+
+    function hideTyping() {
+        document.getElementById('efTypingIndicator')?.remove();
+    }
+
+    async function callSalesAgent({ message, product_id } = {}) {
+        const body = { business_id: BUSINESS_ID };
+        if (message !== undefined) body.message = message;
+        if (product_id !== undefined) body.product_id = product_id;
+
+        const url = `${BACKEND_URL}/api/chat`;
+
+        // ── Debug: log the exact URL + payload for every request ──
+        console.log('[EFFOI Sales Agent] Calling:', url, body);
+
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+
+        if (!res.ok) {
+            const errBody = await res.json().catch(() => ({}));
+            console.error('[EFFOI Sales Agent] Request failed:', res.status, errBody);
+            throw new Error(errBody.detail || `Request failed (${res.status})`);
+        }
+
+        const data = await res.json();
+        console.log('[EFFOI Sales Agent] Response:', data);
+
+        return data;
+    }
+
+    async function sendMessage(text) {
+        if (!text || sending || !BACKEND_URL) return;
+        sending = true;
+        sendBtn.disabled = true;
+
+        addTextMessage(text, 'user');
+        input.value = '';
+        showTyping();
+
+        try {
+            const data = await callSalesAgent({ message: text });
+            hideTyping();
+
+            if (data.type === 'product_search' && Array.isArray(data.products) && data.products.length) {
+                // Covers plain search AND budget-only search
+                // ("tibs under $30", "I have 1500 birr what can I buy?")
+                // — both come back through this same branch.
+                addProductCarousel(data.message, data.products);
+            } else if (data.type === 'product_comparison' && Array.isArray(data.comparison) && data.comparison.length) {
+                const found = data.comparison.filter((c) => c.found && c.product).map((c) => c.product);
+                if (found.length) {
+                    addProductCarousel(data.message, found);
+                } else {
+                    addTextMessage(data.message || "I couldn't find those items to compare.", 'bot');
+                }
+            } else if (data.type === 'order_status' && data.order) {
+                const o = data.order;
+                addTextMessage(
+                    `Order #${o.id}: ${o.status}${o.total ? ` — total $${o.total}` : ''}`,
+                    'bot'
+                );
+            } else {
+                addTextMessage(data.message || "Here's what I found.", 'bot');
+            }
+        } catch (err) {
+            hideTyping();
+            addTextMessage(err.message || 'Connection error. Please try again.', 'error');
+        } finally {
+            sending = false;
+            sendBtn.disabled = false;
+        }
+    }
+
+    async function handleProductSelect(product) {
+        showTyping();
+        try {
+            const data = await callSalesAgent({ product_id: product.id });
+            hideTyping();
+            const detail = data.product || product;
+            addDetailCard(data.message, { ...product, ...detail });
+        } catch (err) {
+            hideTyping();
+            addDetailCard(null, product);
+        }
+    }
+
+    sendBtn.addEventListener('click', () => sendMessage(input.value.trim()));
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') sendMessage(input.value.trim());
+    });
+
+    document.querySelectorAll('.ef-suggestion').forEach((btn) => {
+        btn.addEventListener('click', () => sendMessage(btn.textContent));
+    });
+
+    if (!BACKEND_URL) {
+        console.error('EFFOI_SALES_AGENT.backendUrl is not set — check SALES_AGENT_BACKEND_URL in .env');
+    }
+})();
+</script>
 
     {% block extra_js %}{% endblock %}
 </body>

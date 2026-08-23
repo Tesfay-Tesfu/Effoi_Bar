@@ -74,6 +74,16 @@ BLOCKED_DOMAINS = {
     "trashmail.com"
 }
 
+# Configure sales agent
+app.config['SALES_AGENT_BACKEND_URL'] = os.environ.get('SALES_AGENT_BACKEND_URL')
+
+@app.context_processor
+def inject_sales_agent_config():
+    return {
+        'sales_agent_backend_url': app.config['SALES_AGENT_BACKEND_URL'],
+        'sales_agent_business_id': 5,
+    }
+
 # ==================== TEMPLATE FILTERS ====================
 @app.template_filter('from_json')
 def from_json(value):
@@ -345,6 +355,7 @@ class AboutUs(db.Model):
     
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+
 # ==================== HELPER FUNCTIONS ====================
 # Helper function to upload file to R2
 def upload_to_r2(file_obj, filename, folder='general'):
@@ -466,6 +477,125 @@ def menu():
 def menu_item_detail(item_id):
     item = MenuItem.query.get_or_404(item_id)
     return render_template('public/menu_item_detail.html', item=item)
+
+# ==================== API - MENU LIST & DETAIL ====================
+@app.route('/api/menu')
+def api_menu_list():
+    """Return all active menu items grouped by category, with name/price/etc."""
+    categories = Category.query.filter_by(is_active=True).order_by(Category.display_order).all()
+
+    result = []
+    for category in categories:
+        items = [
+            {
+                'id': item.id,
+                'name': item.name,
+                'description': item.description,
+                'price': item.price,
+                'image_url': item.image_url,
+                'is_special': item.is_special,
+                'is_popular': item.is_popular,
+                'display_order': item.display_order
+            }
+            for item in category.menu_items
+            if item.is_active
+        ]
+        # skip empty categories (e.g. all items inactive)
+        if not items:
+            continue
+
+        result.append({
+            'category_id': category.id,
+            'category': category.name,
+            'display_order': category.display_order,
+            'items': items
+        })
+
+    return jsonify(result)
+
+
+@app.route('/api/menu/<int:item_id>')
+def api_menu_item_detail(item_id):
+    """Return full detail for a single menu item"""
+    item = MenuItem.query.get_or_404(item_id)
+
+    return jsonify({
+        'id': item.id,
+        'name': item.name,
+        'description': item.description,
+        'price': item.price,
+        'image_url': item.image_url,
+        'is_special': item.is_special,
+        'is_popular': item.is_popular,
+        'is_active': item.is_active,
+        'display_order': item.display_order,
+        'created_at': item.created_at.isoformat() if item.created_at else None,
+        'category': {
+            'id': item.category.id,
+            'name': item.category.name
+        } if item.category else None
+    })
+
+# ==================== API - MENU SEARCH ====================
+@app.route('/api/menu/search')
+def api_menu_search():
+    """
+    Search/filter menu items.
+    Query params (all optional):
+      q          - text to match against name or description
+      category   - category name (exact match, case-insensitive)
+      special    - 'true' to only show specials
+      popular    - 'true' to only show popular items
+      min_price  - minimum price
+      max_price  - maximum price
+    """
+    query = MenuItem.query.filter_by(is_active=True)
+
+    q = request.args.get('q', '').strip()
+    if q:
+        like_pattern = f"%{q}%"
+        query = query.filter(
+            db.or_(
+                MenuItem.name.ilike(like_pattern),
+                MenuItem.description.ilike(like_pattern)
+            )
+        )
+
+    category = request.args.get('category', '').strip()
+    if category:
+        query = query.join(Category).filter(Category.name.ilike(category))
+
+    if request.args.get('special', '').lower() == 'true':
+        query = query.filter(MenuItem.is_special == True)
+
+    if request.args.get('popular', '').lower() == 'true':
+        query = query.filter(MenuItem.is_popular == True)
+
+    min_price = request.args.get('min_price', type=float)
+    if min_price is not None:
+        query = query.filter(MenuItem.price >= min_price)
+
+    max_price = request.args.get('max_price', type=float)
+    if max_price is not None:
+        query = query.filter(MenuItem.price <= max_price)
+
+    items = query.order_by(MenuItem.category_id, MenuItem.display_order).all()
+
+    result = [
+        {
+            'id': item.id,
+            'name': item.name,
+            'description': item.description,
+            'price': item.price,
+            'image_url': item.image_url,
+            'is_special': item.is_special,
+            'is_popular': item.is_popular,
+            'category': item.category.name if item.category else None
+        }
+        for item in items
+    ]
+
+    return jsonify({'count': len(result), 'items': result})
 
 @app.route('/events')
 def events():

@@ -119,10 +119,10 @@
     {% else %}
         <div class="row g-3">
             {% set defaults = [
-                'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2070',
-                'https://images.unsplash.com/photo-1501286353178-1ec871214cf9?q=80&w=2070',
-                'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=2070',
-                'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070'
+                'https://raw.githubusercontent.com/hagosalemseged/privacy/main/event_1_birthday.png',
+                'https://raw.githubusercontent.com/hagosalemseged/privacy/main/event_2_meet_and_mingle.png',
+                'https://raw.githubusercontent.com/hagosalemseged/privacy/main/event_3_family_reunion.png',
+                'https://raw.githubusercontent.com/hagosalemseged/privacy/main/event_4_wedding_reception.png'
             ] %}
             {% for img_url in defaults %}
             <div class="col-6 col-md-4 col-lg-3">
@@ -206,15 +206,24 @@
     
     /* Smart Core Engine - Preventing Image Cropping across platforms */
     .event-img-container {
-        height: 220px;
+        height: 280px;
         width: 100%;
         overflow: hidden;
         background: radial-gradient(circle, #2c2c2c 0%, #121212 100%);
     }
     .presentation-img {
+        width: 100%;
+        height: 100%;
         max-height: 100%;
         max-width: 100%;
-        object-fit: contain; /* Prevents text/heads from cutting off on flyers */
+        object-fit: cover;      /* fills the frame consistently across cards */
+        object-position: center top;
+    }
+    @media (max-width: 992px) {
+        .event-img-container { height: 240px; }
+    }
+    @media (max-width: 576px) {
+        .event-img-container { height: 200px; }
     }
 
     /* Floating Dynamic Badge Structuring */
