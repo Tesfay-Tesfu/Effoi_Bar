@@ -2,3085 +2,1001 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{{ settings.get('restaurant_name', 'EFFOI RESTAURANT') }}{% endblock %}</title>
-    <meta name="description" content="{% block meta_description %}{{ settings.get('meta_description', 'Enjoy authentic Ethiopian cuisine and warm hospitality at EFFOI Restaurant & Bar in Silver Spring, MD.') }}{% endblock %}">
-    <link rel="canonical" href="{{ request.url }}">
-    <meta property="og:title" content="{% block og_title %}{{ settings.get('restaurant_name', 'EFFOI RESTAURANT') }}{% endblock %}">
-    <meta property="og:description" content="{% block og_description %}{{ settings.get('meta_description', 'Enjoy authentic Ethiopian cuisine and warm hospitality at EFFOI Restaurant & Bar in Silver Spring, MD.') }}{% endblock %}">
-    <meta property="og:url" content="{{ request.url }}">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="{{ settings.get('og_image_url', url_for('static', filename='uploads/icon/fav_icon.png', _external=True)) }}">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{% block twitter_title %}{{ settings.get('restaurant_name', 'EFFOI RESTAURANT') }}{% endblock %}">
-    <meta name="twitter:description" content="{% block twitter_description %}{{ settings.get('meta_description', 'Enjoy authentic Ethiopian cuisine and warm hospitality at EFFOI Restaurant & Bar in Silver Spring, MD.') }}{% endblock %}">
-    <meta name="twitter:image" content="{{ settings.get('og_image_url', url_for('static', filename='uploads/icon/fav_icon.png', _external=True)) }}">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='uploads/icon/fav_icon.png') }}">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='uploads/icon/fav_icon.png') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>{% block title %}Afro-Merica - Empowering STEM Education{% endblock %}</title>
 
-    <!-- Font Awesome 6 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- AOS Animation -->
+    <!-- Preconnect for faster font loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    
+
+    <!-- MathJax -->
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']], processEscapes: true },
+            options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'], ignoreHtmlClass: 'no-mathjax', processHtmlClass: 'math' }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        /* ─── Reset ─────────────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #faf7f2;
-            color: #2d2d2d;
-            line-height: 1.6;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
+            background: #f0f4f8;
+            color: #1e293b;
+            overflow-x: hidden;   /* prevent horizontal scroll on mobile */
         }
 
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Playfair Display', serif;
-            font-weight: 600;
+        img { max-width: 100%; display: block; }
+
+        /* ─── Brand tokens ───────────────────────────────────── */
+        :root {
+            --gold:       #D4AF37;
+            --gold-dark:  #8B6B1A;
+            --dark:       #144147;
+            --dark-light: #1a5555;
+            --dark-shadow:#0d2e30;
         }
 
-        .page-wrapper {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            flex: 1;
-            width: 100%;
-        }
-
-        /* ===== HEADER ===== */
-
-        /* ---------- Top Bar ---------- */
-        .top-bar {
-            background: linear-gradient(135deg, #6d1515 0%, #8B1E1E 50%, #a82525 100%);
-            color: white;
+        /* ─── Top header ─────────────────────────────────────── */
+        .top-header {
+            background: var(--gold);
             padding: 0.45rem 0;
             font-size: 0.82rem;
-            position: relative;
-            z-index: 1002;
-            border-bottom: 1px solid rgba(255,215,0,0.25);
-            letter-spacing: 0.02em;
+            color: #1e293b;
+            font-weight: 500;
         }
 
-        .top-bar a {
-            color: rgba(255,255,255,0.9);
-            text-decoration: none;
-            transition: color 0.2s ease;
-            white-space: nowrap;
-        }
+        .top-header a { color: #1e293b; text-decoration: none; transition: color 0.2s; }
+        .top-header a:hover { color: #fff; }
 
-        .top-bar a:hover { color: #FFD700; }
-
-        .top-bar i {
-            margin-right: 0.35rem;
-            color: #FFD700;
-            font-size: 0.78rem;
-        }
-
-        .top-bar .tb-divider {
-            width: 1px;
-            height: 14px;
-            background: rgba(255,255,255,0.25);
-            margin: 0 0.75rem;
-            display: inline-block;
-            vertical-align: middle;
-        }
-
-        .top-bar .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        .top-bar-left {
+        .contact-info {
             display: flex;
             align-items: center;
+            gap: 1.2rem;
             flex-wrap: wrap;
-            gap: 0.1rem;
-        }
-
-        .top-bar-right {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            white-space: nowrap;
-        }
-
-        .top-bar-right i.fa-clock { color: #FFD700; }
-
-        /* ---------- Blocked Times Badge ---------- */
-        .blocked-times-badge {
-            background: rgba(255,215,0,0.15);
-            color: #FFD700;
-            padding: 0.2rem 0.75rem;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.78rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            border: 1px solid rgba(255,215,0,0.35);
-            position: relative;
-        }
-
-        .blocked-times-badge .badge-dot {
-            width: 7px;
-            height: 7px;
-            background: #FFD700;
-            border-radius: 50%;
-            animation: pulse-dot 1.8s infinite;
-        }
-
-        @keyframes pulse-dot {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50%       { opacity: 0.4; transform: scale(0.7); }
-        }
-
-        .blocked-times-badge:hover {
-            background: #FFD700;
-            color: #8B1E1E;
-            border-color: #FFD700;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(255,215,0,0.3);
-        }
-
-        .blocked-times-badge:hover .badge-dot { background: #8B1E1E; }
-
-        /* ---------- Blocked Times Popup ---------- */
-        .blocked-times-popup {
-            position: absolute;
-            top: calc(100% + 10px);
-            right: 0;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.18);
-            padding: 1.25rem;
-            min-width: 360px;
-            max-width: 90vw;
-            z-index: 2000;
-            display: none;
-            border: 1px solid #f0f0f0;
-            animation: popup-in 0.2s ease;
-        }
-
-        @keyframes popup-in {
-            from { opacity: 0; transform: translateY(-6px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        .blocked-times-popup.show { display: block; }
-
-        .blocked-times-popup h6 {
-            color: #8B1E1E;
-            margin-bottom: 0.75rem;
-            padding-bottom: 0.6rem;
-            border-bottom: 2px solid #FFD700;
-            font-size: 0.9rem;
-        }
-
-        .blocked-time-item {
-            padding: 0.65rem 0.75rem;
-            border-bottom: 1px solid #f5f5f5;
-            border-radius: 10px;
-            transition: background 0.2s;
-        }
-
-        .blocked-time-item:hover { background: #faf7f2; }
-        .blocked-time-item:last-child { border-bottom: none; }
-
-        .blocked-time-item .date { font-weight: 600; color: #222; font-size: 0.85rem; }
-        .blocked-time-item .time { color: #8B1E1E; font-weight: 500; font-size: 0.85rem; }
-        .blocked-time-item .reason { color: #888; font-size: 0.8rem; font-style: italic; margin-top: 0.2rem; padding-left: 1.25rem; }
-
-        /* ---------- Smart Working Hours Badge ---------- */
-        .hours-badge {
-            background: rgba(255,215,0,0.15);
-            color: #FFD700;
-            padding: 0.2rem 0.75rem;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.82rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.45rem;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            border: 1px solid rgba(255,215,0,0.35);
-            position: relative;
-        }
-
-        .hours-badge.is-closed {
-            background: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.85);
-            border-color: rgba(255,255,255,0.25);
-        }
-
-        .hours-badge:hover {
-            background: #FFD700;
-            color: #8B1E1E;
-            border-color: #FFD700;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(255,215,0,0.3);
-        }
-
-        .hours-badge.is-closed:hover {
-            background: rgba(255,255,255,0.25);
-            color: white;
-        }
-
-        .hours-status-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #4ade80; /* green = open */
-            flex-shrink: 0;
-            animation: pulse-dot 1.8s infinite;
-        }
-
-        .hours-badge.is-closed .hours-status-dot {
-            background: #f87171; /* red = closed */
-            animation: none;
-        }
-
-        .hours-popup {
-            position: absolute;
-            top: calc(100% + 10px);
-            right: 0;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.18);
-            padding: 1.25rem;
-            min-width: 300px;
-            max-width: 90vw;
-            z-index: 2000;
-            display: none;
-            border: 1px solid #f0f0f0;
-            animation: popup-in 0.2s ease;
-            text-align: left;
-        }
-
-        .hours-popup.show { display: block; }
-
-        .hours-popup h6 {
-            color: #8B1E1E;
-            margin-bottom: 0.75rem;
-            padding-bottom: 0.6rem;
-            border-bottom: 2px solid #FFD700;
-            font-size: 0.9rem;
-        }
-
-        .hours-day-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 0.6rem;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            color: #444;
-        }
-
-        .hours-day-row.today {
-            background: rgba(139,30,30,0.06);
-            color: #8B1E1E;
-            font-weight: 700;
-        }
-
-        .hours-day-row .day-label { display: flex; align-items: center; gap: 0.5rem; }
-
-        .hours-day-row .today-pill {
-            font-size: 0.62rem;
-            background: #8B1E1E;
-            color: white;
-            padding: 0.1rem 0.5rem;
-            border-radius: 20px;
-            font-weight: 600;
-            letter-spacing: 0.03em;
-        }
-
-        .hours-day-row.closed-day {
-            color: #b8b8b8;
-        }
-
-        .hours-day-row.closed-day span:last-child {
-            font-style: italic;
-        }
-
-        .hours-day-row.closed-day.today {
-            background: rgba(139,30,30,0.04);
-            color: #a35a5a;
-        }
-
-        .hours-day-row.closed-day .today-pill {
-            background: #b8b8b8;
-        }
-
-        /* ---------- Main Header ---------- */
-        .main-header {
-            background: rgba(255,255,255,0.97);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 0.75rem 0;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.07);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            transition: padding 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
-            border-bottom: 1px solid rgba(139,30,30,0.08);
-        }
-
-        .main-header.scrolled {
-            padding: 0.45rem 0;
-            box-shadow: 0 4px 30px rgba(0,0,0,0.12);
-            background: rgba(255,255,255,0.99);
-        }
-
-        .header-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* ---------- Logo ---------- */
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 0.85rem;
-            text-decoration: none;
-            flex-shrink: 0;
-            min-width: 0;
-        }
-
-        .logo {
-            height: 62px;
-            width: auto;
-            transition: transform 0.35s ease, height 0.3s ease;
-            filter: drop-shadow(0 2px 6px rgba(139,30,30,0.15));
-            flex-shrink: 0;
-        }
-
-        .main-header.scrolled .logo { height: 50px; }
-
-        .logo-area:hover .logo { transform: scale(1.04) rotate(-1deg); }
-
-        .logo-text {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.65rem;
-            font-weight: 700;
-            color: #8B1E1E;
-            line-height: 1.1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .logo-text .logo-sub {
-            font-size: 0.72rem;
-            color: #999;
-            font-family: 'Inter', sans-serif;
-            font-weight: 400;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            display: block;
-        }
-
-        .logo-text .bar-text {
-            font-size: 1rem;
-            color: #8B1E1E;
-            font-weight: 500;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            display: block;
-            margin-top: -2px;
-        }
-
-        /* ---------- Navigation ---------- */
-        .main-nav {
-            display: flex;
-            gap: 0.3rem;
-            align-items: center;
-        }
-
-        .main-nav a {
-            text-decoration: none;
-            color: #444;
-            font-weight: 500;
-            font-size: 0.9rem;
-            padding: 0.45rem 0.75rem;
-            border-radius: 8px;
-            transition: color 0.25s ease, background 0.25s ease;
-            position: relative;
-            letter-spacing: 0.01em;
-            white-space: nowrap;
-        }
-
-        .main-nav a:hover { color: #8B1E1E; background: rgba(139,30,30,0.05); }
-
-        .main-nav a.active { color: #8B1E1E; }
-
-        /* Animated underline */
-        .main-nav a:not(.reserve-btn)::after {
-            content: '';
-            position: absolute;
-            bottom: 4px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 2px;
-            background: linear-gradient(90deg, #8B1E1E, #FFD700);
-            border-radius: 2px;
-            transition: width 0.3s ease;
-        }
-
-        .main-nav a:not(.reserve-btn):hover::after,
-        .main-nav a.active::after {
-            width: calc(100% - 1.5rem);
-        }
-
-        /* Reserve Button */
-        .reserve-btn {
-            background: linear-gradient(135deg, #8B1E1E, #a82525) !important;
-            color: white !important;
-            padding: 0.5rem 1.35rem !important;
-            border-radius: 50px !important;
-            font-weight: 600 !important;
-            font-size: 0.88rem !important;
-            letter-spacing: 0.03em;
-            box-shadow: 0 4px 15px rgba(139,30,30,0.3);
-            transition: all 0.3s ease !important;
-            margin-left: 0.5rem;
-        }
-
-        .reserve-btn:hover {
-            background: linear-gradient(135deg, #a82525, #c43535) !important;
-            color: white !important;
-            transform: translateY(-2px) !important;
-            box-shadow: 0 8px 25px rgba(139,30,30,0.4) !important;
-        }
-
-        .reserve-btn i { margin-right: 0.4rem; }
-
-        /* ---------- Hamburger Button ---------- */
-        .mobile-toggle {
-            display: none;
-            background: white;
-            border: 1.5px solid rgba(139,30,30,0.18);
-            color: #8B1E1E;
-            cursor: pointer;
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-            transition: all 0.25s ease;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .mobile-toggle:hover {
-            background: #8B1E1E;
-            color: white;
-            border-color: #8B1E1E;
-            box-shadow: 0 4px 16px rgba(139,30,30,0.25);
-            transform: rotate(5deg);
-        }
-
-        .mobile-toggle i { font-size: 1.15rem; transition: transform 0.3s ease; }
-        .mobile-toggle.open i { transform: rotate(90deg); }
-
-        /* ---------- Responsive: Header / Nav ---------- */
-        @media (max-width: 992px) {
-            .top-bar .header-container {
-                flex-direction: column;
-                gap: 0.4rem;
-                text-align: center;
-            }
-
-            .top-bar-left { justify-content: center; }
-            .top-bar-right { justify-content: center; }
-
-            .blocked-times-badge { margin-left: 0; }
-
-            .mobile-toggle { display: flex; }
-
-            .main-nav {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: white;
-                flex-direction: column;
-                padding: 1rem 1.25rem 1.25rem;
-                box-shadow: 0 16px 40px rgba(0,0,0,0.12);
-                gap: 0.3rem;
-                border-top: 2px solid #8B1E1E;
-                z-index: 1000;
-                animation: slide-down 0.25s ease;
-                max-height: calc(100vh - 100%);
-                overflow-y: auto;
-            }
-
-            @keyframes slide-down {
-                from { opacity: 0; transform: translateY(-10px); }
-                to   { opacity: 1; transform: translateY(0); }
-            }
-
-            .main-nav.show { display: flex; }
-
-            .main-nav a {
-                width: 100%;
-                padding: 0.75rem 1rem;
-                border-radius: 10px;
-                font-size: 0.95rem;
-                background: #faf7f2;
-                color: #333;
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                transition: all 0.2s ease;
-            }
-
-            .main-nav a:hover,
-            .main-nav a.active {
-                background: #8B1E1E;
-                color: white;
-                padding-left: 1.4rem;
-            }
-
-            .main-nav a:not(.reserve-btn)::after { display: none; }
-
-            .reserve-btn {
-                text-align: center !important;
-                justify-content: center;
-                background: linear-gradient(135deg, #8B1E1E, #a82525) !important;
-                color: white !important;
-                margin-left: 0 !important;
-                margin-top: 0.4rem;
-                border-radius: 10px !important;
-            }
-
-            .header-container { flex-wrap: nowrap; }
-        }
-
-        @media (max-width: 576px) {
-            .page-wrapper { padding: 0 1rem; }
-
-            .top-bar { font-size: 0.72rem; }
-            .top-bar .header-container { padding: 0 1rem; }
-            .top-bar .tb-divider { margin: 0 0.4rem; }
-
-            .blocked-times-badge { font-size: 0.7rem; padding: 0.2rem 0.6rem; }
-            .blocked-times-popup { min-width: 0; width: calc(100vw - 2rem); left: 50%; right: auto; transform: translateX(-50%); }
-
-            .hours-badge { font-size: 0.72rem; padding: 0.2rem 0.6rem; }
-            .hours-popup { min-width: 0; width: calc(100vw - 2rem); left: 50%; right: auto; transform: translateX(-50%); }
-
-            .header-container { padding: 0 1rem; }
-            .logo { height: 46px; }
-            .main-header.scrolled .logo { height: 40px; }
-            .logo-text { font-size: 1.15rem; max-width: 55vw; }
-            .logo-text .bar-text { font-size: 0.78rem; }
-        }
-
-        /* ===== HERO SECTION ===== */
-        .hero-section {
-            width: 100%;
-            height: 600px;
-            display: flex;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
-        
-        .hero-left {
-            width: 50%;
-            height: 100%;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .hero-right {
-            width: 50%;
-            height: 100%;
-            position: relative;
-            overflow: hidden;
-            background: #000;
-        }
-        
-        .hero-video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .hero-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            grid-template-rows: repeat(2, 1fr);
-            width: 100%;
-            height: 100%;
-            gap: 2px;
-            background: #8B1E1E;
-        }
-        
-        .hero-grid-item {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .hero-grid-item img,
-        .hero-grid-item video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-        
-        .hero-grid-item:hover img,
-        .hero-grid-item:hover video {
-            transform: scale(1.05);
-        }
-        
-        .hero-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(transparent, rgba(0,0,0,0.7));
-            color: white;
-            padding: 1rem;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
-        }
-        
-        .hero-grid-item:hover .hero-overlay {
-            transform: translateY(0);
-        }
-        
-        .hero-overlay h4 {
-            font-size: 1rem;
-            margin-bottom: 0.25rem;
-        }
-        
-        .hero-overlay p {
-            font-size: 0.8rem;
-            margin-bottom: 0;
-            opacity: 0.9;
-        }
-
-        /* ===== ETHIOPIAN COFFEE CEREMONY SECTION ===== */
-        .coffee-ceremony-section {
-            max-width: 1400px;
-            margin: 4rem auto;
-            padding: 0 2rem;
-        }
-        
-        .coffee-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            grid-template-rows: repeat(2, 1fr);
-            gap: 1.5rem;
-            height: 600px;
-        }
-        
-        .coffee-grid-item {
-            position: relative;
-            overflow: hidden;
-            border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-        }
-        
-        .coffee-grid-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-        
-        .coffee-grid-item:hover img {
-            transform: scale(1.05);
-        }
-        
-        .coffee-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(transparent, rgba(139, 30, 30, 0.9));
-            color: white;
-            padding: 2rem 1.5rem;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
-        }
-        
-        .coffee-grid-item:hover .coffee-overlay {
-            transform: translateY(0);
-        }
-        
-        .coffee-overlay h4 {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .coffee-overlay p {
-            font-size: 0.9rem;
-            margin: 0;
-            opacity: 0.9;
-        }
-        
-        @media (max-width: 768px) {
-            .coffee-grid {
-                grid-template-columns: 1fr !important;
-                grid-template-rows: repeat(4, 260px) !important;
-                height: auto !important;
-                gap: 1rem;
-            }
-            .coffee-ceremony-section { margin: 2.5rem auto; padding: 0 1rem; }
-
-            /* On touch devices, overlays default visible since hover doesn't apply */
-            .coffee-overlay { transform: translateY(0); padding: 1.25rem 1rem; }
-        }
-
-        @media (max-width: 576px) {
-            .hero-overlay { transform: translateY(0); padding: 0.75rem; }
-        }
-
-        /* ===== FOOTER ===== */
-        .footer {
-            background: {{ settings.get('footer_bg_color', '#1a2c3e') }};
-            color: {{ settings.get('footer_text_color', '#ffffff') }};
-            padding: 4rem 0 2rem;
-            margin-top: 4rem;
-        }
-
-        .footer-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-
-        .footer-col h4 {
-            color: white;
-            margin-bottom: 1.5rem;
-            position: relative;
-            font-size: 1.2rem;
-        }
-
-        .footer-col h4::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 40px;
-            height: 2px;
-            background: #FFD700;
-        }
-
-        .footer-links {
-            list-style: none;
-            padding: 0;
-        }
-
-        .footer-links li {
-            margin-bottom: 0.8rem;
-        }
-
-        .footer-links a {
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .footer-links a:hover {
-            color: #FFD700;
-        }
-
-        .contact-info p {
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
         }
 
         .contact-info i {
-            width: 20px;
-            color: #FFD700;
+            margin-right: 0.3rem;
+            color: var(--dark);
+            font-size: 0.75rem;
         }
 
-        .contact-info i.fa-map-marker-alt {
-            color: {{ settings.get('map_icon_color', '#4285F4') }};
+        /* Hide address on phones — email + phone is enough */
+        @media (max-width: 575px) {
+            .contact-info .map-link { display: none; }
+            .top-header { font-size: 0.75rem; }
+            .contact-info { gap: 0.7rem; justify-content: center; }
         }
 
-        .contact-info a {
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
+        /* ─── Main navbar ────────────────────────────────────── */
+        .main-nav {
+            background: white;
+            padding: 0.55rem 0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
-        .contact-info a:hover {
-            color: #FFD700;
-        }
-
-        .social-icons {
+        .nav-container {
             display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .social-icons a {
-            color: white;
-            font-size: 1.3rem;
-            transition: all 0.3s ease;
-        }
-
-        .social-icons a:hover {
-            color: #FFD700;
-            transform: translateY(-3px);
-        }
-
-        .copyright {
-            text-align: center;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-
-        @media (max-width: 768px) {
-            .footer-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .hero-section {
-                flex-direction: column;
-                height: auto;
-            }
-            .hero-left, .hero-right {
-                width: 100%;
-                height: 300px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .footer-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 400px) {
-            .hero-left, .hero-right { height: 220px; }
-        }
-
-        /* ===== REVIEWS SECTION (above footer) ===== */
-        .reviews-strip {
-            background: #faf7f2;
-            padding: 4.5rem 0 5rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* subtle warm grain */
-        .reviews-strip::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(139,30,30,0.05), transparent);
-            pointer-events: none;
-        }
-
-        .reviews-strip-inner {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            position: relative;
-        }
-
-        /* ── Section header ── */
-        .rs-header {
-            display: flex;
-            align-items: flex-end;
             justify-content: space-between;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-bottom: 2.75rem;
-        }
-
-        .rs-header-left {}
-
-        .rs-eyebrow {
-            display: inline-flex;
             align-items: center;
-            gap: 0.45rem;
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: #8B1E1E;
-            margin-bottom: 0.5rem;
+            gap: 0.75rem;
         }
 
-        .rs-eyebrow span {
-            width: 28px;
-            height: 2px;
-            background: #8B1E1E;
-            border-radius: 2px;
+        /* ─── Logo ───────────────────────────────────────────── */
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            flex-shrink: 0;
+            gap: 0.6rem;
+        }
+
+        .logo img {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+            transition: transform 0.3s;
+        }
+
+        .logo:hover img { transform: scale(1.03); }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+        }
+
+        /* ─── Desktop nav ────────────────────────────────────── */
+        .desktop-nav {
+            display: flex;
+            gap: 0.15rem;
+            align-items: center;
+        }
+
+        .desktop-nav .nav-link {
+            color: #1e293b;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.45rem 0.65rem;
+            border-radius: 60px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.87rem;
+            white-space: nowrap;
+        }
+
+        .desktop-nav .nav-link:hover { color: var(--gold); background: #f8fafc; }
+        .desktop-nav .nav-link i { color: var(--dark); font-size: 0.8rem; }
+
+        .desktop-nav .cart-link { background: var(--dark); color: white; padding: 0.45rem 0.9rem; }
+        .desktop-nav .cart-link i { color: white; }
+        .desktop-nav .cart-link:hover { background: var(--gold); color: var(--dark); }
+        .desktop-nav .cart-link:hover i { color: var(--dark); }
+
+        .cart-badge {
+            background: var(--gold);
+            color: var(--dark);
+            border-radius: 50%;
+            padding: 2px 5px;
+            font-size: 0.62rem;
+            margin-left: 4px;
+            min-width: 18px;
+            text-align: center;
+            font-weight: 800;
             display: inline-block;
         }
 
-        .rs-title {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(1.6rem, 3vw, 2.2rem);
-            font-weight: 700;
-            color: #1a1a1a;
-            line-height: 1.2;
-            margin: 0;
-        }
+        /* ─── Dropdown ───────────────────────────────────────── */
+        .nav-dropdown { position: relative; display: inline-block; }
 
-        .rs-title em {
-            font-style: normal;
-            color: #8B1E1E;
-        }
-
-        .rs-all-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.6rem 1.4rem;
-            border: 1.5px solid #8B1E1E;
-            color: #8B1E1E;
-            border-radius: 50px;
-            font-size: 0.83rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.25s ease;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        .rs-all-btn:hover {
-            background: #8B1E1E;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(139,30,30,0.25);
-        }
-
-        /* ── Horizontal scroll track ── */
-        .rs-track-wrap {
-            position: relative;
-        }
-
-        .rs-track {
-            display: flex;
-            gap: 1.1rem;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
-            padding-bottom: 0.5rem;
-            scrollbar-width: none;           /* Firefox */
-        }
-
-        .rs-track::-webkit-scrollbar { display: none; }
-
-        /* ── Individual review card ── */
-        .rs-card {
+        .dropdown-content {
+            position: absolute;
+            top: 100%;
+            left: 0;
             background: white;
+            min-width: 260px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
             border-radius: 20px;
-            padding: 1.4rem 1.5rem 1.3rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-            border: 1px solid rgba(0,0,0,0.04);
-            min-width: 280px;
-            max-width: 300px;
-            flex-shrink: 0;
-            scroll-snap-align: start;
-            display: flex;
-            flex-direction: column;
-            gap: 0.85rem;
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .rs-card::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #8B1E1E, #FFD700);
+            padding: 0.75rem 0;
+            z-index: 1001;
             opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .rs-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 14px 40px rgba(139,30,30,0.12);
-        }
-
-        .rs-card:hover::after { opacity: 1; }
-
-        /* Quote decoration */
-        .rs-quote-bg {
-            position: absolute;
-            top: 0.8rem;
-            right: 1rem;
-            font-family: 'Playfair Display', serif;
-            font-size: 4rem;
-            line-height: 1;
-            color: rgba(139,30,30,0.06);
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
             pointer-events: none;
-            user-select: none;
         }
 
-        /* Stars row */
-        .rs-stars {
-            display: flex;
-            gap: 3px;
-            font-size: 0.78rem;
+        .nav-dropdown:hover .dropdown-content {
+            opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto;
         }
 
-        .rs-stars .fa-star      { color: #FFD700; }
-        .rs-stars .fa-star.off  { color: #e8e1d9; }
+        .nav-dropdown::after { content: ''; position: absolute; bottom: -12px; left: 0; width: 100%; height: 16px; }
+        .dropdown-content::before { content: ''; position: absolute; top: -8px; left: 0; width: 100%; height: 12px; }
 
-        /* Comment */
-        .rs-comment {
-            font-size: 0.87rem;
-            color: #444;
-            line-height: 1.65;
-            flex: 1;
-        }
-
-        /* Author row */
-        .rs-author-row {
+        .dropdown-content a {
+            color: #1e293b;
+            padding: 0.7rem 1.4rem;
+            text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 0.7rem;
-            border-top: 1px solid #f5f0ea;
-            padding-top: 0.8rem;
+            gap: 0.9rem;
+            transition: all 0.15s;
+            font-size: 0.9rem;
         }
 
-        .rs-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #8B1E1E, #c43535);
+        .dropdown-content a:hover { background: #f8fafc; color: var(--gold); padding-left: 1.9rem; }
+        .dropdown-content a i { width: 22px; color: var(--dark); }
+        .dropdown-content a:hover i { color: var(--gold); }
+        .dropdown-divider { height: 1px; background: #e2e8f0; margin: 0.4rem 0; }
+
+        /* ─── Mobile menu button ─────────────────────────────── */
+        .mobile-menu-btn {
+            display: none;
+            background: var(--dark);
             color: white;
-            font-family: 'Playfair Display', serif;
-            font-size: 0.95rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .rs-author-name {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #222;
-            line-height: 1.2;
-        }
-
-        .rs-author-date {
-            font-size: 0.7rem;
-            color: #aaa;
-        }
-
-        /* ── Scroll arrow buttons ── */
-        .rs-arrow {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
+            border: none;
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: white;
-            border: 1.5px solid #e8e1d9;
-            color: #8B1E1E;
-            font-size: 0.85rem;
-            display: flex;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .mobile-menu-btn:hover { background: var(--gold); color: var(--dark); }
+
+        /* ─── Hide desktop nav on mobile ─────────────────────── */
+        @media (max-width: 991px) {
+            .desktop-nav { display: none; }
+            .mobile-menu-btn { display: flex; }
+        }
+
+        /* ─── Mobile menu overlay ────────────────────────────── */
+        .mobile-menu-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            opacity: 0; visibility: hidden;
+            transition: all 0.3s;
+        }
+        .mobile-menu-overlay.active { opacity: 1; visibility: visible; }
+
+        /* ─── Mobile drawer ──────────────────────────────────── */
+        .mobile-menu {
+            position: fixed;
+            top: 0; right: -100%;          /* off-screen */
+            width: min(280px, 85vw);        /* never wider than 85% of screen */
+            height: 100%;
+            background: white;
+            z-index: 2001;
+            padding: 2rem 1.25rem 2rem;
+            transition: right 0.3s ease;
+            box-shadow: -5px 0 20px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .mobile-menu.active { right: 0; }
+
+        .mobile-menu-close {
+            position: absolute; top: 1rem; right: 1rem;
+            background: #f1f5f9; border: none;
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            font-size: 0.95rem;
             cursor: pointer;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-            transition: all 0.25s ease;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--dark);
+        }
+
+        .mobile-menu-close:hover { background: var(--gold); color: white; }
+
+        .mobile-menu .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+            padding: 0.8rem 1rem;
+            color: #1e293b;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.92rem;
+            border-radius: 60px;
+            transition: all 0.2s;
+            margin-bottom: 0.2rem;
+        }
+
+        .mobile-menu .nav-link:hover { background: #f1f5f9; color: var(--gold); }
+        .mobile-menu .nav-link i { width: 20px; color: var(--dark); font-size: 0.85rem; }
+        .mobile-menu .nav-link:hover i { color: var(--gold); }
+
+        .mobile-menu .cart-link { background: var(--dark); color: white; margin-top: 0.75rem; justify-content: center; }
+        .mobile-menu .cart-link i { color: white; }
+        .mobile-menu .cart-link:hover { background: var(--gold); color: var(--dark); }
+
+        .mobile-section-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 0.5rem 1rem 0.25rem;
+            margin-top: 0.75rem;
+        }
+
+        .mobile-divider { height: 1px; background: #e2e8f0; margin: 0.75rem 0 0.5rem; }
+
+        /* ─── Logo mobile sizing ─────────────────────────────── */
+        @media (max-width: 480px) {
+            .logo img { height: 38px; }
+            .logo-text { font-size: 1.1rem; }
+        }
+
+        /* ─── Cart toast ─────────────────────────────────────── */
+        .cart-toast {
+            position: fixed;
+            bottom: 20px; right: 20px;
+            background: var(--dark);
+            color: white;
+            padding: 12px 18px;
+            border-radius: 50px;
+            display: flex; align-items: center; gap: 10px;
+            z-index: 9999;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            font-size: 0.88rem;
+            max-width: calc(100vw - 40px);  /* never overflow on mobile */
+        }
+
+        .cart-toast.show { transform: translateX(0); }
+
+        /* ─── Flash alerts ───────────────────────────────────── */
+        .alert {
+            border-radius: 60px;
+            border: none;
+            padding: 0.85rem 1.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 575px) {
+            .alert { border-radius: 16px; padding: 0.75rem 1rem; font-size: 0.85rem; }
+        }
+
+        /* ─── Buttons ────────────────────────────────────────── */
+        .btn-primary {
+            background: var(--dark); border: none;
+            border-radius: 60px; padding: 0.75rem 1.8rem;
+            font-weight: 600; transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: var(--gold); color: var(--dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
+        }
+
+        /* ─── Hero Swiper ────────────────────────────────────── */
+        .hero-swiper {
+            width: 100%;
+            height: clamp(260px, 55vw, 600px);   /* scales with screen */
+            border-radius: clamp(16px, 4vw, 40px);
+            overflow: hidden;
+            box-shadow: 0 20px 50px -15px rgba(0,0,0,0.3);
+            margin: 1.5rem 0 2.5rem;
+        }
+
+        .hero-swiper .swiper-slide {
+            position: relative;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .hero-swiper .swiper-slide::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(90deg, rgba(20,65,71,0.88) 0%, rgba(20,65,71,0.45) 55%, transparent 100%);
+        }
+
+        .hero-content {
+            position: absolute;
+            top: 50%; left: clamp(1rem, 8%, 10%);
+            right: clamp(1rem, 5%, 45%);
+            transform: translateY(-50%);
+            color: white;
             z-index: 2;
         }
 
-        .rs-arrow:hover {
-            background: #8B1E1E;
-            color: white;
-            border-color: #8B1E1E;
-            box-shadow: 0 6px 20px rgba(139,30,30,0.3);
+        .hero-content h2 {
+            font-size: clamp(1.3rem, 4.5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            line-height: 1.2;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
         }
 
-        .rs-arrow-left  { left: -18px; }
-        .rs-arrow-right { right: -18px; }
-
-        /* ── Scroll dots ── */
-        .rs-dots {
-            display: flex;
-            justify-content: center;
-            gap: 0.4rem;
-            margin-top: 1.5rem;
-        }
-
-        .rs-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: #e0d8ce;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-            transition: all 0.25s ease;
-        }
-
-        .rs-dot.active {
-            background: #8B1E1E;
-            width: 22px;
-            border-radius: 3px;
-        }
-
-        /* ── Empty state ── */
-        .rs-empty {
-            text-align: center;
-            padding: 3rem 2rem;
-            color: #aaa;
-            width: 100%;
-        }
-
-        .rs-empty i { font-size: 2.5rem; opacity: 0.25; display: block; margin-bottom: 0.75rem; }
-
-        /* ── Write-review inline CTA card ── */
-        .rs-cta-card {
-            background: linear-gradient(135deg, #8B1E1E 0%, #6d1515 100%);
-            border-radius: 20px;
-            padding: 1.4rem 1.5rem;
-            min-width: 240px;
-            max-width: 260px;
-            flex-shrink: 0;
-            scroll-snap-align: start;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 1rem;
-            color: white;
-            position: relative;
+        .hero-content p {
+            font-size: clamp(0.8rem, 2.2vw, 1.3rem);
+            margin-bottom: 1.4rem;
+            opacity: 0.95;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
             overflow: hidden;
         }
 
-        .rs-cta-card::before {
-            content: '';
-            position: absolute;
-            top: -40px; right: -40px;
-            width: 140px; height: 140px;
-            background: radial-gradient(circle, rgba(255,215,0,0.18), transparent 65%);
-            pointer-events: none;
-        }
-
-        .rs-cta-card h4 {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: white;
-            line-height: 1.3;
-            margin: 0;
-        }
-
-        .rs-cta-card p {
-            color: rgba(255,255,255,0.65);
-            font-size: 0.8rem;
-            line-height: 1.5;
-            margin: 0;
-        }
-
-        .rs-cta-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.45rem;
-            padding: 0.6rem 1.3rem;
-            background: #FFD700;
-            color: #4a0e0e;
+        .hero-content .btn {
+            padding: clamp(0.5rem, 2vw, 1rem) clamp(1rem, 4vw, 2.5rem);
+            font-size: clamp(0.8rem, 2vw, 1.1rem);
             border-radius: 50px;
-            font-size: 0.8rem;
-            font-weight: 700;
+            background: var(--gold);
+            color: var(--dark);
+            border: none;
+            font-weight: 600;
             text-decoration: none;
-            transition: all 0.25s ease;
+            display: inline-block;
+            transition: all 0.3s;
+            box-shadow: 0 6px 15px -3px rgba(0,0,0,0.3);
+            white-space: nowrap;
         }
 
-        .rs-cta-btn:hover {
-            background: white;
-            color: #8B1E1E;
-            transform: translateY(-2px);
-        }
+        .hero-content .btn:hover { transform: translateY(-3px); background: #c49b2c; }
 
-        @media (max-width: 768px) {
-            .rs-arrow { display: none; }
-            .rs-card  { min-width: 260px; }
-            .reviews-strip { padding: 3rem 0 3.5rem; }
-            .reviews-strip-inner { padding: 0 1.25rem; }
-            .rs-header { margin-bottom: 1.75rem; }
-        }
-
-        @media (max-width: 576px) {
-            .reviews-strip-inner { padding: 0 1rem; }
-            .rs-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
-            .rs-all-btn { padding: 0.5rem 1.1rem; font-size: 0.78rem; }
-        }
-
+        /* Hide slider arrows on very small screens */
         @media (max-width: 480px) {
-            .rs-card, .rs-cta-card { min-width: 85vw; max-width: 85vw; }
+            .swiper-button-next, .swiper-button-prev { display: none; }
         }
 
-        /* Curved box styles */
-        .curved-box {
-            border-radius: 30px 30px 30px 5px;
-            background: white;
-            padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
+        .swiper-pagination-bullet { width: 10px; height: 10px; background: white; opacity: 0.5; }
+        .swiper-pagination-bullet-active { opacity: 1; background: var(--gold); }
+
+        .swiper-button-next, .swiper-button-prev {
+            color: white;
+            background: rgba(20,65,71,0.5);
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .swiper-button-next:hover, .swiper-button-prev:hover { background: var(--gold); color: var(--dark); }
+        .swiper-button-next::after, .swiper-button-prev::after { font-size: 1rem; }
+
+        /* ─── Stats grid ─────────────────────────────────────── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+
+        @media (max-width: 768px) { .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; } }
+        @media (max-width: 360px) { .stats-grid { grid-template-columns: 1fr; } }
+
+        .stat-card {
+            background: var(--dark);
+            border-radius: 20px;
+            padding: clamp(1.2rem, 4vw, 2rem);
+            text-align: center;
+            color: white;
+            box-shadow: 0 10px 0 var(--dark-shadow);
+            transform: translateY(-4px);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover { transform: translateY(-8px); box-shadow: 0 14px 0 var(--dark-shadow); }
+        .stat-card i { font-size: clamp(1.6rem, 4vw, 2.2rem); margin-bottom: 0.75rem; display: block; color: var(--gold); }
+        .stat-card h3 { font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 800; margin-bottom: 0.35rem; }
+        .stat-card p  { font-size: clamp(0.8rem, 2vw, 1rem); opacity: 0.8; margin: 0; }
+
+        /* ─── Step cards ─────────────────────────────────────── */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 480px) { .steps-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; } }
+        @media (max-width: 320px) { .steps-grid { grid-template-columns: 1fr; } }
+
+        .step-card {
             position: relative;
-            overflow: hidden;
+            background: var(--dark);
+            border-radius: 18px;
+            padding: clamp(1.2rem, 4vw, 2rem) clamp(1rem, 3vw, 1.5rem);
+            text-align: center;
+            color: white;
+            box-shadow: 0 12px 0 var(--dark-shadow);
+            transform: translateY(-4px);
+            transition: all 0.3s;
         }
 
-        .curved-box:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(139, 30, 30, 0.1);
+        .step-card:hover { transform: translateY(-8px); }
+
+        .step-card .step-number {
+            position: absolute; top: -13px; left: 18px;
+            background: var(--gold); color: var(--dark);
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 1rem;
         }
 
-        .curved-box::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, #8B1E1E, #FFD700);
-        }
-
-        .curved-box-title {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: #8B1E1E;
-        }
-
-        @media (max-width: 576px) {
-            .curved-box { padding: 1.25rem; border-radius: 22px 22px 22px 4px; }
-            .curved-box-title { font-size: 1.2rem; }
-        }
-
-        /* Image frame styles */
-        .image-frame {
-            border-radius: 5%;
-            overflow: hidden;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .image-frame:hover {
-            transform: scale(1.02);
-            box-shadow: 0 20px 40px rgba(139, 30, 30, 0.2);
-        }
-
-        .image-frame img,
-        .image-frame video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        /* Video wrapper */
-        .video-wrapper {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            border-radius: 5%;
-        }
-
-        .video-wrapper video {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* ===== GALLERY CARD STYLES ===== */
-        /* Catering Gallery */
-        .ct-gallery-card {
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .ct-gallery-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 16px 40px rgba(139, 30, 30, 0.2) !important;
-        }
-
-        .ct-gallery-img-wrap {
-            width: 100%;
-            height: 280px;
-            overflow: hidden;
+        .step-card .step-icon {
+            width: 60px; height: 60px;
             border-radius: 16px;
-            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1rem;
+            background: rgba(212,175,55,0.15);
+            transition: all 0.3s;
         }
 
-        .ct-gallery-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.4s ease;
-            display: block;
+        .step-card:hover .step-icon { background: rgba(212,175,55,0.25); }
+        .step-card .step-icon i { font-size: 1.7rem; color: var(--gold); }
+        .step-card h4 { font-size: clamp(0.95rem, 2.5vw, 1.15rem); font-weight: 700; margin-bottom: 0.4rem; }
+        .step-card p  { font-size: 0.82rem; opacity: 0.8; margin: 0; }
+
+        /* ─── Services grid ──────────────────────────────────── */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
         }
 
-        .ct-gallery-card:hover .ct-gallery-img {
-            transform: scale(1.08);
+        @media (max-width: 992px) { .services-grid { grid-template-columns: repeat(2, 1fr); gap: 1.25rem; } }
+        @media (max-width: 576px) { .services-grid { grid-template-columns: 1fr; gap: 1rem; } }
+
+        .service-card {
+            background: var(--dark);
+            border-radius: 22px;
+            padding: clamp(1.5rem, 4vw, 2rem) clamp(1.2rem, 3vw, 1.8rem);
+            color: white;
+            box-shadow: 0 12px 0 var(--dark-shadow);
+            transform: translateY(-4px);
+            transition: all 0.3s;
         }
 
-        .ct-gallery-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-            padding: 2rem 1.5rem 1.5rem;
-            transform: translateY(0);
-            transition: transform 0.3s ease;
-            height: 100%;
-            width: 100%;
-            display: flex;
-            align-items: flex-end;
+        .service-card:hover { transform: translateY(-8px); box-shadow: 0 18px 0 var(--dark-shadow); }
+
+        .service-card .service-icon {
+            width: 64px; height: 64px;
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 1.25rem;
+            background: rgba(212,175,55,0.15);
+            transition: all 0.3s;
         }
 
-        .ct-gallery-zoom-icon {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transform: scale(0.8);
-            transition: all 0.3s ease;
-            z-index: 5;
+        .service-card:hover .service-icon { background: rgba(212,175,55,0.25); }
+        .service-card .service-icon i { font-size: 1.8rem; color: var(--gold); }
+        .service-card h3 { font-size: clamp(1.1rem, 2.5vw, 1.35rem); font-weight: 700; margin-bottom: 0.6rem; }
+        .service-card p  { font-size: 0.87rem; line-height: 1.5; margin-bottom: 1.1rem; opacity: 0.82; }
+
+        .service-card .service-link {
+            display: inline-flex; align-items: center; gap: 0.45rem;
+            color: var(--gold); font-weight: 600; font-size: 0.83rem;
+            text-decoration: none;
+            background: rgba(212,175,55,0.1);
+            padding: 0.45rem 0.9rem;
+            border-radius: 60px;
+            transition: all 0.2s;
         }
 
-        .ct-gallery-card:hover .ct-gallery-zoom-icon {
-            opacity: 1;
-            transform: scale(1);
+        .service-card .service-link:hover { background: rgba(212,175,55,0.22); gap: 0.65rem; }
+        .service-card .service-link i { transition: transform 0.2s; font-size: 0.72rem; }
+        .service-card .service-link:hover i { transform: translateX(4px); }
+
+        /* ─── Testimonials ───────────────────────────────────── */
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
         }
 
-        /* EFFOI Gallery */
-        .effoi-gallery-card {
-            cursor: pointer;
-            transition: all 0.3s ease;
-            scroll-snap-align: start;
+        @media (max-width: 768px) { .testimonials-grid { grid-template-columns: 1fr; gap: 1rem; } }
+
+        .testimonial-card {
+            background: white;
+            border-radius: 22px;
+            padding: clamp(1.25rem, 4vw, 2rem);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.07);
+            border: 1px solid rgba(20,65,71,0.08);
+            transition: all 0.3s;
+        }
+
+        .testimonial-card:hover { transform: translateY(-4px); box-shadow: 0 16px 36px rgba(0,0,0,0.11); }
+        .testimonial-card i.fa-quote-left { font-size: 1.8rem; color: var(--gold); opacity: 0.4; }
+        .testimonial-card p { font-style: italic; margin: 0.9rem 0; color: #4a5568; font-size: 0.92rem; }
+
+        .testimonial-card .avatar {
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            background: var(--dark); color: var(--gold);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1.1rem;
             flex-shrink: 0;
         }
 
-        .effoi-gallery-card:hover {
-            transform: scale(1.05);
+        /* ─── Section helpers ────────────────────────────────── */
+        .section-badge {
+            background: rgba(212,175,55,0.15);
+            padding: 0.28rem 1.1rem;
+            border-radius: 60px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gold);
+            letter-spacing: 1px;
+            display: inline-block;
         }
 
-        .effoi-gallery-inner {
-            width: 300px;
-            height: 300px;
-            overflow: hidden;
-            border-radius: 16px;
-            position: relative;
-            background: #f0f0f0;
+        .section-title {
+            font-size: clamp(1.6rem, 4vw, 2.2rem);
+            font-weight: 800;
+            margin-top: 0.75rem;
+            color: var(--dark);
         }
 
-        .effoi-gallery-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.4s ease;
-            display: block;
+        .section-subtitle { color: #4a5568; max-width: 520px; margin: 0.5rem auto 0; font-size: 0.97rem; }
+
+        /* ─── Welcome card ───────────────────────────────────── */
+        .welcome-card {
+            background: white;
+            border-radius: clamp(24px, 5vw, 50px);
+            padding: clamp(1.5rem, 5vw, 3rem);
+            box-shadow: 0 16px 40px -12px rgba(20,65,71,0.1);
+            border: 1px solid rgba(20,65,71,0.06);
         }
 
-        .effoi-gallery-card:hover .effoi-gallery-img {
-            transform: scale(1.1);
+        /* ─── Footer ─────────────────────────────────────────── */
+        .footer {
+            background: linear-gradient(135deg, #0a1a2b, #1a2c3e);
+            color: #e2e8f0;
+            padding: clamp(2rem, 5vw, 3rem) 0 1.5rem;
+            margin-top: 3rem;
         }
 
-        .effoi-gallery-caption {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
-            padding: 1.5rem 1rem 1rem;
-            transform: translateY(0);
-            transition: transform 0.3s ease;
+        .footer h5 {
+            color: var(--gold); font-weight: 700;
+            margin-bottom: 1.25rem;
+            position: relative; padding-bottom: 0.5rem;
         }
 
-        .effoi-gallery-zoom {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transform: scale(0.8);
-            transition: all 0.3s ease;
-            z-index: 5;
-            color: #333;
+        .footer h5::after {
+            content: ''; position: absolute;
+            bottom: 0; left: 0;
+            width: 40px; height: 3px;
+            background: var(--gold);
         }
 
-        .effoi-gallery-card:hover .effoi-gallery-zoom {
-            opacity: 1;
-            transform: scale(1);
+        .footer-links { list-style: none; padding: 0; }
+        .footer-links li { margin-bottom: 0.65rem; }
+        .footer-links a { color: #94a3b8; text-decoration: none; transition: all 0.2s; display: inline-block; font-size: 0.9rem; }
+        .footer-links a:hover { color: var(--gold); padding-left: 4px; }
+        .footer-links i { color: var(--gold); width: 18px; margin-right: 0.4rem; }
+
+        .copyright {
+            text-align: center;
+            padding-top: 1.75rem; margin-top: 1.75rem;
+            border-top: 1px solid #334155;
+            color: #94a3b8; font-size: 0.85rem;
         }
 
-        /* ---------- Responsive: Galleries / Frames ---------- */
-        @media (max-width: 768px) {
-            .ct-gallery-img-wrap { height: 220px; }
-            .effoi-gallery-inner { width: 240px; height: 240px; }
+        .social-links { margin-top: 1.25rem; }
+
+        .social-links a {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 38px; height: 38px;
+            background: rgba(255,255,255,0.1);
+            color: white; border-radius: 50%;
+            margin-right: 0.4rem;
+            font-size: 0.9rem;
+            transition: all 0.2s;
         }
 
-        @media (max-width: 480px) {
-            .ct-gallery-img-wrap { height: 190px; }
-            .ct-gallery-overlay { padding: 1.5rem 1rem 1rem; }
-            .effoi-gallery-inner { width: 200px; height: 200px; }
-            .effoi-gallery-caption { padding: 1.1rem 0.75rem 0.75rem; }
+        .social-links a:hover { background: var(--gold); color: var(--dark); transform: translateY(-3px); }
+
+        /* ─── Main content padding ───────────────────────────── */
+        .main-content {
+            min-height: 60vh;
+            padding: 1.5rem 0;
         }
 
-        /* Touch devices: gallery zoom icons / overlays always visible since :hover is unreliable */
-        @media (hover: none) {
-            .ct-gallery-zoom-icon,
-            .effoi-gallery-zoom {
-                opacity: 1;
-                transform: scale(1);
-            }
+        /* ─── Generic mobile fix: prevent overflow ───────────── */
+        @media (max-width: 575px) {
+            .container { padding-left: 1rem; padding-right: 1rem; }
         }
     </style>
-
-    <style>
-    .fw-black { fw-weight: 900; }
-    .fw-extrabold { fw-weight: 800; }
-    .bg-warning-subtle { background-color: rgba(255, 193, 7, 0.12) !important; }
-    .bg-warning-light { background-color: rgba(255, 193, 7, 0.15) !important; }
-    .transition-all { transition: all 0.25s ease-in-out; }
-    .hover-lift:hover { transform: translateY(-5px); box-shadow: 0 1rem 3rem rgba(0,0,0,0.1) !important; }
-    .hover-bg-light:hover { background-color: #f8f9fa; }
-    .fw-extrabold { font-weight: 800; }
-    .bg-warning-subtle { background-color: rgba(255, 193, 7, 0.12) !important; }
-    .transition-all { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-    .duration-500 { transition-duration: 500ms; }
-    .backdrop-blur { backdrop-filter: blur(6px); background-color: rgba(33, 37, 41, 0.6) !important; }
-    .cursor-pointer { cursor: pointer; }
-    .italic-quote { font-style: italic; font-weight: 400; }
-    
-    /* Smart Visual Micro-Interactions */
-    .hover-lift:hover { 
-        transform: translateY(-6px); 
-        box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.075) !important; 
-    }
-    .hover-shadow:hover {
-        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.04) !important;
-    }
-    .hover-zoom-container {
-        outline: 0px solid rgba(255, 193, 7, 0);
-    }
-    .hover-zoom-container:hover img {
-        transform: scale(1.06);
-    }
-    .hover-zoom-container img {
-        transition: transform 0.4s ease;
-    }
-    .card:hover .hover-zoom {
-        transform: scale(1.04);
-    }
-    </style>
-    
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Top Bar -->
-    <div class="top-bar">
-        <div class="header-container">
-            <div class="top-bar-left">
-                <a href="tel:{{ settings.get('phone', '+12406601337') }}">
-                    <i class="fas fa-phone"></i>{{ settings.get('phone', '+1 (240) 660-1337') }}
-                </a>
-                <span class="tb-divider"></span>
-                <a href="mailto:{{ settings.get('email', 'nigistme1277@gmail.com') }}">
-                    <i class="fas fa-envelope"></i>{{ settings.get('email', 'nigistme1277@gmail.com') }}
-                </a>
-                <span class="tb-divider"></span>
 
-                <!-- Blocked Times Badge -->
-                <div class="blocked-times-badge" id="blockedTimesBadge" style="position:relative;">
-                    <span class="badge-dot"></span>
-                    <span id="blockedCount">0</span> Blocked Slots
-                    <i class="fas fa-chevron-down" style="font-size:0.65rem; margin-left:2px;"></i>
-
-                    <!-- Blocked Times Popup -->
-                    <div class="blocked-times-popup" id="blockedTimesPopup">
-                        <h6><i class="fas fa-calendar-xmark me-2"></i>Unavailable Times</h6>
-                        <div id="blockedTimesList">
-                            <div class="text-center text-muted py-3" style="font-size:0.85rem;">
-                                <i class="fas fa-spinner fa-spin me-2"></i>Loading…
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="top-bar-right">
-                <!-- Smart Working Hours Badge -->
-                <div class="hours-badge" id="hoursBadge" style="position:relative;">
-                    <span class="hours-status-dot" id="hoursStatusDot"></span>
-                    <span id="hoursStatusText">Loading…</span>
-                    <i class="fas fa-chevron-down" style="font-size:0.65rem; margin-left:2px;"></i>
-
-                    <!-- Hours Popup -->
-                    <div class="hours-popup" id="hoursPopup">
-                        <h6><i class="fas fa-clock me-2"></i>Working Hours</h6>
-                        <div id="hoursPopupList"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Header -->
-    <div class="main-header" id="mainHeader">
-        <div class="header-container">
-
-            <!-- Logo -->
-            <a href="{{ url_for('index') }}" class="logo-area" style="text-decoration:none;">
-                <img src="{{ settings.get('logo_url', 'https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Effoi_Logo.png') }}"
-                     alt="{{ settings.get('restaurant_name', 'EFFOI') }}"
-                     class="logo"
-                     onerror="this.onerror=null; this.src='https://via.placeholder.com/62x62/8B1E1E/ffffff?text=EFFOI';">
-                <div class="logo-text">
-                    {{ settings.get('logo_text', 'EFFOI RESTAURANT') }}
-                    <span class="bar-text">& Bar</span>
-                </div>
-            </a>
-
-            <!-- Hamburger (mobile) -->
-            <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation">
-                <i class="fas fa-bars"></i>
-            </button>
-
-            <!-- Nav -->
-            <nav class="main-nav" id="mainNav" role="navigation">
-                <a href="{{ url_for('index') }}"   class="{% if request.endpoint == 'index'  %}active{% endif %}"><i class="fas fa-house"      style="font-size:.75rem;opacity:.6;"></i> Home</a>
-                <a href="{{ url_for('menu') }}"    class="{% if request.endpoint == 'menu'   %}active{% endif %}"><i class="fas fa-utensils"   style="font-size:.75rem;opacity:.6;"></i> Menu</a>
-                <a href="{{ url_for('events') }}"  class="{% if request.endpoint == 'events' %}active{% endif %}"><i class="fas fa-music"      style="font-size:.75rem;opacity:.6;"></i> Events</a>
-                <a href="{{ url_for('about') }}"   class="{% if request.endpoint == 'about'  %}active{% endif %}"><i class="fas fa-users"      style="font-size:.75rem;opacity:.6;"></i> About</a>
-                <a href="{{ url_for('blog') }}"    class="{% if request.endpoint == 'blog'   %}active{% endif %}"><i class="fas fa-pen-nib"    style="font-size:.75rem;opacity:.6;"></i> Blog</a>
-                <a href="{{ url_for('contact') }}" class="{% if request.endpoint == 'contact'%}active{% endif %}"><i class="fas fa-envelope"   style="font-size:.75rem;opacity:.6;"></i> Contact</a>
-                <a href="{{ url_for('reserve') }}" class="reserve-btn">
-                    <i class="fas fa-calendar-check"></i>Reserve a Table
-                </a>
-            </nav>
-        </div>
-    </div>
-
-    <div class="page-wrapper">
-        <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <!-- Main Content - This is where child templates will inject content -->
-        {% block content %}{% endblock %}
-    </div>
-
-    <!-- ===== REVIEWS STRIP (above footer) ===== -->
-    <section class="reviews-strip" aria-label="Guest reviews">
-        <div class="reviews-strip-inner">
-
-            <!-- Header -->
-            <div class="rs-header" data-aos="fade-up">
-                <div class="rs-header-left">
-                    <div class="rs-eyebrow">
-                        <span></span> Guest Reviews
-                    </div>
-                    <h2 class="rs-title">What Our <em>Guests</em> Say</h2>
-                </div>
-                <a href="{{ url_for('reviews') }}" class="rs-all-btn">
-                    All Reviews <i class="fas fa-arrow-right" style="font-size:.75rem;"></i>
-                </a>
-            </div>
-
-            <!-- Scrollable track -->
-            <div class="rs-track-wrap" data-aos="fade-up" data-aos-delay="80">
-
-                <button class="rs-arrow rs-arrow-left" id="rsArrowLeft" aria-label="Scroll left">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-
-                <div class="rs-track" id="rsTrack">
-
-                    {% for review in recent_reviews %}
-                    <div class="rs-card">
-                        <div class="rs-quote-bg" aria-hidden="true">"</div>
-
-                        <!-- Stars -->
-                        <div class="rs-stars" aria-label="{{ review.rating }} out of 5 stars">
-                            {% for i in range(5) %}
-                                <i class="fas fa-star{% if i >= review.rating %} off{% endif %}"></i>
-                            {% endfor %}
-                        </div>
-
-                        <!-- Comment -->
-                        <p class="rs-comment">
-                            "{{ review.comment[:110] }}{% if review.comment|length > 110 %}…{% endif %}"
-                        </p>
-
-                        <!-- Author -->
-                        <div class="rs-author-row">
-                            <div class="rs-avatar" aria-hidden="true">
-                                {{ review.customer_name[0]|upper }}
-                            </div>
-                            <div>
-                                <div class="rs-author-name">{{ review.customer_name }}</div>
-                                <div class="rs-author-date">{{ review.created_at.strftime('%b %d, %Y') }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    {% else %}
-                    <div class="rs-empty">
-                        <i class="far fa-comment-dots"></i>
-                        <p>No reviews yet — be the first!</p>
-                    </div>
-                    {% endfor %}
-
-                    <!-- CTA card always at the end -->
-                    <div class="rs-cta-card">
-                        <div>
-                            <h4>Enjoyed Your Visit?</h4>
-                            <p>Share your experience and help others discover EFFOI.</p>
-                        </div>
-                        <a href="{{ url_for('reviews') }}" class="rs-cta-btn">
-                            <i class="fas fa-pen-nib"></i> Write a Review
-                        </a>
-                    </div>
-
-                </div><!-- /rs-track -->
-
-                <button class="rs-arrow rs-arrow-right" id="rsArrowRight" aria-label="Scroll right">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-
-            </div><!-- /rs-track-wrap -->
-
-            <!-- Scroll dots -->
-            <div class="rs-dots" id="rsDots" aria-hidden="true"></div>
-
-        </div>
-    </section>
-
-    <!-- Footer - FAQ KEPT HERE in Quick Links -->
-    <footer class="ef-footer" role="contentinfo">
-
-        <!-- Top accent bar -->
-        <div class="ef-footer-accent" aria-hidden="true"></div>
-
-        <div class="ef-footer-container">
-
-            <!-- ── Main grid ── -->
-            <div class="ef-footer-grid">
-
-                <!-- Col 1: Brand -->
-                <div class="ef-footer-col ef-footer-brand">
-                    <a href="{{ url_for('index') }}" class="ef-brand-logo-link" aria-label="EFFOI home">
-                        <img
-                            src="{{ settings.get('logo_url', 'https://raw.githubusercontent.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/main/Effoi_logo3.png') }}"
-                            alt="{{ settings.get('restaurant_name', 'EFFOI') }} logo"
-                            class="ef-brand-logo"
-                            onerror="this.onerror=null;this.src='https://via.placeholder.com/56x56/8B1E1E/ffffff?text=E';"
-                        >
-                        <span class="ef-brand-name">{{ settings.get('logo_text', 'EFFOI') }}</span>
-                    </a>
-                    <p class="ef-brand-tagline">
-                        {{ settings.get('footer_text', 'Experience the taste of Ethiopia — authentic cuisine, warm hospitality, and unforgettable moments in Silver Spring, MD.') }}
-                    </p>
-                    <div class="ef-socials">
-                        <a href="{{ settings.get('facebook_url', '#') }}"  target="_blank" rel="noopener" aria-label="Facebook"  class="ef-social-btn"><i class="fab fa-facebook-f"></i></a>
-                        <a href="{{ settings.get('instagram_url', '#') }}" target="_blank" rel="noopener" aria-label="Instagram" class="ef-social-btn"><i class="fab fa-instagram"></i></a>
-                        <a href="{{ settings.get('twitter_url', '#') }}"   target="_blank" rel="noopener" aria-label="X / Twitter" class="ef-social-btn"><i class="fab fa-x-twitter"></i></a>
-                        <a href="{{ settings.get('yelp_url', '#') }}"      target="_blank" rel="noopener" aria-label="Yelp"      class="ef-social-btn"><i class="fab fa-yelp"></i></a>
-                    </div>
-                </div>
-
-                <!-- Col 2: Quick links -->
-                <div class="ef-footer-col">
-                    <h3 class="ef-col-heading">Explore</h3>
-                    <ul class="ef-link-list">
-                        <li><a href="{{ url_for('menu') }}"><i class="fas fa-utensils" aria-hidden="true"></i>Our Menu</a></li>
-                        <li><a href="{{ url_for('events') }}"><i class="fas fa-music" aria-hidden="true"></i>Events</a></li>
-                        <li><a href="{{ url_for('blog') }}"><i class="fas fa-pen-nib" aria-hidden="true"></i>Blog</a></li>
-                        <li><a href="{{ url_for('about') }}"><i class="fas fa-users" aria-hidden="true"></i>About Us</a></li>
-                        <li><a href="{{ url_for('policy') }}"><i class="fas fa-file-lines" aria-hidden="true"></i>Policies</a></li>
-                        <li><a href="{{ url_for('faq') }}"><i class="fas fa-circle-question" aria-hidden="true"></i>FAQ</a></li>
-                        <li><a href="{{ url_for('contact') }}"><i class="fas fa-envelope" aria-hidden="true"></i>Contact</a></li>
-                    </ul>
-                </div>
-
-                <!-- Col 3: Contact -->
-                <div class="ef-footer-col">
-                    <h3 class="ef-col-heading">Find Us</h3>
-                    <ul class="ef-contact-list">
-                        <li>
-                            <span class="ef-contact-icon" style="color:#4285F4;" aria-hidden="true"><i class="fas fa-map-marker-alt"></i></span>
-                            <a href="https://maps.google.com/?q={{ settings.get('address', '8233 Fenton St, Silver Spring, MD 20910')|urlencode }}" target="_blank" rel="noopener">
-                                {{ settings.get('address', '8233 Fenton St, Silver Spring, MD 20910') }}
-                            </a>
-                        </li>
-                        <li>
-                            <span class="ef-contact-icon" aria-hidden="true"><i class="fas fa-phone"></i></span>
-                            <a href="tel:{{ settings.get('phone', '+12406601337') }}">{{ settings.get('phone', '+1 (240) 660-1337') }}</a>
-                        </li>
-                        <li>
-                            <span class="ef-contact-icon" aria-hidden="true"><i class="fas fa-envelope"></i></span>
-                            <a href="mailto:{{ settings.get('email', 'nigistme1277@gmail.com') }}">{{ settings.get('email', 'nigistme1277@gmail.com') }}</a>
-                        </li>
-                    </ul>
-
-                    <!-- Reserve CTA -->
-                    <a href="{{ url_for('reserve') }}" class="ef-reserve-btn">
-                        <i class="fas fa-calendar-check" aria-hidden="true"></i> Reserve a table
-                    </a>
-                </div>
-
-                <!-- Col 4: Hours -->
-                <div class="ef-footer-col">
-                    <h3 class="ef-col-heading">Working Hours</h3>
-                    <ul class="ef-hours-list">
-                        {% set detailed_hours = settings.get('hours_detailed', 'Monday–Tuesday:10AM–2AM,Wednesday:Closed,Thursday:10AM–2AM,Friday–Saturday:10AM–3AM,Sunday:10AM–2AM') %}
-                        {% for hour in detailed_hours.split(',') %}
-                            {% set parts = hour.split(':') %}
-                            <li>
-                                <span class="ef-hours-day">{{ parts[0] }}</span>
-                                <span class="ef-hours-time">{{ parts[1:] | join(':') }}</span>
-                            </li>
-                        {% endfor %}
-                    </ul>
-
-                    <!-- Google Maps mini embed -->
-                    <div class="ef-map-wrap">
-                        <a href="https://maps.google.com/?q={{ settings.get('address', '8233 Fenton St, Silver Spring, MD 20910')|urlencode }}"
-                           target="_blank" rel="noopener" class="ef-map-link" aria-label="Open in Google Maps">
-                            <i class="fas fa-map-location-dot" aria-hidden="true"></i>
-                            Get directions
-                            <i class="fas fa-arrow-up-right-from-square" style="font-size:.7rem;" aria-hidden="true"></i>
-                        </a>
-                    </div>
-                </div>
-
-            </div>{# /ef-footer-grid #}
-
-            <!-- ── Divider ── -->
-            <div class="ef-footer-divider" aria-hidden="true"></div>
-
-            <!-- ── Bottom bar ── -->
-            <div class="ef-footer-bottom">
-                <p class="ef-copyright">
-                    {{ settings.get('copyright_text', '© 2026 EFFOI Restaurant &amp; Bar. All rights reserved.') }}
-                </p>
-
-                <div class="ef-footer-bottom-center">
-                    <span class="ef-dev-badge">
-                        <i class="fas fa-code" aria-hidden="true"></i>
-                        Developed by
-                        <a href="http://www.amonlines.com/" target="_blank" rel="noopener">Afro-Merica</a>
-                        &nbsp;·&nbsp;
-                        <a href="mailto:info@amonlines.com">info@amonlines.com</a>
-                    </span>
-                </div>
-
-                <div class="ef-footer-bottom-links">
-                    <a href="{{ url_for('policy') }}">Privacy policy</a>
-                    <span class="ef-dot" aria-hidden="true">·</span>
-                    <a href="{{ url_for('faq') }}">FAQ</a>
-                    <span class="ef-dot" aria-hidden="true">·</span>
-                    <a href="{{ url_for('contact') }}">Contact</a>
-                </div>
-            </div>
-
-        </div>{# /ef-footer-container #}
-    </footer>
-
-    <style>
-    /* ===== EFFOI FOOTER ===== */
-    .ef-footer {
-        background: {{ settings.get('footer_bg_color', '#111820') }};
-        color: rgba(255,255,255,0.75);
-        font-family: 'Inter', sans-serif;
-        font-size: 0.88rem;
-        line-height: 1.7;
-        margin-top: 5rem;
-        position: relative;
-    }
-
-    /* Gold accent line across the top */
-    .ef-footer-accent {
-        height: 3px;
-        background: linear-gradient(90deg, #8B1E1E 0%, #FFD700 50%, #8B1E1E 100%);
-    }
-
-    .ef-footer-container {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 3.5rem 2rem 2rem;
-    }
-
-    /* ── Grid ── */
-    .ef-footer-grid {
-        display: grid;
-        grid-template-columns: 1.6fr 1fr 1.1fr 1fr;
-        gap: 2.5rem;
-        margin-bottom: 2.5rem;
-    }
-
-    /* ── Brand col ── */
-    .ef-brand-logo-link {
-        display: flex;
-        align-items: center;
-        gap: 0.7rem;
-        text-decoration: none;
-        margin-bottom: 1rem;
-    }
-
-    .ef-brand-logo {
-        height: 52px;
-        width: auto;
-        filter: brightness(1.05);
-        transition: transform 0.3s ease;
-    }
-
-    .ef-brand-logo-link:hover .ef-brand-logo { transform: scale(1.04) rotate(-1deg); }
-
-    .ef-brand-name {
-        font-family: 'Playfair Display', serif;
-        font-size: 1.35rem;
-        font-weight: 700;
-        color: #fff;
-        letter-spacing: 0.02em;
-    }
-
-    .ef-brand-tagline {
-        color: rgba(255,255,255,0.55);
-        font-size: 0.84rem;
-        line-height: 1.7;
-        margin-bottom: 1.25rem;
-        max-width: 280px;
-    }
-
-    /* Social icons */
-    .ef-socials { display: flex; gap: 0.6rem; }
-
-    .ef-social-btn {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        border: 1px solid rgba(255,255,255,0.12);
-        background: rgba(255,255,255,0.05);
-        color: rgba(255,255,255,0.7);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.88rem;
-        text-decoration: none;
-        transition: all 0.2s ease;
-    }
-
-    .ef-social-btn:hover {
-        background: #8B1E1E;
-        border-color: #8B1E1E;
-        color: #fff;
-        transform: translateY(-2px);
-    }
-
-    /* ── Column headings ── */
-    .ef-col-heading {
-        font-family: 'Playfair Display', serif;
-        font-size: 1rem;
-        font-weight: 600;
-        color: #fff;
-        margin-bottom: 1.1rem;
-        padding-bottom: 0.6rem;
-        position: relative;
-    }
-
-    .ef-col-heading::after {
-        content: '';
-        position: absolute;
-        bottom: 0; left: 0;
-        width: 30px; height: 2px;
-        background: #FFD700;
-        border-radius: 2px;
-    }
-
-    /* ── Link list ── */
-    .ef-link-list {
-        list-style: none;
-        padding: 0; margin: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .ef-link-list a {
-        display: flex;
-        align-items: center;
-        gap: 0.55rem;
-        color: rgba(255,255,255,0.65);
-        text-decoration: none;
-        font-size: 0.86rem;
-        transition: color 0.2s ease, gap 0.2s ease;
-    }
-
-    .ef-link-list a i {
-        font-size: 0.75rem;
-        width: 14px;
-        color: #FFD700;
-        flex-shrink: 0;
-    }
-
-    .ef-link-list a:hover {
-        color: #fff;
-        gap: 0.75rem;
-    }
-
-    /* ── Contact list ── */
-    .ef-contact-list {
-        list-style: none;
-        padding: 0; margin: 0 0 1.25rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.7rem;
-    }
-
-    .ef-contact-list li {
-        display: flex;
-        align-items: flex-start;
-        gap: 0.6rem;
-        font-size: 0.85rem;
-        color: rgba(255,255,255,0.65);
-    }
-
-    .ef-contact-icon {
-        color: #FFD700;
-        font-size: 0.8rem;
-        width: 16px;
-        flex-shrink: 0;
-        margin-top: 3px;
-    }
-
-    .ef-contact-list a {
-        color: rgba(255,255,255,0.65);
-        text-decoration: none;
-        transition: color 0.2s ease;
-    }
-
-    .ef-contact-list a:hover { color: #FFD700; }
-
-    /* Reserve CTA button in footer */
-    .ef-reserve-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.55rem 1.2rem;
-        background: #8B1E1E;
-        color: #fff;
-        border-radius: 50px;
-        font-size: 0.83rem;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.25s ease;
-        border: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .ef-reserve-btn:hover {
-        background: #a82525;
-        color: #fff;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(139,30,30,0.4);
-    }
-
-    /* ── Hours list ── */
-    .ef-hours-list {
-        list-style: none;
-        padding: 0; margin: 0 0 1.25rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.45rem;
-    }
-
-    .ef-hours-list li {
-        display: flex;
-        justify-content: space-between;
-        font-size: 0.83rem;
-        padding: 0.3rem 0;
-        border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-
-    .ef-hours-day { color: rgba(255,255,255,0.6); }
-    .ef-hours-time { color: #FFD700; font-weight: 500; }
-
-    /* Directions link */
-    .ef-map-wrap { margin-top: 0.5rem; }
-
-    .ef-map-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.45rem;
-        font-size: 0.82rem;
-        color: rgba(255,255,255,0.55);
-        text-decoration: none;
-        transition: color 0.2s ease;
-    }
-
-    .ef-map-link i { color: #4285F4; font-size: 0.9rem; }
-    .ef-map-link:hover { color: #fff; }
-
-    /* ── Divider ── */
-    .ef-footer-divider {
-        height: 1px;
-        background: rgba(255,255,255,0.07);
-        margin-bottom: 1.5rem;
-    }
-
-    /* ── Bottom bar ── */
-    .ef-footer-bottom {
-        display: grid;
-        grid-template-columns: 1fr auto 1fr;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .ef-copyright {
-        font-size: 0.8rem;
-        color: rgba(255,255,255,0.35);
-        margin: 0;
-    }
-
-    .ef-footer-bottom-center {
-        text-align: center;
-    }
-
-    /* Developer badge */
-    .ef-dev-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-        font-size: 0.78rem;
-        color: rgba(255,255,255,0.35);
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.08);
-        padding: 0.3rem 0.85rem;
-        border-radius: 99px;
-        white-space: nowrap;
-    }
-
-    .ef-dev-badge i { color: #FFD700; font-size: 0.72rem; }
-
-    .ef-dev-badge a {
-        color: rgba(255,255,255,0.6);
-        text-decoration: none;
-        transition: color 0.2s ease;
-    }
-
-    .ef-dev-badge a:hover { color: #FFD700; }
-
-    .ef-footer-bottom-links {
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        gap: 0.6rem;
-    }
-
-    .ef-footer-bottom-links a {
-        font-size: 0.8rem;
-        color: rgba(255,255,255,0.35);
-        text-decoration: none;
-        transition: color 0.2s ease;
-    }
-
-    .ef-footer-bottom-links a:hover { color: rgba(255,255,255,0.8); }
-
-    .ef-dot { color: rgba(255,255,255,0.2); }
-
-    /* ── Responsive ── */
-    @media (max-width: 992px) {
-        .ef-footer-grid {
-            grid-template-columns: 1fr 1fr;
-            row-gap: 2.5rem;
-        }
-        .ef-footer-brand { grid-column: 1 / -1; }
-        .ef-brand-tagline { max-width: 420px; }
-    }
-
-    @media (max-width: 768px) {
-        .ef-footer-container { padding: 3rem 1.25rem 1.75rem; }
-        .ef-footer-grid {
-            grid-template-columns: 1fr;
-            gap: 2.25rem;
-        }
-        .ef-footer-brand { grid-column: auto; }
-        .ef-brand-tagline { max-width: 100%; }
-
-        .ef-footer-bottom {
-            grid-template-columns: 1fr;
-            gap: 1rem;
-            text-align: center;
-        }
-        .ef-footer-bottom-center { order: -1; }
-        .ef-footer-bottom-links { justify-content: center; flex-wrap: wrap; }
-        .ef-copyright { text-align: center; }
-    }
-
-    @media (max-width: 480px) {
-        .ef-footer-container { padding: 2.5rem 1rem 1.5rem; }
-        .ef-dev-badge { white-space: normal; text-align: center; justify-content: center; }
-        .ef-hours-list li { font-size: 0.8rem; }
-    }
-    </style>
-
-    <!-- Scripts -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    
-    <script>
-        AOS.init({ duration: 800, once: true });
-
-        /* ── Reviews strip scroll ── */
-        (function () {
-            const track      = document.getElementById('rsTrack');
-            const btnLeft    = document.getElementById('rsArrowLeft');
-            const btnRight   = document.getElementById('rsArrowRight');
-            const dotsWrap   = document.getElementById('rsDots');
-
-            if (!track) return;
-
-            const CARD_W = () => {
-                const c = track.querySelector('.rs-card, .rs-cta-card');
-                return c ? c.offsetWidth + 18 : 300; // card + gap
-            };
-
-            /* ── Build dots ── */
-            const cards = track.querySelectorAll('.rs-card, .rs-cta-card');
-            const visibleCount = () => Math.round(track.offsetWidth / CARD_W()) || 1;
-
-            function buildDots() {
-                if (!dotsWrap || cards.length === 0) return;
-                dotsWrap.innerHTML = '';
-                const pages = Math.ceil(cards.length / visibleCount());
-                for (let i = 0; i < pages; i++) {
-                    const d = document.createElement('button');
-                    d.className = 'rs-dot' + (i === 0 ? ' active' : '');
-                    d.addEventListener('click', () => scrollToPage(i));
-                    dotsWrap.appendChild(d);
-                }
-            }
-
-            function scrollToPage(page) {
-                track.scrollTo({ left: page * visibleCount() * CARD_W(), behavior: 'smooth' });
-            }
-
-            function updateDots() {
-                if (!dotsWrap) return;
-                const dots = dotsWrap.querySelectorAll('.rs-dot');
-                const page = Math.round(track.scrollLeft / (visibleCount() * CARD_W()));
-                dots.forEach((d, i) => d.classList.toggle('active', i === page));
-            }
-
-            buildDots();
-            track.addEventListener('scroll', updateDots, { passive: true });
-
-            btnLeft?.addEventListener('click',  () => track.scrollBy({ left: -CARD_W(), behavior: 'smooth' }));
-            btnRight?.addEventListener('click', () => track.scrollBy({ left:  CARD_W(), behavior: 'smooth' }));
-
-            /* Auto-scroll every 4 s */
-            let autoTimer = setInterval(() => {
-                const maxScroll = track.scrollWidth - track.clientWidth;
-                if (track.scrollLeft >= maxScroll - 10) {
-                    track.scrollTo({ left: 0, behavior: 'smooth' });
-                } else {
-                    track.scrollBy({ left: CARD_W(), behavior: 'smooth' });
-                }
-            }, 4000);
-
-            /* Pause auto-scroll on hover / touch */
-            track.addEventListener('mouseenter', () => clearInterval(autoTimer));
-            track.addEventListener('touchstart',  () => clearInterval(autoTimer), { passive: true });
-        })();
-
-        
-        const mainHeader = document.getElementById('mainHeader');
-        window.addEventListener('scroll', () => {
-            mainHeader.classList.toggle('scrolled', window.scrollY > 60);
-        }, { passive: true });
-
-        /* ── Mobile menu toggle ── */
-        const mobileToggle = document.getElementById('mobileToggle');
-        const mainNav       = document.getElementById('mainNav');
-
-        mobileToggle.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            const isOpen = mainNav.classList.toggle('show');
-            this.classList.toggle('open', isOpen);
-            const icon = this.querySelector('i');
-            icon.classList.toggle('fa-bars',  !isOpen);
-            icon.classList.toggle('fa-times',  isOpen);
-        });
-
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', function (event) {
-            if (mainNav.classList.contains('show') &&
-                !mainNav.contains(event.target) &&
-                !mobileToggle.contains(event.target)) {
-                mainNav.classList.remove('show');
-                mobileToggle.classList.remove('open');
-                const icon = mobileToggle.querySelector('i');
-                icon.classList.replace('fa-times', 'fa-bars');
-            }
-        });
-
-        /* ── Blocked Times Popup ── */
-        const badge = document.getElementById('blockedTimesBadge');
-        const popup = document.getElementById('blockedTimesPopup');
-
-        if (badge) {
-            badge.addEventListener('click', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-                popup.classList.toggle('show');
-            });
-        }
-
-        document.addEventListener('click', function (e) {
-            if (badge && popup && !badge.contains(e.target)) {
-                popup.classList.remove('show');
-            }
-        });
-
-        /* ── Load blocked times ── */
-        function loadBlockedTimes() {
-            fetch('/api/blocked-times')
-                .then(r => r.json())
-                .then(data => {
-                    const countSpan = document.getElementById('blockedCount');
-                    const listDiv   = document.getElementById('blockedTimesList');
-
-                    if (countSpan) countSpan.textContent = data.length;
-
-                    if (!listDiv) return;
-
-                    if (data.length === 0) {
-                        listDiv.innerHTML = `<div class="text-center text-muted py-3" style="font-size:.85rem;">
-                            <i class="fas fa-check-circle me-2 text-success"></i>No blocked times right now</div>`;
-                        return;
-                    }
-
-                    listDiv.innerHTML = data.map(b => `
-                        <div class="blocked-time-item">
-                            <div>
-                                <span class="date"><i class="fas fa-calendar-alt me-1"></i>${b.date}</span>
-                                <span class="time ms-3"><i class="fas fa-clock me-1"></i>${b.start_time} – ${b.end_time}</span>
-                            </div>
-                            <div class="reason"><i class="fas fa-info-circle me-1"></i>${b.reason}</div>
-                        </div>`).join('');
-                })
-                .catch(() => {
-                    const listDiv = document.getElementById('blockedTimesList');
-                    if (listDiv) listDiv.innerHTML = `<div class="text-center text-danger py-3" style="font-size:.85rem;">
-                        <i class="fas fa-triangle-exclamation me-2"></i>Could not load data</div>`;
-                });
-        }
-
-        loadBlockedTimes();
-        setInterval(loadBlockedTimes, 30000);
-
-        /* ── Smart Working Hours Badge ──
-           Schedule: Mon–Tue 10AM–2AM, Wednesday CLOSED, Thu 10AM–2AM,
-           Fri–Sat 10AM–3AM, Sun 10AM–2AM.
-           Close times cross midnight, and there's now a closed day in the
-           middle of the week, so status is computed from real Date-based
-           open/close intervals rather than simple hour comparisons — that
-           correctly handles things like "still open" at 1am Wednesday
-           (Tuesday night's hours) followed by "closed all day Wednesday",
-           reopening Thursday at 10am. */
-        (function () {
-            const DAY_LABELS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-
-            function scheduleFor(dayIndex) {
-                if (dayIndex === 3) { // Wednesday — closed
-                    return { label: DAY_LABELS[dayIndex], closed: true };
-                }
-                // Fri = 5, Sat = 6 -> close at 3am. Everyone else closes at 2am.
-                const closeHour = (dayIndex === 5 || dayIndex === 6) ? 3 : 2;
-                return { label: DAY_LABELS[dayIndex], openHour: 10, closeHour };
-            }
-
-            // Format a plain hour number (used for the popup's day-by-day list)
-            function fmt(hour) {
-                const h12 = hour % 12 === 0 ? 12 : hour % 12;
-                const isAfterMidnight = hour <= 4; // 2am / 3am close times
-                const suffix = isAfterMidnight ? 'AM' : (hour < 12 ? 'AM' : 'PM');
-                return `${h12}:00 ${suffix}`;
-            }
-
-            // Format a Date's time-of-day (used for live open/close status)
-            function fmtDate(date) {
-                return fmt(date.getHours());
-            }
-
-            // Build real open→close Date intervals for a window around "now"
-            // so overnight and closed-day logic falls out naturally.
-            function buildIntervals(now) {
-                const intervals = [];
-                const base = new Date(now);
-                base.setHours(0, 0, 0, 0);
-
-                for (let offset = -2; offset <= 9; offset++) {
-                    const d = new Date(base);
-                    d.setDate(d.getDate() + offset);
-                    const sched = scheduleFor(d.getDay());
-                    if (sched.closed) continue;
-
-                    const start = new Date(d);
-                    start.setHours(sched.openHour, 0, 0, 0);
-
-                    const end = new Date(d);
-                    end.setDate(end.getDate() + 1); // close time is after midnight
-                    end.setHours(sched.closeHour, 0, 0, 0);
-
-                    intervals.push({ start, end });
-                }
-                return intervals.sort((a, b) => a.start - b.start);
-            }
-
-            function statusNow(now) {
-                const intervals = buildIntervals(now);
-
-                const current = intervals.find(iv => now >= iv.start && now < iv.end);
-                if (current) {
-                    return { open: true, closesAt: fmtDate(current.end) };
-                }
-
-                const next = intervals.find(iv => iv.start > now);
-                if (!next) return { open: false, opensAt: 'soon' };
-
-                const sameDay = next.start.toDateString() === now.toDateString();
-                const tomorrow = new Date(now);
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                const isTomorrow = next.start.toDateString() === tomorrow.toDateString();
-
-                let prefix = '';
-                if (!sameDay) prefix = isTomorrow ? 'Tomorrow ' : `${DAY_LABELS[next.start.getDay()]} `;
-
-                return { open: false, opensAt: `${prefix}${fmtDate(next.start)}` };
-            }
-
-            function renderBadge() {
-                const badgeEl = document.getElementById('hoursBadge');
-                const textEl = document.getElementById('hoursStatusText');
-                if (!badgeEl || !textEl) return;
-
-                const status = statusNow(new Date());
-                badgeEl.classList.toggle('is-closed', !status.open);
-                textEl.textContent = status.open
-                    ? `Open · Closes ${status.closesAt}`
-                    : `Closed · Opens ${status.opensAt}`;
-            }
-
-            function renderPopupList() {
-                const list = document.getElementById('hoursPopupList');
-                if (!list) return;
-                const todayIdx = new Date().getDay();
-
-                list.innerHTML = DAY_LABELS.map((label, i) => {
-                    const s = scheduleFor(i);
-                    const isToday = i === todayIdx;
-                    const timeStr = s.closed ? 'Closed' : `${fmt(s.openHour)} – ${fmt(s.closeHour)}`;
-                    return `
-                        <div class="hours-day-row ${isToday ? 'today' : ''} ${s.closed ? 'closed-day' : ''}">
-                            <span class="day-label">
-                                ${label}
-                                ${isToday ? '<span class="today-pill">Today</span>' : ''}
-                            </span>
-                            <span>${timeStr}</span>
-                        </div>`;
-                }).join('');
-            }
-
-            renderBadge();
-            renderPopupList();
-            setInterval(renderBadge, 60000); // refresh open/closed status every minute
-
-            const hoursBadgeEl = document.getElementById('hoursBadge');
-            const hoursPopupEl = document.getElementById('hoursPopup');
-
-            hoursBadgeEl?.addEventListener('click', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-                hoursPopupEl.classList.toggle('show');
-            });
-
-            document.addEventListener('click', function (e) {
-                if (hoursBadgeEl && hoursPopupEl && !hoursBadgeEl.contains(e.target)) {
-                    hoursPopupEl.classList.remove('show');
-                }
-            });
-        })();
-    </script>
-
-    <!-- ===== Sales agent runtime config, injected from Flask (.env value) ===== -->
-    <script>
-        window.EFFOI_SALES_AGENT = {
-            backendUrl: "{{ sales_agent_backend_url }}",
-            businessId: {{ sales_agent_business_id }}
-        };
-    </script>
-
-    <!-- ===== AI CHAT WIDGET ===== -->
-<div id="ef-chat-widget">
-    <button id="efChatToggle" aria-label="Chat with us">
-        <i class="fas fa-comment-dots" id="efChatIconOpen"></i>
-        <i class="fas fa-times" id="efChatIconClose" style="display:none;"></i>
-    </button>
-
-    <div id="efChatPanel">
-        <div id="efChatHeader">
-            <div class="ef-chat-header-info">
-                <div class="ef-chat-avatar"><i class="fas fa-utensils"></i></div>
-                <div>
-                    <div class="ef-chat-title">EFFOI Assistant</div>
-                    <div class="ef-chat-subtitle"><span class="ef-chat-dot"></span>Ask about menu, hours, events</div>
-                </div>
-            </div>
-            <button id="efChatClose" aria-label="Close chat"><i class="fas fa-times"></i></button>
-        </div>
-
-        <div id="efChatMessages">
-            <div class="ef-msg ef-msg-bot">
-                Selam! 👋 I'm the EFFOI virtual host. Ask me about our menu, budget, order status, or how to compare dishes.
-            </div>
-            <div class="ef-chat-suggestions">
-                <button class="ef-suggestion">What's on the menu?</button>
-                <button class="ef-suggestion">Tibs under $30</button>
-                <button class="ef-suggestion">Compare Derek Tibs and Kitfo</button>
-            </div>
-        </div>
-
-        <div id="efChatInputRow">
-            <input type="text" id="efChatInput" placeholder="Type your question..." maxlength="1000">
-            <button id="efChatSend" aria-label="Send"><i class="fas fa-paper-plane"></i></button>
+<!-- Top Header -->
+<div class="top-header">
+    <div class="container">
+        <div class="contact-info">
+            <span>
+                <i class="fas fa-envelope"></i>
+                <a href="mailto:tesfaymn402@gmail.com">tesfaymn402@gmail.com</a>
+            </span>
+            <span>
+                <i class="fas fa-phone-alt"></i>
+                <a href="tel:+13019961201">+1 (301) 996-1201</a>
+            </span>
+            <span class="map-link" style="cursor:pointer;" onclick="window.open('https://maps.google.com/?q=7513+Maple+Ave,+Takoma+Park,+MD','_blank')">
+                <i class="fas fa-map-marker-alt"></i>
+                7513 Maple Ave, Takoma Park, MD
+            </span>
         </div>
     </div>
 </div>
 
-<style>
-#ef-chat-widget {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 3000;
-    font-family: 'Inter', sans-serif;
-}
+<!-- Main Navigation -->
+<nav class="main-nav">
+    <div class="container nav-container">
+        <a href="{{ url_for('index') }}" class="logo">
+            <img src="https://github.com/Tesfay-Tesfu/Mella-Technollogy-LLC-Python-Course/blob/main/Afro_Logo2.png?raw=true" alt="Afro-Merica Logo">
+            <div class="logo-text">AFRO-MERICA</div>
+        </a>
 
-#efChatToggle {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #8B1E1E, #a82525);
-    color: white;
-    border: none;
-    box-shadow: 0 8px 24px rgba(139,30,30,0.4);
-    cursor: pointer;
-    font-size: 1.4rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
+        <!-- Desktop Navigation -->
+        <div class="desktop-nav">
+            <a href="{{ url_for('index') }}" class="nav-link"><i class="fas fa-home"></i> Home</a>
 
-#efChatToggle:hover {
-    transform: scale(1.08);
-    box-shadow: 0 12px 32px rgba(139,30,30,0.5);
-}
+            <div class="nav-dropdown">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-th"></i> Services <i class="fas fa-chevron-down" style="font-size:0.65rem;"></i>
+                </a>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('teachers_page') }}"><i class="fas fa-chalkboard-teacher"></i> Teachers</a>
+                    <a href="{{ url_for('tutorials_page') }}"><i class="fas fa-calculator"></i> Math & Physics</a>
+                    <a href="{{ url_for('data_analytics_page') }}"><i class="fas fa-chart-line"></i> Data Analytics</a>
+                    <a href="{{ url_for('research_support_page') }}"><i class="fas fa-microscope"></i> Research Support</a>
+                    <a href="{{ url_for('web_development_page') }}"><i class="fas fa-code"></i> Web & App Development</a>
+                    <a href="{{ url_for('python_challenge') }}"><i class="fab fa-python"></i> Python Kids Challenge</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="{{ url_for('tests_listing') }}"><i class="fas fa-flask"></i> Math/Physics Tests</a>
+                    <a href="{{ url_for('tools_page') }}"><i class="fas fa-tools"></i> Interactive Tools</a>
+                </div>
+            </div>
 
-#efChatPanel {
-    position: absolute;
-    bottom: 76px;
-    right: 0;
-    width: 360px;
-    max-width: calc(100vw - 32px);
-    height: 520px;
-    max-height: calc(100vh - 140px);
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-    display: none;
-    flex-direction: column;
-    overflow: hidden;
-    border: 1px solid rgba(0,0,0,0.06);
-    animation: ef-chat-in 0.25s ease;
-}
+            <a href="{{ url_for('blog') }}" class="nav-link"><i class="fas fa-blog"></i> Blog</a>
+            <a href="{{ url_for('syllabus_by_booking') }}" class="nav-link"><i class="fas fa-download"></i> Syllabus</a>
+            <a href="{{ url_for('about_us') }}" class="nav-link"><i class="fas fa-info-circle"></i> About</a>
+            <a href="{{ url_for('subscribe_page') }}" class="nav-link">Membership</a>
 
-#ef-chat-widget.open #efChatPanel { display: flex; }
+            {% if not session.user_id %}
+            <a href="{{ url_for('register') }}" class="nav-link">Register</a>
+            <a href="{{ url_for('login') }}" class="nav-link">Login</a>
+            {% endif %}
 
-@keyframes ef-chat-in {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
+            <a href="/cart" class="nav-link cart-link" id="cart-link">
+                <i class="fas fa-shopping-cart"></i> Cart
+                <span id="cart-count-badge" class="cart-badge">{{ cart_items_count }}</span>
+            </a>
 
-#efChatHeader {
-    background: linear-gradient(135deg, #8B1E1E, #6d1515);
-    color: white;
-    padding: 1rem 1.1rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
+            {% if session.user_id %}
+            <div class="nav-dropdown">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-user"></i> {{ session.user_name.split()[0] }}
+                    <i class="fas fa-chevron-down" style="font-size:0.65rem;"></i>
+                </a>
+                <div class="dropdown-content" style="min-width:200px;">
+                    <a href="{{ url_for('profile') }}"><i class="fas fa-id-card"></i> Profile</a>
+                    <a href="{{ url_for('student_dashboard') }}"><i class="fas fa-chart-line"></i> My Progress</a>
+                    <a href="{{ url_for('parent_dashboard') }}"><i class="fas fa-chalkboard-user"></i> Parent Dashboard</a>
+                    <a href="{{ url_for('python_challenge') }}"><i class="fab fa-python"></i> Kids Challenge</a>
+                    <a href="{{ url_for('tests_listing') }}"><i class="fas fa-flask"></i> Math/Physics Tests</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
 
-.ef-chat-header-info { display: flex; align-items: center; gap: 0.7rem; }
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Open menu">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+</nav>
 
-.ef-chat-avatar {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    flex-shrink: 0;
-}
+<!-- Mobile Menu Overlay -->
+<div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="closeMobileMenu()"></div>
 
-.ef-chat-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1rem; }
-.ef-chat-subtitle { font-size: 0.72rem; color: rgba(255,255,255,0.75); display: flex; align-items: center; gap: 0.35rem; }
+<!-- Mobile Drawer -->
+<div class="mobile-menu" id="mobileMenu">
+    <button class="mobile-menu-close" onclick="closeMobileMenu()" aria-label="Close menu">
+        <i class="fas fa-times"></i>
+    </button>
 
-.ef-chat-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: #4ade80; display: inline-block;
-    animation: pulse-dot 1.8s infinite;
-}
+    <div style="margin-top:2.5rem;">
+        <div class="mobile-section-label">Navigation</div>
+        <a href="{{ url_for('index') }}" class="nav-link" onclick="closeMobileMenu()"><i class="fas fa-home"></i> Home</a>
+        <a href="{{ url_for('about_us') }}" class="nav-link" onclick="closeMobileMenu()"><i class="fas fa-info-circle"></i> About Us</a>
+        <a href="{{ url_for('subscribe_page') }}" class="nav-link" onclick="closeMobileMenu()"><i class="fas fa-crown"></i> Membership</a>
+        <a href="{{ url_for('blog') }}" class="nav-link" onclick="closeMobileMenu()"><i class="fas fa-blog"></i> Student Blog</a>
+        <a href="{{ url_for('syllabus_by_booking') }}" class="nav-link" onclick="closeMobileMenu()"><i class="fas fa-download"></i> Syllabus</a>
 
-#efChatClose {
-    background: none; border: none; color: white;
-    font-size: 1rem; cursor: pointer; opacity: 0.8;
-    width: 30px; height: 30px; border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    transition: background 0.2s ease;
-}
-#efChatClose:hover { background: rgba(255,255,255,0.15); opacity: 1; }
+        <div class="mobile-divider"></div>
+        <div class="mobile-section-label">Services</div>
+        <a href="{{ url_for('teachers_page') }}" class="nav-link" onclick="closeMobileMenu()"><i class="fas fa-chalkboard-teacher"></i> Teachers</a>
+        <a href="{{ url_for('tutorials_page') }}" class="nav-link" onclick="closeMobileMenu()"><i class="fas fa-calculator"></i> Math & Physics</a>
+        <a href="{{ url_for('data_analytics_page') }}" class="nav-link" onclick="closeMobileMenu()"><i class="fas fa-chart-line"></i> Data Analytics</a>
+        <a href="{{ url_for('research_support_page') }}" class="nav-link" onclick="closeMobileMenu()"><i class="fas fa-microscope"></i> Research Support</a>
+        <a href="{{ url_for('web_development_page') }}" class="nav-link" onclick="closeMobileMenu()"><i class="fas fa-code"></i> Web & App Dev</a>
+        <a href="{{ url_for('python_challenge') }}" class="nav-link" onclick="closeMobileMenu()"><i class="fab fa-python"></i> Kids Challenge</a>
+        <a href="{{ url_for('tests_listing') }}" class="nav-link" onclick="closeMobileMenu()"><i class="fas fa-flask"></i> Math/Physics Tests</a>
+        <a href="{{ url_for('tools_page') }}" class="nav-link" onclick="closeMobileMenu()"><i class="fas fa-tools"></i> Interactive Tools</a>
 
-#efChatMessages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 1.1rem;
-    background: #faf7f2;
-    display: flex;
-    flex-direction: column;
-    gap: 0.65rem;
-}
+        <div class="mobile-divider"></div>
+        <div class="mobile-section-label">Account</div>
+        {% if session.user_id %}
+        <a href="{{ url_for('profile') }}" class="nav-link" onclick="closeMobileMenu()"><i class="fas fa-id-card"></i> Profile</a>
+        <a href="{{ url_for('student_dashboard') }}" class="nav-link" onclick="closeMobileMenu()"><i class="fas fa-chart-line"></i> My Progress</a>
+        <a href="{{ url_for('parent_dashboard') }}" class="nav-link" onclick="closeMobileMenu()"><i class="fas fa-chalkboard-user"></i> Parent Dashboard</a>
+        <a href="{{ url_for('logout') }}" class="nav-link" onclick="closeMobileMenu()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        {% else %}
+        <a href="{{ url_for('register') }}" class="nav-link" onclick="closeMobileMenu()"><i class="fas fa-user-plus"></i> Register</a>
+        <a href="{{ url_for('login') }}" class="nav-link" onclick="closeMobileMenu()"><i class="fas fa-sign-in-alt"></i> Login</a>
+        {% endif %}
 
-.ef-msg {
-    max-width: 82%;
-    padding: 0.65rem 0.9rem;
-    border-radius: 16px;
-    font-size: 0.87rem;
-    line-height: 1.5;
-    white-space: pre-wrap;
-}
+        <a href="/cart" class="nav-link cart-link" onclick="closeMobileMenu()">
+            <i class="fas fa-shopping-cart"></i> Cart (<span id="mobile-cart-count">{{ cart_items_count }}</span>)
+        </a>
+    </div>
+</div>
 
-.ef-msg-bot {
-    background: white;
-    color: #333;
-    align-self: flex-start;
-    border-bottom-left-radius: 4px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
+<!-- Flash Messages -->
+<div class="container mt-3">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show" role="alert">
+                    {% if category == 'success' %}<i class="fas fa-check-circle me-2"></i>
+                    {% elif category == 'danger' %}<i class="fas fa-exclamation-circle me-2"></i>
+                    {% elif category == 'warning' %}<i class="fas fa-exclamation-triangle me-2"></i>
+                    {% else %}<i class="fas fa-info-circle me-2"></i>{% endif %}
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
 
-.ef-msg-user {
-    background: linear-gradient(135deg, #8B1E1E, #a82525);
-    color: white;
-    align-self: flex-end;
-    border-bottom-right-radius: 4px;
-}
+<main class="main-content">{% block content %}{% endblock %}</main>
 
-.ef-msg-error { background: #fde8e8; color: #a82525; align-self: flex-start; }
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <h5>About Afro-Merica</h5>
+                <p style="color:#94a3b8; font-size:0.9rem; line-height:1.6;">
+                    Empowering students through quality education in Mathematics, Physics, Data Analytics, Web Development, and Research Support.
+                </p>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <h5>Quick Links</h5>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('index') }}"><i class="fas fa-chevron-right"></i> Home</a></li>
+                    <li><a href="{{ url_for('teachers_page') }}"><i class="fas fa-chevron-right"></i> Teachers</a></li>
+                    <li><a href="{{ url_for('tutorials_page') }}"><i class="fas fa-chevron-right"></i> Math & Physics</a></li>
+                    <li><a href="{{ url_for('data_analytics_page') }}"><i class="fas fa-chevron-right"></i> Data Analytics</a></li>
+                    <li><a href="{{ url_for('research_support_page') }}"><i class="fas fa-chevron-right"></i> Research Support</a></li>
+                    <li><a href="{{ url_for('web_development_page') }}"><i class="fas fa-chevron-right"></i> Web & App Development</a></li>
+                    <li><a href="{{ url_for('python_challenge') }}"><i class="fas fa-chevron-right"></i> Kids Challenge</a></li>
+                    <li><a href="{{ url_for('tests_listing') }}"><i class="fas fa-chevron-right"></i> Math/Physics Tests</a></li>
+                    <li><a href="{{ url_for('tools_page') }}"><i class="fas fa-chevron-right"></i> Tools</a></li>
+                    <li><a href="{{ url_for('subscribe_page') }}"><i class="fas fa-chevron-right"></i> Membership</a></li>
+                    <li><a href="{{ url_for('about_us') }}"><i class="fas fa-chevron-right"></i> About Us</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-4 col-md-12 mb-4">
+                <h5>Contact Info</h5>
+                <ul class="footer-links">
+                    <li><i class="fas fa-envelope"></i> <a href="mailto:tesfaymn402@gmail.com">tesfaymn402@gmail.com</a></li>
+                    <li><i class="fas fa-phone"></i> <a href="tel:+13019961201">+1 (301) 996-1201</a></li>
+                    <li><i class="fas fa-map-marker-alt"></i> <a href="https://maps.google.com/?q=7513+Maple+Ave,+Takoma+Park,+MD" target="_blank">7513 Maple Ave, Takoma Park, MD</a></li>
+                </ul>
+                <h5 class="mt-3">Our Portfolio</h5>
+                <ul class="footer-links">
+                    <li><a href="https://ezana.onrender.com" target="_blank"><i class="fas fa-external-link-alt"></i> ezana.onrender</a></li>
+                    <li><a href="https://ybbeauties.onrender.com" target="_blank"><i class="fas fa-external-link-alt"></i> ybbeauties</a></li>
+                    <li><a href="http://www.lakesideecl.com" target="_blank"><i class="fas fa-external-link-alt"></i> lakesideecl</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>&copy; 2026 Afro-Merica Tutorial &amp; Trainings – All rights reserved</p>
+        </div>
+    </div>
+</footer>
 
-.ef-chat-suggestions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-}
+<!-- Cart Toast -->
+<div class="cart-toast" id="cartToast">
+    <i class="fas fa-shopping-cart"></i>
+    <span id="cartToastMsg"></span>
+    <i class="fas fa-check-circle" style="color:var(--gold);"></i>
+</div>
 
-.ef-suggestion {
-    background: white;
-    border: 1px solid rgba(139,30,30,0.25);
-    color: #8B1E1E;
-    padding: 0.4rem 0.75rem;
-    border-radius: 50px;
-    font-size: 0.76rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-.ef-suggestion:hover { background: #8B1E1E; color: white; }
-
-.ef-typing {
-    align-self: flex-start;
-    background: white;
-    padding: 0.7rem 1rem;
-    border-radius: 16px;
-    border-bottom-left-radius: 4px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    display: flex;
-    gap: 4px;
-}
-.ef-typing span {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: #ccc; display: inline-block;
-    animation: ef-typing-bounce 1.2s infinite;
-}
-.ef-typing span:nth-child(2) { animation-delay: 0.15s; }
-.ef-typing span:nth-child(3) { animation-delay: 0.3s; }
-@keyframes ef-typing-bounce {
-    0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
-    30% { transform: translateY(-5px); opacity: 1; }
-}
-
-#efChatInputRow {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.85rem;
-    border-top: 1px solid #f0ece5;
-    background: white;
-}
-
-#efChatInput {
-    flex: 1;
-    border: 1.5px solid #eee;
-    border-radius: 50px;
-    padding: 0.6rem 1rem;
-    font-size: 0.85rem;
-    outline: none;
-    transition: border-color 0.2s ease;
-}
-#efChatInput:focus { border-color: #8B1E1E; }
-
-#efChatSend {
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    background: #8B1E1E;
-    color: white;
-    border: none;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    transition: background 0.2s ease, transform 0.2s ease;
-}
-#efChatSend:hover { background: #a82525; transform: scale(1.05); }
-#efChatSend:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-/* ── Product carousel (horizontal scroll) ── */
-.ef-chat-products {
-    display: flex;
-    gap: 0.65rem;
-    overflow-x: auto;
-    padding-bottom: 0.35rem;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-}
-.ef-chat-products::-webkit-scrollbar { display: none; }
-
-.ef-product-card {
-    background: white;
-    border: 1px solid rgba(139,30,30,0.12);
-    border-radius: 14px;
-    width: 128px;
-    flex-shrink: 0;
-    scroll-snap-align: start;
-    cursor: pointer;
-    overflow: hidden;
-    text-align: left;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-    padding: 0;
-    font-family: inherit;
-}
-.ef-product-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(139,30,30,0.15);
-    border-color: #8B1E1E;
-}
-
-.ef-product-img {
-    width: 100%;
-    height: 88px;
-    object-fit: cover;
-    background: #f2ede6;
-    display: block;
-}
-
-.ef-product-info { padding: 0.55rem 0.6rem 0.65rem; }
-
-.ef-product-name {
-    font-size: 0.76rem;
-    font-weight: 600;
-    color: #2d2d2d;
-    line-height: 1.3;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    margin-bottom: 0.25rem;
-}
-
-.ef-product-price {
-    font-size: 0.83rem;
-    font-weight: 700;
-    color: #8B1E1E;
-}
-
-.ef-product-badge {
-    display: inline-block;
-    font-size: 0.62rem;
-    font-weight: 600;
-    color: #a68a00;
-    background: rgba(255,215,0,0.18);
-    padding: 0.1rem 0.4rem;
-    border-radius: 20px;
-    margin-top: 0.25rem;
-}
-
-/* Inline product detail card, shown after tapping a product */
-.ef-detail-card {
-    background: white;
-    border: 1px solid rgba(139,30,30,0.12);
-    border-radius: 16px;
-    overflow: hidden;
-    max-width: 220px;
-}
-.ef-detail-img {
-    width: 100%;
-    height: 130px;
-    object-fit: cover;
-    background: #f2ede6;
-    display: block;
-}
-.ef-detail-body { padding: 0.7rem 0.8rem; }
-.ef-detail-name { font-size: 0.85rem; font-weight: 700; color: #2d2d2d; margin-bottom: 0.3rem; }
-.ef-detail-desc { font-size: 0.76rem; color: #777; line-height: 1.5; margin-bottom: 0.5rem; }
-.ef-detail-price { font-size: 0.95rem; font-weight: 700; color: #8B1E1E; margin-bottom: 0.55rem; }
-.ef-detail-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.76rem;
-    font-weight: 600;
-    color: white;
-    background: #8B1E1E;
-    padding: 0.45rem 0.85rem;
-    border-radius: 50px;
-    text-decoration: none;
-    transition: background 0.2s ease;
-}
-.ef-detail-link:hover { background: #a82525; color: white; }
-
-@media (max-width: 480px) {
-    #ef-chat-widget { bottom: 16px; right: 16px; }
-    #efChatPanel { width: calc(100vw - 24px); height: calc(100vh - 120px); bottom: 72px; }
-}
-</style>
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
 <script>
-(function () {
-    const widget    = document.getElementById('ef-chat-widget');
-    const toggle    = document.getElementById('efChatToggle');
-    const closeBtn  = document.getElementById('efChatClose');
-    const iconOpen  = document.getElementById('efChatIconOpen');
-    const iconClose = document.getElementById('efChatIconClose');
-    const messages  = document.getElementById('efChatMessages');
-    const input     = document.getElementById('efChatInput');
-    const sendBtn   = document.getElementById('efChatSend');
+    AOS.init({ duration: 700, once: true, offset: 80 });
 
-    const BACKEND_URL = window.EFFOI_SALES_AGENT?.backendUrl;
-    const BUSINESS_ID = window.EFFOI_SALES_AGENT?.businessId;
+    /* ── Mobile menu ─────────────────────────────── */
+    function toggleMobileMenu() {
+        document.getElementById('mobileMenu').classList.toggle('active');
+        document.getElementById('mobileMenuOverlay').classList.toggle('active');
+        document.body.style.overflow = document.body.style.overflow === 'hidden' ? '' : 'hidden';
+    }
 
-    // ── Debug: confirm config loaded correctly on page load ──
-    console.log('[EFFOI Sales Agent] Config loaded:', {
-        backendUrl: BACKEND_URL,
-        businessId: BUSINESS_ID,
-        fullChatEndpoint: `${BACKEND_URL}/api/chat`,
+    function closeMobileMenu() {
+        document.getElementById('mobileMenu').classList.remove('active');
+        document.getElementById('mobileMenuOverlay').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 991) closeMobileMenu();
     });
 
-    let sending = false;
-
-    function toggleChat() {
-        const isOpen = widget.classList.toggle('open');
-        iconOpen.style.display  = isOpen ? 'none' : 'inline';
-        iconClose.style.display = isOpen ? 'inline' : 'none';
-        if (isOpen) input.focus();
-    }
-
-    toggle.addEventListener('click', toggleChat);
-    closeBtn.addEventListener('click', toggleChat);
-
-    function scrollToBottom() {
-        messages.scrollTop = messages.scrollHeight;
-    }
-
-    function addTextMessage(text, role) {
-        const div = document.createElement('div');
-        div.className = 'ef-msg ' + (role === 'user' ? 'ef-msg-user' : role === 'error' ? 'ef-msg-error' : 'ef-msg-bot');
-        div.textContent = text;
-        messages.appendChild(div);
-        scrollToBottom();
-    }
-
-    function addProductCarousel(text, products) {
-        if (text) addTextMessage(text, 'bot');
-
-        const track = document.createElement('div');
-        track.className = 'ef-chat-products';
-
-        products.forEach((p) => {
-            const card = document.createElement('button');
-            card.className = 'ef-product-card';
-            card.type = 'button';
-            card.addEventListener('click', () => handleProductSelect(p));
-
-            const img = document.createElement('img');
-            img.className = 'ef-product-img';
-            img.loading = 'lazy';
-            img.alt = p.name || '';
-            img.src = p.image || '';
-            img.onerror = () => { img.src = 'https://via.placeholder.com/128x88/8B1E1E/ffffff?text=EFFOI'; };
-
-            const info = document.createElement('div');
-            info.className = 'ef-product-info';
-
-            const name = document.createElement('div');
-            name.className = 'ef-product-name';
-            name.textContent = p.name || 'Menu item';
-
-            const price = document.createElement('div');
-            price.className = 'ef-product-price';
-            price.textContent = p.price != null ? `$${p.price}` : '';
-
-            info.appendChild(name);
-            info.appendChild(price);
-
-            if (p.is_special) {
-                const badge = document.createElement('span');
-                badge.className = 'ef-product-badge';
-                badge.textContent = 'Special';
-                info.appendChild(badge);
-            } else if (p.is_popular) {
-                const badge = document.createElement('span');
-                badge.className = 'ef-product-badge';
-                badge.textContent = 'Popular';
-                info.appendChild(badge);
-            }
-
-            card.appendChild(img);
-            card.appendChild(info);
-            track.appendChild(card);
+    /* ── Auto-dismiss alerts ─────────────────────── */
+    setTimeout(function() {
+        document.querySelectorAll('.alert').forEach(function(el) {
+            el.style.transition = 'opacity 0.5s';
+            el.style.opacity = '0';
+            setTimeout(function() { el.remove(); }, 500);
         });
+    }, 5000);
 
-        messages.appendChild(track);
-        scrollToBottom();
-    }
-
-    function addDetailCard(text, product) {
-        if (text) addTextMessage(text, 'bot');
-
-        const card = document.createElement('div');
-        card.className = 'ef-detail-card';
-
-        const imgSrc = product.images?.[0]?.src || product.image || '';
-
-        card.innerHTML = `
-            <img class="ef-detail-img" src="${imgSrc}" alt="${product.name || ''}"
-                 onerror="this.src='https://via.placeholder.com/220x130/8B1E1E/ffffff?text=EFFOI';">
-            <div class="ef-detail-body">
-                <div class="ef-detail-name">${product.name || 'Menu item'}</div>
-                ${product.description ? `<div class="ef-detail-desc">${product.description}</div>` : ''}
-                <div class="ef-detail-price">${product.price != null ? '$' + product.price : ''}</div>
-                <a class="ef-detail-link" href="/menu/${product.id}">
-                    View in menu <i class="fas fa-arrow-right" style="font-size:.68rem;"></i>
-                </a>
-            </div>
-        `;
-
-        messages.appendChild(card);
-        scrollToBottom();
-    }
-
-    function showTyping() {
-        const div = document.createElement('div');
-        div.className = 'ef-typing';
-        div.id = 'efTypingIndicator';
-        div.innerHTML = '<span></span><span></span><span></span>';
-        messages.appendChild(div);
-        scrollToBottom();
-    }
-
-    function hideTyping() {
-        document.getElementById('efTypingIndicator')?.remove();
-    }
-
-    async function callSalesAgent({ message, product_id } = {}) {
-        const body = { business_id: BUSINESS_ID };
-        if (message !== undefined) body.message = message;
-        if (product_id !== undefined) body.product_id = product_id;
-
-        const url = `${BACKEND_URL}/api/chat`;
-
-        // ── Debug: log the exact URL + payload for every request ──
-        console.log('[EFFOI Sales Agent] Calling:', url, body);
-
-        const res = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
+    /* ── Hero Swiper ─────────────────────────────── */
+    if (document.querySelector('.hero-swiper')) {
+        new Swiper('.hero-swiper', {
+            loop: true,
+            autoplay: { delay: 5000, disableOnInteraction: false },
+            pagination: { el: '.swiper-pagination', clickable: true },
+            navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+            effect: 'fade',
+            fadeEffect: { crossFade: true },
+            speed: 900
         });
-
-        if (!res.ok) {
-            const errBody = await res.json().catch(() => ({}));
-            console.error('[EFFOI Sales Agent] Request failed:', res.status, errBody);
-            throw new Error(errBody.detail || `Request failed (${res.status})`);
-        }
-
-        const data = await res.json();
-        console.log('[EFFOI Sales Agent] Response:', data);
-
-        return data;
     }
 
-    async function sendMessage(text) {
-        if (!text || sending || !BACKEND_URL) return;
-        sending = true;
-        sendBtn.disabled = true;
-
-        addTextMessage(text, 'user');
-        input.value = '';
-        showTyping();
-
-        try {
-            const data = await callSalesAgent({ message: text });
-            hideTyping();
-
-            if (data.type === 'product_search' && Array.isArray(data.products) && data.products.length) {
-                // Covers plain search AND budget-only search
-                // ("tibs under $30", "I have 1500 birr what can I buy?")
-                // — both come back through this same branch.
-                addProductCarousel(data.message, data.products);
-            } else if (data.type === 'product_comparison' && Array.isArray(data.comparison) && data.comparison.length) {
-                const found = data.comparison.filter((c) => c.found && c.product).map((c) => c.product);
-                if (found.length) {
-                    addProductCarousel(data.message, found);
-                } else {
-                    addTextMessage(data.message || "I couldn't find those items to compare.", 'bot');
-                }
-            } else if (data.type === 'order_status' && data.order) {
-                const o = data.order;
-                addTextMessage(
-                    `Order #${o.id}: ${o.status}${o.total ? ` — total $${o.total}` : ''}`,
-                    'bot'
-                );
-            } else {
-                addTextMessage(data.message || "Here's what I found.", 'bot');
-            }
-        } catch (err) {
-            hideTyping();
-            addTextMessage(err.message || 'Connection error. Please try again.', 'error');
-        } finally {
-            sending = false;
-            sendBtn.disabled = false;
-        }
+    /* ── Cart toast ──────────────────────────────── */
+    function showCartNotification(itemName) {
+        var toast = document.getElementById('cartToast');
+        document.getElementById('cartToastMsg').textContent = (itemName || 'Item') + ' added to cart!';
+        toast.classList.add('show');
+        setTimeout(function() { toast.classList.remove('show'); }, 3000);
     }
 
-    async function handleProductSelect(product) {
-        showTyping();
-        try {
-            const data = await callSalesAgent({ product_id: product.id });
-            hideTyping();
-            const detail = data.product || product;
-            addDetailCard(data.message, { ...product, ...detail });
-        } catch (err) {
-            hideTyping();
-            addDetailCard(null, product);
-        }
+    /* ── Add to cart ─────────────────────────────── */
+    window.addToCart = function(itemType, itemId, bookingDate, bookingTime, itemName) {
+        var data = { item_type: itemType, item_id: itemId };
+        if (bookingDate) data.booking_date = bookingDate;
+        if (bookingTime)  data.booking_time  = bookingTime;
+
+        var $btn = $('[data-service-id="' + itemId + '"], [data-teacher-id="' + itemId + '"]');
+        var origHTML = $btn.html();
+        $btn.html('<i class="fas fa-spinner fa-spin"></i>').prop('disabled', true);
+
+        $.ajax({
+            url: '/add-to-cart', type: 'POST', data: data,
+            success: function(res) {
+                if (res.success) { showCartNotification(itemName || 'Item'); updateCartCount(); }
+                else { alert('Error: ' + res.error); }
+            },
+            error: function(xhr) { alert('Error: ' + (xhr.responseJSON?.error || 'Could not add to cart')); },
+            complete: function() { $btn.html(origHTML).prop('disabled', false); }
+        });
+    };
+
+    /* ── Cart count ──────────────────────────────── */
+    function updateCartCount() {
+        $.get('/cart-count', function(data) {
+            $('#cart-count-badge, #mobile-cart-count').text(data.count || 0);
+        });
     }
 
-    sendBtn.addEventListener('click', () => sendMessage(input.value.trim()));
-    input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') sendMessage(input.value.trim());
+    $(document).ready(function() {
+        updateCartCount();
+        setInterval(updateCartCount, 30000);
     });
-
-    document.querySelectorAll('.ef-suggestion').forEach((btn) => {
-        btn.addEventListener('click', () => sendMessage(btn.textContent));
-    });
-
-    if (!BACKEND_URL) {
-        console.error('EFFOI_SALES_AGENT.backendUrl is not set — check SALES_AGENT_BACKEND_URL in .env');
-    }
-})();
 </script>
-
-    {% block extra_js %}{% endblock %}
+{% block extra_js %}{% endblock %}
 </body>
 </html>
