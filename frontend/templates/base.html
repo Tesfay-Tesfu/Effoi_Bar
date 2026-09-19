@@ -2362,9 +2362,6 @@
             const DAY_LABELS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
             function scheduleFor(dayIndex) {
-                if (dayIndex === 3) { // Wednesday — closed
-                    return { label: DAY_LABELS[dayIndex], closed: true };
-                }
                 // Fri = 5, Sat = 6 -> close at 3am. Everyone else closes at 2am.
                 const closeHour = (dayIndex === 5 || dayIndex === 6) ? 3 : 2;
                 return { label: DAY_LABELS[dayIndex], openHour: 10, closeHour };
