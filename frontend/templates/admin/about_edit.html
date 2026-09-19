@@ -27,6 +27,7 @@
         </ul>
         
         <form method="POST" enctype="multipart/form-data" id="aboutForm">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="tab-content">
                 <!-- Hero Section Tab -->
                 <div class="tab-pane fade show active" id="hero" role="tabpanel">
@@ -301,6 +302,7 @@
 
 <!-- Hidden form for AJAX uploads -->
 <form id="uploadForm" method="POST" enctype="multipart/form-data" style="display: none;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <input type="file" name="images" multiple>
 </form>
 

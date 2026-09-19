@@ -396,6 +396,7 @@
     <div class="ef-modal-actions">
       <button class="btn-m-cancel modal-close" data-modal="modal-delete">Cancel</button>
       <form id="del-form" method="POST" style="display:inline;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <button type="submit" class="btn-m-confirm del"><i class="fas fa-trash"></i> Delete</button>
       </form>
     </div>
@@ -411,6 +412,7 @@
     <div class="ef-modal-actions">
       <button class="btn-m-cancel modal-close" data-modal="modal-approve">Cancel</button>
       <form id="apr-form" method="POST" style="display:inline;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="status" value="approved">
         <input type="hidden" id="apr-title-f"   name="title">
         <input type="hidden" id="apr-content-f" name="content">
@@ -431,6 +433,7 @@
     <div class="ef-modal-actions">
       <button class="btn-m-cancel modal-close" data-modal="modal-reject">Cancel</button>
       <form id="rej-form" method="POST" style="display:inline;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="status" value="rejected">
         <input type="hidden" id="rej-title-f"   name="title">
         <input type="hidden" id="rej-content-f" name="content">

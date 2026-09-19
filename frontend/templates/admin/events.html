@@ -431,6 +431,7 @@
     <div class="ef-modal-actions">
       <button class="btn-ef-cancel" id="ef-modal-cancel">Cancel</button>
       <form id="ef-delete-form" method="POST" style="display:inline;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <button type="submit" class="btn-ef-danger"><i class="fas fa-trash"></i> Delete</button>
       </form>
     </div>
@@ -565,6 +566,7 @@
           <div class="ef-actions">
             <a href="${r.editUrl}" class="btn-ef-icon edit" title="Edit"><i class="fas fa-edit"></i></a>
             <form method="POST" action="${r.toggleUrl}" style="display:inline;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <button type="submit" class="btn-ef-icon ${r.active === 'yes' ? 'toggle-on' : 'toggle-off'}"
                 title="${r.active === 'yes' ? 'Deactivate' : 'Activate'}">
                 <i class="fas fa-${r.active === 'yes' ? 'eye-slash' : 'eye'}"></i>

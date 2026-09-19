@@ -402,6 +402,7 @@
         </div>
 
         <form id="contactForm" method="POST" action="{{ url_for('send_contact') }}" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
           <div class="frow">
             <div class="fgroup">

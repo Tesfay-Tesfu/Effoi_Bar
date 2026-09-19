@@ -160,6 +160,7 @@
           </a>
 
           <form method="POST" action="{{ url_for('admin_toggle_slider', slider_id=slider.id) }}" style="display:contents;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="action-btn {{ 'deactivate' if slider.is_active else 'activate' }}">
               <i class="fas fa-{{ 'eye-slash' if slider.is_active else 'eye' }}"></i>
               {{ 'Deactivate' if slider.is_active else 'Activate' }}
@@ -197,6 +198,7 @@
     <div class="modal-actions">
       <button class="modal-cancel" onclick="closeDeleteModal()">Cancel</button>
       <form id="deleteForm" method="POST" style="display:inline;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <button type="submit" class="modal-confirm">Delete slide</button>
       </form>
     </div>

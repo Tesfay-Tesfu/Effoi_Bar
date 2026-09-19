@@ -143,6 +143,7 @@
         </div>
 
         <form method="POST" action="{{ url_for('submit_blog') }}" enctype="multipart/form-data" id="ef-form" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
           <p class="ef-section-label">About you</p>
           <div class="ef-row">

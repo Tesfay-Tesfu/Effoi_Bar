@@ -11,6 +11,7 @@
             </div>
             <div class="card-body">
                 <form method="POST" action="{{ url_for('admin_import_menu') }}" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-4">
                         <label class="form-label">Select JSON File</label>
                         <input type="file" class="form-control" name="menu_json" accept=".json" required>

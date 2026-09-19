@@ -9,6 +9,7 @@
     </div>
     <div class="card-body">
         <form method="POST" {% if category %}action="{{ url_for('admin_edit_category', category_id=category.id) }}"{% else %}action="{{ url_for('admin_add_category') }}"{% endif %}>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="mb-3">
                 <label class="form-label">Category Name</label>
                 <input type="text" class="form-control" name="name" value="{{ category.name if category else '' }}" required>

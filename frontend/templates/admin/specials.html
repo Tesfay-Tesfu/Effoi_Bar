@@ -542,6 +542,7 @@
         <td><span class="ef-price">$${r.price}</span></td>
         <td>
           <form method="POST" action="${r.toggleSpecialUrl}" style="display:inline;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="btn-toggle ${r.special === 'yes' ? 'is-on-special' : 'is-off-special'}" title="${r.special === 'yes' ? 'Remove Special' : 'Mark as Special'}">
               <i class="fas fa-${r.special === 'yes' ? 'check-circle' : 'circle'}"></i>
               ${r.special === 'yes' ? ' On' : ' Off'}
@@ -550,6 +551,7 @@
         </td>
         <td>
           <form method="POST" action="${r.togglePopularUrl}" style="display:inline;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="btn-toggle ${r.popular === 'yes' ? 'is-on-popular' : 'is-off-popular'}" title="${r.popular === 'yes' ? 'Remove Popular' : 'Mark as Popular'}">
               <i class="fas fa-fire"></i>
               ${r.popular === 'yes' ? ' On' : ' Off'}

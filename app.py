@@ -9,6 +9,7 @@ from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
+from flask_wtf.csrf import CSRFProtect
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from urllib.parse import urlparse
@@ -48,6 +49,7 @@ app.config['BASE_URL'] = os.getenv('BASE_URL', 'http://localhost:5001')
 # Initialize extensions
 db = SQLAlchemy(app)
 mail = Mail(app)
+csrf = CSRFProtect(app)
 
 # ==================== CLOUDFLARE R2 CONFIGURATION ====================
 R2_ACCOUNT_ID = os.getenv('R2_ACCOUNT_ID')

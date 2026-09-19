@@ -416,6 +416,7 @@
         </div>
 
         <form method="POST" action="{{ url_for('reserve') }}" id="resForm" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
           <div class="frow">
             <div class="fgroup">

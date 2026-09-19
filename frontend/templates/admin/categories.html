@@ -198,6 +198,7 @@
     <div class="modal-actions">
       <button class="modal-cancel" onclick="closeDeleteModal()">Cancel</button>
       <form id="deleteForm" method="POST" style="display:inline;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <button type="submit" class="modal-confirm">Delete category</button>
       </form>
     </div>

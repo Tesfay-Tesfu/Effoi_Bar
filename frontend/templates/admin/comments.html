@@ -38,17 +38,20 @@
                         <td>
                             {% if comment.status == 'pending' %}
                             <form method="POST" action="{{ url_for('admin_approve_comment', comment_id=comment.id) }}" style="display: inline;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="btn btn-sm btn-success" title="Approve">
                                     <i class="fas fa-check"></i>
                                 </button>
                             </form>
                             <form method="POST" action="{{ url_for('admin_reject_comment', comment_id=comment.id) }}" style="display: inline;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="btn btn-sm btn-warning" title="Reject">
                                     <i class="fas fa-times"></i>
                                 </button>
                             </form>
                             {% endif %}
                             <form method="POST" action="{{ url_for('admin_delete_comment', comment_id=comment.id) }}" style="display: inline;" onsubmit="return confirm('Delete this comment?')">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="btn btn-sm btn-danger">
                                     <i class="fas fa-trash"></i>
                                 </button>

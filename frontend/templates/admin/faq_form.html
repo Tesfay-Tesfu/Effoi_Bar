@@ -9,6 +9,7 @@
     </div>
     <div class="card-body">
         <form method="POST" {% if faq %}action="{{ url_for('admin_edit_faq', faq_id=faq.id) }}"{% else %}action="{{ url_for('admin_add_faq') }}"{% endif %}>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="mb-3">
                 <label class="form-label">Question</label>
                 <input type="text" class="form-control" name="question" value="{{ faq.question if faq else '' }}" required>

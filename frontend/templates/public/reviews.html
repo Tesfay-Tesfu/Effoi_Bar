@@ -756,6 +756,7 @@
             </div>
 
             <form method="POST" action="{{ url_for('submit_review') }}" id="reviewForm" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="modal-body">
 
                     <!-- Name -->

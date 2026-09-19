@@ -63,6 +63,7 @@
                     <div class="card border-0 bg-light rounded-4 p-4 mt-4" data-aos="fade-up">
                         <h4 class="mb-3">Leave a Comment</h4>
                         <form method="POST" action="{{ url_for('add_comment', post_id=post.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <input type="text" class="form-control rounded-pill" name="author_name" placeholder="Your Name *" required>
